@@ -1,11 +1,19 @@
-import { createRouter, createWebHashHistory, createWebHistory } from "vue-router";
+import {
+  createRouter,
+  createWebHashHistory,
+  createWebHistory,
+} from "vue-router";
 
 import NProgress from "nprogress/nprogress.js";
 
-const Home = ()=> import("@/views/it-connect/Home.vue");
+const Home = () => import("@/views/it-connect/Home.vue");
+const Blog = () => import("@/views/it-connect/blog/Blog.vue");
 
-const MainLayout = () => import("@/layouts/variations/it-connect/MainLayout.vue");
-const MasterPage = () => import("@/layouts/variations/master-page/MasterPage.vue")
+const MainLayout = () =>
+  import("@/layouts/variations/it-connect/MainLayout.vue");
+const MasterPage = () =>
+  import("@/layouts/variations/master-page/MasterPage.vue");
+const BlogLayout = () => import("@/layouts/variations/blog/BlogLayout.vue");
 
 const routes = [
   {
@@ -18,18 +26,28 @@ const routes = [
       {
         path: "/home",
         component: MainLayout,
-        children : [
+        children: [
           {
             path: "",
             name: "Home",
             component: Home,
-          }
-        ]
+          },
+        ],
       },
-    ]
+      {
+        path: "/blog",
+        component: BlogLayout,
+        children: [
+          {
+            path: "",
+            name: "Blog",
+            component: Blog,
+          },
+        ],
+      },
+    ],
   },
 ];
-
 
 const router = createRouter({
   history: createWebHistory(),

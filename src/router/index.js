@@ -8,6 +8,7 @@ import NProgress from "nprogress/nprogress.js";
 
 const Home = () => import("@/views/it-connect/Home.vue");
 const Blog = () => import("@/views/it-connect/blog/Blog.vue");
+const Detail = () => import("@/views/it-connect/blog/Detail.vue");
 
 const MainLayout = () =>
   import("@/layouts/variations/it-connect/MainLayout.vue");
@@ -42,6 +43,11 @@ const routes = [
             path: "",
             name: "Blog",
             component: Blog,
+          },
+          {
+            path: "detail",
+            name: "Detail",
+            component: Detail,
           },
         ],
       },

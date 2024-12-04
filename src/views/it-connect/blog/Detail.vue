@@ -8,7 +8,9 @@
           <div class="blog-detail-box">
             <div class="text-muted mb-3">
               <strong>{{ featuredArticle.date }}</strong> |
-              <span class="text-primary">{{ featuredArticle.category }}</span>
+              <span class="text-primary clickable-text">{{
+                featuredArticle.category
+              }}</span>
             </div>
             <img
               :src="featuredArticle.image"
@@ -36,8 +38,10 @@
               :key="index"
               class="d-flex justify-content-between align-items-center mb-2"
             >
-              <span>{{ category.name }}</span>
-              <span class="custom-badge">{{ category.count }}</span>
+              <span class="clickable-text">{{ category.name }}</span>
+              <span class="custom-badge clickable-text">{{
+                category.count
+              }}</span>
             </li>
           </ul>
         </div>
@@ -56,7 +60,7 @@
                 :src="article.image"
                 alt="Related Post Image"
                 class="rounded"
-                style="width: 50px; height: 50px; object-fit: cover"
+                style="width: 60px; height: 60px; object-fit: cover"
               />
               <!-- Title and Details -->
               <div style="flex: 1">
@@ -139,7 +143,7 @@ export default {
   color: black;
   font-size: inherit; /* Make the font size inherit from the parent */
 }
-.clickable-text {
+.clickable-text:hover {
   color: black;
   cursor: pointer;
   text-decoration: none;
@@ -162,5 +166,4 @@ ul li {
 .small {
   font-size: 0.875rem;
 }
-</style>
 </style>

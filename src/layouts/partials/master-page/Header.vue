@@ -22,7 +22,7 @@
         <div class="container">
             <div class="row justify-content-between">
                 <img
-                    src="../../../../public/assets/media/brand/vlu_logo_final_vlu_logo ngang_eng.png"
+                    src="../../../../public/assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png"
                     class="col-sm-2 col-5 image-responsive"
                     style="object-fit: contain;"
                     alt="Van Lang Logo"

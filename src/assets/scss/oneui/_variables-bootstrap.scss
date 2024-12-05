@@ -26,7 +26,8 @@ $warning: #F6B100 !default;
 $danger: #F8285A !default;
 $light: #FFFFFF !default;
 $dark: #1E2129 !default;
-$gray: #E3E9FF !default;
+$new-gray: #E3E9FF !default;
+$new-pale-gray: #EFF6FF !default;
 $skin: #F9F9F9 !default;
 
 $theme-colors: (
@@ -38,7 +39,8 @@ $theme-colors: (
   "danger": $danger,
   "light": $light,
   "dark": $dark,
-  "gray": $gray,
+  "new-gray": $new-gray,
+  "new-pale-gray": $new-pale-gray,
   "skin": $skin,
 ) !default;
 

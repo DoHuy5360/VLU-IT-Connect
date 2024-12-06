@@ -2,71 +2,47 @@
   <div class="container py-3">
     <div class="row gx-2 gy-2">
       <!-- Left Column: Blog Details -->
-      <div class="col-lg-9">
+      <div class="col-lg-8">
         <div class="rounded p-4 bg-white">
           <h4 class="mb-3 fw-bold">Nội Dung Bài Viết</h4>
           <div class="blog-detail-box">
             <div class="text-muted mb-3">
               <strong>{{ featuredArticle.date }}</strong> |
-              <span class="text-primary clickable-text">{{
-                featuredArticle.category
-              }}</span>
+              <span class="text-primary clickable-text">{{ featuredArticle.category }}</span>
             </div>
-            <img
-              :src="featuredArticle.image"
-              alt="Blog Article Image"
-              class="rounded mb-3"
-              style="width: 100%; height: 400px; object-fit: cover"
-            />
+            <img :src="featuredArticle.image" alt="Blog Article Image" class="rounded mb-3" style="width: 100%; height: 400px; object-fit: cover" />
             <h4 class="mb-3">{{ featuredArticle.title }}</h4>
             <p class="text-muted mb-3">{{ featuredArticle.details }}</p>
-            <div class="text-muted">
-              <strong>Tác giả:</strong> {{ featuredArticle.author }}
-            </div>
+            <div class="text-muted"><strong>Tác giả:</strong> {{ featuredArticle.author }}</div>
           </div>
         </div>
       </div>
 
       <!-- Right Column: Category List and Related Posts -->
-      <div class="col-lg-3">
+      <div class="col-lg-4">
         <!-- Category List -->
-        <div class="rounded p-4 bg-white mb-3">
+        <div class="rounded p-3 bg-white mb-3">
           <h4 class="mb-3 fw-bold">Danh Mục</h4>
           <ul class="list-unstyled">
-            <li
-              v-for="(category, index) in categories"
-              :key="index"
-              class="d-flex justify-content-between align-items-center mb-2"
-            >
+            <li v-for="(category, index) in categories" :key="index" class="d-flex justify-content-between align-items-center mb-2">
               <span class="clickable-text">{{ category.name }}</span>
-              <span class="custom-badge clickable-text">{{
-                category.count
-              }}</span>
+              <span class="custom-badge clickable-text">{{ category.count }}</span>
             </li>
           </ul>
         </div>
 
         <!-- Related Posts -->
-        <div class="rounded p-4 bg-white">
+        <div class="rounded p-3 bg-white">
           <h4 class="mb-3 fw-bold">Bài Viết Liên Quan</h4>
           <ul class="list-unstyled">
-            <li
-              v-for="(article, index) in relatedPosts"
-              :key="index"
-              class="d-flex gap-2 align-items-start mb-3"
-            >
+            <li v-for="(article, index) in relatedPosts" :key="index" class="d-flex gap-2 align-items-start mb-3">
               <!-- Image -->
-              <img
-                :src="article.image"
-                alt="Related Post Image"
-                class="rounded"
-                style="width: 60px; height: 60px; object-fit: cover"
-              />
+              <img :src="article.image" alt="Related Post Image" class="rounded" style="width: 100px; height: 100px; object-fit: cover" />
               <!-- Title and Details -->
-              <div style="flex: 1">
+              <div>
                 <!-- Title -->
-                <h6 class="mb-1 clickable-text text-truncate">
-                  {{ article.title }}
+                <h6 class="mb-1 p-1 clickable-text text-truncate related-post-title" :title="article.title">
+                  {{ truncateText(article.title, 20) }}
                 </h6>
                 <!-- Details -->
                 <p class="text-muted small mb-0">
@@ -113,25 +89,32 @@ export default {
         },
         {
           title: "Aliquam tincidunt mauris eu risus",
-          details:
-            "Vestibulum auctor dapibus neque. Vivamus eget nibh et sapien eleifend.",
+          details: "Vestibulum auctor dapibus neque. Vivamus eget nibh et sapien eleifend.",
           image: "https://via.placeholder.com/100x100",
         },
         {
           title: "Phasellus ultrices nulla quis nibh",
-          details:
-            "Quisque facilisis libero et nisi placerat blandit. Morbi eget nisi id libero dapibus volutpat.",
+          details: "Quisque facilisis libero et nisi placerat blandit. Morbi eget nisi id libero dapibus volutpat.",
           image: "https://via.placeholder.com/100x100",
         },
       ],
     };
   },
+  computed: {
+    truncatedPosts() {
+      return this.relatedPosts.map((post) => ({
+        ...post,
+        truncatedTitle: this.truncateText(post.title, 18),
+        truncatedDetails: this.truncateText(post.details, 60),
+      }));
+    },
+  },
   methods: {
-    // Helper Function to Truncate Text
     truncateText(text, maxLength) {
-      return text.length > maxLength
-        ? text.substring(0, maxLength) + "..."
-        : text;
+      return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+    },
+    getImage(src) {
+      return src || "https://via.placeholder.com/100x100";
     },
   },
 };
@@ -156,14 +139,36 @@ export default {
 ul li {
   list-style-type: none;
 }
-
 .text-truncate {
-  white-space: nowrap;
+  white-space: normal; /* Allow wrapping */
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis; /* Optional for long words */
+  display: -webkit-box; /* Enable line clamping */
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+}
+
+h6.clickable-text {
+  font-size: 1rem; /* Adjust font size */
+  line-height: 1.3; /* Improve readability */
+  margin-bottom: 0.5rem; /* Add space between title and description */
 }
 
 .small {
   font-size: 0.875rem;
+}
+.related-post-title {
+  font-size: 1rem; /* Adjust the font size */
+  font-weight: bold; /* Set font weight */
+  color: #333; /* Define a default color */
+  text-overflow: ellipsis; /* Ensure ellipsis for truncated text */
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.related-post-title:hover {
+  color: #0056b3; /* Add hover color */
+  text-decoration: underline; /* Optional: underline on hover */
+  cursor: pointer;
 }
 </style>

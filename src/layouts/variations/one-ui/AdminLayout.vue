@@ -40,7 +40,7 @@ store.mainContent({ mode: "narrow" });
             {
               name: 'Bài viết',
               icon: 'si si-note',
-              to: 'HomePage',
+              to: 'AdminBlog',
               // subActivePaths: '/',
               // sub: [
               //   {
@@ -52,7 +52,7 @@ store.mainContent({ mode: "narrow" });
             {
               name: 'Thể loại',
               icon: 'si si-layers',
-              to: 'HomePage',
+              to: 'AdminCategory',
             },
           ]"
         />
@@ -64,21 +64,13 @@ store.mainContent({ mode: "narrow" });
     <!-- Using the available v-slot, we can override the default Header content from layouts/partials/Header.vue -->
     <template #header-content-left>
       <!-- Toggle Sidebar -->
-      <button
-        type="button"
-        class="btn btn-sm btn-alt-secondary me-2 d-lg-none"
-        @click="store.sidebar({ mode: 'toggle' })"
-      >
+      <button type="button" class="btn btn-sm btn-alt-secondary me-2 d-lg-none" @click="store.sidebar({ mode: 'toggle' })">
         <i class="fa fa-fw fa-bars"></i>
       </button>
       <!-- END Toggle Sidebar -->
 
       <!-- Toggle Mini Sidebar -->
-      <button
-        type="button"
-        class="btn btn-sm btn-alt-secondary me-2 d-none d-lg-inline-block"
-        @click="store.sidebarMini({ mode: 'toggle' })"
-      >
+      <button type="button" class="btn btn-sm btn-alt-secondary me-2 d-none d-lg-inline-block" @click="store.sidebarMini({ mode: 'toggle' })">
         <i class="fa fa-fw fa-ellipsis-v"></i>
       </button>
       <!-- END Toggle Mini Sidebar -->
@@ -89,11 +81,7 @@ store.mainContent({ mode: "narrow" });
     <!-- Using the available v-slot, we can override the default Header content from layouts/partials/Header.vue -->
     <template #header-content-right>
       <!-- Toggle Side Overlay -->
-      <button
-        type="button"
-        class="btn btn-sm btn-alt-secondary ms-2"
-        @click="store.sideOverlay({ mode: 'toggle' })"
-      >
+      <button type="button" class="btn btn-sm btn-alt-secondary ms-2" @click="store.sideOverlay({ mode: 'toggle' })">
         <i class="fa fa-fw fa-list-ul fa-flip-horizontal"></i>
       </button>
       <!-- END Toggle Side Overlay -->

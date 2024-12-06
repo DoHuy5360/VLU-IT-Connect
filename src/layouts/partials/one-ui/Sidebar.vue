@@ -106,7 +106,7 @@ onMounted(() => {
               </div>
             </span>
             <span class="smini-hide fs-5 tracking-wider">
-              <img src="../../../../public/assets/media/brand/vlu_logo_final_vlu_logo ngang_eng.png" class="w-75" style="object-fit: contain;"/>
+              <img src="../../../../public/assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="w-75" style="object-fit: contain;"/>
             </span>
           </RouterLink>
           <!-- END Logo -->

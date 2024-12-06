@@ -4,6 +4,7 @@ import NProgress from "nprogress/nprogress.js";
 
 const Home = ()=> import("@/views/it-connect/Home.vue");
 const Categories = ()=> import("@/views/it-connect/Categories.vue");
+const Videos = ()=> import("@/views/it-connect/Videos.vue");
 const Search = ()=> import("@/views/it-connect/Search.vue");
 const AdminMasterView = ()=> import("@/views/one-ui/AdminMasterView.vue");
 
@@ -73,7 +74,7 @@ const routes = [
             component: ContentLayout,
             children : [
               {
-                path: "/categories",
+                path: "categories",
                 name: "ListCategories",
                 component: Categories,
                 meta: {breadcrumb: "Categories", heroTitles: {
@@ -88,7 +89,20 @@ const routes = [
                 }}
               },
               {
-                path: "/search",
+                path: "videos",
+                name: "ListVideos",
+                component: Videos,
+                meta: {breadcrumb: "Videos", heroTitles: {
+                  website: [
+                    "Video Clips Công Nghệ Thông Tin",
+                  ],
+                  mobile: [
+                    "Video Clips Công Nghệ Thông Tin",
+                  ],
+                }}
+              },
+              {
+                path: "search",
                 name: "ListResult",
                 component: Search,
                 meta: {breadcrumb: "Search", heroTitles: {

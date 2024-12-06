@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="row g-2 py-4">
-            <div v-for="category in categories" :key="category.id" class="col-4">
+            <div v-for="category in categories" :key="category.id" class="col-sm-4">
                 <div class="rounded-2 shadow-sm border border-new-gray py-2 px-4">
                     <div style="font-weight: bold;" class="py-3">{{ category.name }}</div>
                     <div class="d-flex flex-column gap-2">
@@ -14,7 +14,7 @@
                                     />
                                 </svg>
                             </span>
-                            <span>{{ blog.title }}</span>
+                            <div style="word-break: break-all;">{{ blog.title }}</div>
                         </div>
                     </div>
                 </div>

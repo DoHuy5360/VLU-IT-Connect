@@ -29,6 +29,7 @@ $dark: #1E2129 !default;
 $new-gray: #E3E9FF !default;
 $new-pale-gray: #EFF6FF !default;
 $skin: #F9F9F9 !default;
+$grey: #252F4A !default;
 
 $theme-colors: (
   "primary": $primary,
@@ -42,6 +43,7 @@ $theme-colors: (
   "new-gray": $new-gray,
   "new-pale-gray": $new-pale-gray,
   "skin": $skin,
+  "grey": $grey,
 ) !default;
 
 // The contrast ratio to reach against white, to determine if color changes from "light" to "dark". Acceptable values for WCAG 2.0 are 3, 4.5 and 7.

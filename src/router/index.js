@@ -76,16 +76,27 @@ const routes = [
                 path: "/categories",
                 name: "ListCategories",
                 component: Categories,
-                meta: {breadcrumb: "Categories", heroTitles: [
-                  "Kiến thức CNTT",
-                  "Dành cho Sinh viên"
-                ]}
+                meta: {breadcrumb: "Categories", heroTitles: {
+                  website: [
+                    "Kiến thức CNTT",
+                    "Dành cho Sinh viên"
+                  ],
+                  mobile: [
+                    "Kiến thức CNTT",
+                    "Dành cho Sinh viên"
+                  ],
+                }}
               },
               {
                 path: "/search",
                 name: "ListResult",
                 component: Search,
-                meta: {breadcrumb: "Search", heroTitles: []}
+                meta: {breadcrumb: "Search", heroTitles: {
+                  website: [],
+                  mobile: [
+                    "Kết quả tìm kiếm"
+                  ]
+                }}
               }
             ]
           },

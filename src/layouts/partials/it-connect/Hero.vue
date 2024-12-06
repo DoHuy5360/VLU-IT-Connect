@@ -1,5 +1,5 @@
 <template>
-    <div class="position-relative w-100">
+    <div class="d-none d-sm-block position-relative w-100">
         <div class="position-relative overflow-hidden">
             <img src="../../../../public/assets/media/brand/hero.png" style="width: 100%; height: 200px;" class="" alt="">
             <img src="../../../../public/assets/media/brand/hero-partial-right.png" style="right: 0; transform: translateX(50%);" class="position-absolute" alt="">
@@ -7,12 +7,12 @@
         </div>
         <div class="d-flex position-absolute top-50 w-100 justify-content-between align-items-center px-5" style="transform: translateY(-50%);">
             <span class="text-white d-flex flex-column" style="line-height: 2.2rem;">
-                <span v-if="heroTitles[0]!=undefined" style="font-size: 2rem; font-weight: 600;">
-                    {{ heroTitles[0] }}
-                </span>
-                <span v-if="heroTitles[1]!=undefined" style="font-size: 2rem;">
-                    {{ heroTitles[1] }}
-                </span>
+                <div v-if="heroTitles.website[0]!=undefined" style="font-size: 2rem; font-weight: 600;">
+                    {{ heroTitles.website[0] }}
+                </div>
+                <div v-if="heroTitles.website[1]!=undefined" style="font-size: 2rem;">
+                    {{ heroTitles.website[1] }}
+                </div>
             </span>
             <div class="bg-white rounded-pill px-2 py-1 d-flex">
                 <input
@@ -49,6 +49,14 @@
             </div>
         </div>
     </div>
+    <div class="d-sm-none bg-grey text-white py-6 px-3">
+        <div v-if="heroTitles.mobile[0]!=undefined" style="font-size: 2rem; font-weight: 600;">
+            {{ heroTitles.mobile[0] }}
+        </div>
+        <div v-if="heroTitles.mobile[1]!=undefined" style="font-size: 2rem;">
+            {{ heroTitles.mobile[1] }}
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -57,6 +65,7 @@
    const route = useRoute()
    const metaInfo = computed(() => route.meta)
    const heroTitles = metaInfo.value.heroTitles
+   console.log(heroTitles.mobile[0]);
 
 </script>
 

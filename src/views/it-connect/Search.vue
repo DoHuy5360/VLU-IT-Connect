@@ -20,7 +20,7 @@
                     >
                 </div>
                 <div class="row" id="wrapVideo">
-                    <div class="col">
+                    <div class="col-auto col-sm">
                         <iframe
                             width="100%"
                             height="200px"
@@ -38,7 +38,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-auto col-sm">
                         <iframe
                             width="100%"
                             height="200px"
@@ -56,7 +56,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-auto col-sm">
                         <iframe
                             width="100%"
                             height="200px"

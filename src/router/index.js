@@ -4,6 +4,7 @@ import NProgress from "nprogress/nprogress.js";
 
 const Home = ()=> import("@/views/it-connect/Home.vue");
 const Categories = ()=> import("@/views/it-connect/Categories.vue");
+const Search = ()=> import("@/views/it-connect/Search.vue");
 const AdminMasterView = ()=> import("@/views/one-ui/AdminMasterView.vue");
 
 // Import layout
@@ -68,17 +69,23 @@ const routes = [
             ]
           },
           {
-            path: "/categories",
+            path: "",
             component: ContentLayout,
             children : [
               {
-                path: "",
+                path: "/categories",
                 name: "ListCategories",
                 component: Categories,
                 meta: {breadcrumb: "Categories", heroTitles: [
                   "Kiến thức CNTT",
                   "Dành cho Sinh viên"
                 ]}
+              },
+              {
+                path: "/search",
+                name: "ListResult",
+                component: Search,
+                meta: {breadcrumb: "Search", heroTitles: []}
               }
             ]
           },

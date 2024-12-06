@@ -3,10 +3,12 @@ import { createRouter, createWebHashHistory, createWebHistory } from "vue-router
 import NProgress from "nprogress/nprogress.js";
 
 const Home = ()=> import("@/views/it-connect/Home.vue");
+const Categories = ()=> import("@/views/it-connect/Categories.vue");
 const AdminMasterView = ()=> import("@/views/one-ui/AdminMasterView.vue");
 
 // Import layout
 const MainLayout = () => import("@/layouts/variations/it-connect/MainLayout.vue");
+const ContentLayout = () => import("@/layouts/variations/it-connect/ContentLayout.vue");
 const MasterPage = () => import("@/layouts/variations/master-page/MasterPage.vue")
 const AdminMasterPage = () => import("@/layouts/variations/master-page/AdminMasterPage.vue")
 const AdminLayout = () =>  import("@/layouts/variations/one-ui/AdminLayout.vue");
@@ -52,14 +54,34 @@ const routes = [
       },
       {
         path: "",
-        component: MainLayout,
         children : [
           {
             path: "",
-            name: "HomePage",
-            component: Home,
-            meta: {breadcrumb: "Home"}
-          }
+            component: MainLayout,
+            children: [
+              {
+                path: "",
+                name: "HomePage",
+                component: Home,
+                meta: {breadcrumb: "Home"}
+              },
+            ]
+          },
+          {
+            path: "/categories",
+            component: ContentLayout,
+            children : [
+              {
+                path: "",
+                name: "ListCategories",
+                component: Categories,
+                meta: {breadcrumb: "Categories", heroTitles: [
+                  "Kiến thức CNTT",
+                  "Dành cho Sinh viên"
+                ]}
+              }
+            ]
+          },
         ]
       },
     ]

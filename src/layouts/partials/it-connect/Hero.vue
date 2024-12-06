@@ -6,7 +6,14 @@
             <img src="../../../../public/assets/media/brand/hero-partial-left.png" style="left: -10px; bottom: 0; transform: translateY(50%);" class="position-absolute" alt="">
         </div>
         <div class="d-flex position-absolute top-50 w-100 justify-content-between align-items-center px-5" style="transform: translateY(-50%);">
-            <span class="text-white" style="font-size: 2rem; font-weight: bold;">Title</span>
+            <span class="text-white d-flex flex-column" style="line-height: 2.2rem;">
+                <span v-if="heroTitles[0]!=undefined" style="font-size: 2rem; font-weight: 600;">
+                    {{ heroTitles[0] }}
+                </span>
+                <span v-if="heroTitles[1]!=undefined" style="font-size: 2rem;">
+                    {{ heroTitles[1] }}
+                </span>
+            </span>
             <div class="bg-white rounded-pill px-2 py-1 d-flex">
                 <input
                     type="text"
@@ -45,6 +52,11 @@
 </template>
 
 <script setup>
+   import {useRoute} from 'vue-router'
+   import { computed } from 'vue';
+   const route = useRoute()
+   const metaInfo = computed(() => route.meta)
+   const heroTitles = metaInfo.value.heroTitles
 
 </script>
 

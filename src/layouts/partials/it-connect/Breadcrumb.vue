@@ -16,7 +16,7 @@
                     />
                 </svg>
             </RouterLink>
-            <div v-for="(crumb, index) in breadcrumbs" :key="index" class="breadcrumb d-flex gap-2 align-items-center">
+            <div class="breadcrumb d-flex gap-2 align-items-center">
                 <div>
                     <!-- Greater icon -->
                     <svg
@@ -34,52 +34,13 @@
                         />
                     </svg>
                 </div>
-                <RouterLink  :to="crumb.path" style="font-size: 1.5rem;" class="text-black">{{ crumb.name }}</RouterLink>
+                <a href="/" style="font-size: 1.5rem;" class="text-black">Breadcrumb</a>
             </div>
         </div>
     </div>
 </template>
 
-<script setup>
-import {computed} from 'vue'
-import { useRoute } from 'vue-router'
-
-const route = useRoute()
-
-const breadcrumbs = computed(()=>{
-    const paths = []
-    let matchedRoutes = route.matched;
-
-    matchedRoutes.forEach(routeRecord => {
-        if(routeRecord.meta.breadcrumb){
-            paths.push({
-                name: routeRecord.meta.breadcrumb,
-                path: routeRecord.path,
-            })
-        }
-    })
-    // if (route.params.name) {
-    //     paths.push({
-    //       name: route.params.name,
-    //       path: paths.join("") + route.params.name
-    //     })
-    //   }
-    //   console.log(paths);
-    return paths
-})
-
-// const props = defineProps({
-//     breadcrumbs: {
-//         type: Array,
-//         default: [
-//             {
-//                 name: "home",
-//                 path: "/",
-//             },
-//         ],
-//     },
-// });
-</script>
+<script setup></script>
 
 <style lang="css" scoped>
 .breadcrumb:last-child > a{

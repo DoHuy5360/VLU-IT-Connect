@@ -1,9 +1,9 @@
 <template>
     <div class="position-relative w-100">
         <div class="position-relative overflow-hidden">
-            <img src="../../../../public/assets/media/brand/hero.png" style="width: 100%; height: 200px" class="" alt="" />
-            <img src="../../../../public/assets/media/brand/hero-partial-right.png" style="right: 0; transform: translateX(50%)" class="position-absolute" alt="" />
-            <img src="../../../../public/assets/media/brand/hero-partial-left.png" style="left: -10px; bottom: 0; transform: translateY(50%)" class="position-absolute" alt="" />
+            <img src="../../../../../assets/media/brand/hero.png" style="width: 100%; height: 200px" class="" alt="" />
+            <img src="../../../../../assets/media/brand/hero-partial-right.png" style="right: 0; transform: translateX(50%)" class="position-absolute" alt="" />
+            <img src="../../../../../assets/media/brand/hero-partial-left.png" style="left: -10px; bottom: 0; transform: translateY(50%)" class="position-absolute" alt="" />
         </div>
         <div class="position-absolute w-100 top-50" style="transform: translateY(-50%)">
             <div class="container">

@@ -89,11 +89,7 @@ onMounted(() => {
     Adding 'smini-visible' to an element will show it (display: inline-block) only when the sidebar is in mini mode
     Adding 'smini-visible-block' to an element will show it (display: block) only when the sidebar is in mini mode
   -->
-  <nav
-    id="sidebar"
-    :class="{ 'with-mini-nav': withMiniNav }"
-    aria-label="Main Navigation"
-  >
+  <nav id="sidebar" :class="{ 'with-mini-nav': withMiniNav }" aria-label="Main Navigation">
     <slot>
       <!-- Side Header -->
       <div class="content-header">
@@ -102,11 +98,11 @@ onMounted(() => {
           <RouterLink :to="{ name: 'AdminPage' }" class="fw-semibold text-dual">
             <span class="smini-visible">
               <div class="position-relative w-25" style="transform:translate(-25%, 50%)">
-                <img src="../../../../public/assets/media/brand/logo-khong-chu.png" class="w-100" style="object-fit: contain;"/>
+                <img src="../../../../../assets/media/brand/logo-khong-chu.png" class="w-100" style="object-fit: contain;"/>
               </div>
             </span>
             <span class="smini-hide fs-5 tracking-wider">
-              <img src="../../../../public/assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="w-75" style="object-fit: contain;"/>
+              <img src="../../../../../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="w-75" style="object-fit: contain;"/>
             </span>
           </RouterLink>
           <!-- END Logo -->
@@ -130,59 +126,25 @@ onMounted(() => {
                   <i v-if="!store.settings.darkMode" class="far fa-moon"></i>
                   <i v-if="store.settings.darkMode" class="fa fa-moon"></i>
                 </button>
-                <div
-                  class="dropdown-menu dropdown-menu-end dropdown-menu fs-sm smini-hide border-0"
-                  style="min-width: 11rem"
-                  aria-labelledby="sidebar-dark-mode-dropdown"
-                >
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu fs-sm smini-hide border-0" style="min-width: 11rem" aria-labelledby="sidebar-dark-mode-dropdown">
                   <div class="px-3 py-2 space-y-2">
                     <div class="form-check form-block">
-                      <input
-                        class="form-check-input"
-                        type="radio"
-                        id="radio-dark-mode-off"
-                        value="light"
-                        v-model="radioDarkMode"
-                        @change="onDarkModeRadioChange"
-                      />
-                      <label
-                        class="form-check-label fw-semibold"
-                        for="radio-dark-mode-off"
-                      >
+                      <input class="form-check-input" type="radio" id="radio-dark-mode-off" value="light" v-model="radioDarkMode" @change="onDarkModeRadioChange" />
+                      <label class="form-check-label fw-semibold" for="radio-dark-mode-off">
                         <i class="fa fa-fw fa-sun opacity-50 me-2"></i>
                         <span>Light</span>
                       </label>
                     </div>
                     <div class="form-check form-block">
-                      <input
-                        class="form-check-input"
-                        type="radio"
-                        id="radio-dark-mode-on"
-                        value="dark"
-                        v-model="radioDarkMode"
-                        @change="onDarkModeRadioChange"
-                      />
-                      <label
-                        class="form-check-label fw-semibold"
-                        for="radio-dark-mode-on"
-                      >
+                      <input class="form-check-input" type="radio" id="radio-dark-mode-on" value="dark" v-model="radioDarkMode" @change="onDarkModeRadioChange" />
+                      <label class="form-check-label fw-semibold" for="radio-dark-mode-on">
                         <i class="fa fa-fw fa-moon opacity-50 me-2"></i>
                         <span>Dark</span>
                       </label>
                     </div>
                     <div class="form-check form-block mb-0">
-                      <input
-                        class="form-check-input"
-                        type="radio"
-                        id="radio-dark-mode-system"
-                        value="system"
-                        v-model="radioDarkMode"
-                        @change="onDarkModeRadioChange"
-                      />
-                      <label
-                        class="form-check-label fw-semibold"
-                        for="radio-dark-mode-system"
-                      >
+                      <input class="form-check-input" type="radio" id="radio-dark-mode-system" value="system" v-model="radioDarkMode" @change="onDarkModeRadioChange" />
+                      <label class="form-check-label fw-semibold" for="radio-dark-mode-system">
                         <i class="fa fa-fw fa-desktop opacity-50 me-2"></i>
                         <span>System</span>
                       </label>
@@ -191,7 +153,7 @@ onMounted(() => {
                 </div>
               </div>
               <!-- END Dark Mode -->
-  
+
               <!-- Options -->
               <div class="dropdown d-inline-block ms-1">
                 <button
@@ -205,96 +167,53 @@ onMounted(() => {
                 >
                   <i class="fa fa-brush"></i>
                 </button>
-                <div
-                  class="dropdown-menu dropdown-menu-end fs-sm smini-hide border-0"
-                  aria-labelledby="sidebar-themes-dropdown"
-                >
+                <div class="dropdown-menu dropdown-menu-end fs-sm smini-hide border-0" aria-labelledby="sidebar-themes-dropdown">
                   <!-- Color Themes -->
-                  <button
-                    type="button"
-                    class="dropdown-item d-flex align-items-center justify-content-between fw-medium"
-                    @click="store.setColorTheme({ theme: '' })"
-                  >
+                  <button type="button" class="dropdown-item d-flex align-items-center justify-content-between fw-medium" @click="store.setColorTheme({ theme: '' })">
                     <span>Default</span>
                     <i class="fa fa-circle text-default"></i>
                   </button>
-                  <button
-                    type="button"
-                    class="dropdown-item d-flex align-items-center justify-content-between fw-medium"
-                    @click="store.setColorTheme({ theme: 'amethyst' })"
-                  >
+                  <button type="button" class="dropdown-item d-flex align-items-center justify-content-between fw-medium" @click="store.setColorTheme({ theme: 'amethyst' })">
                     <span>Amethyst</span>
                     <i class="fa fa-circle text-amethyst"></i>
                   </button>
-                  <button
-                    type="button"
-                    class="dropdown-item d-flex align-items-center justify-content-between fw-medium"
-                    @click="store.setColorTheme({ theme: 'city' })"
-                  >
+                  <button type="button" class="dropdown-item d-flex align-items-center justify-content-between fw-medium" @click="store.setColorTheme({ theme: 'city' })">
                     <span>City</span>
                     <i class="fa fa-circle text-city"></i>
                   </button>
-                  <button
-                    type="button"
-                    class="dropdown-item d-flex align-items-center justify-content-between fw-medium"
-                    @click="store.setColorTheme({ theme: 'flat' })"
-                  >
+                  <button type="button" class="dropdown-item d-flex align-items-center justify-content-between fw-medium" @click="store.setColorTheme({ theme: 'flat' })">
                     <span>Flat</span>
                     <i class="fa fa-circle text-flat"></i>
                   </button>
-                  <button
-                    type="button"
-                    class="dropdown-item d-flex align-items-center justify-content-between fw-medium"
-                    @click="store.setColorTheme({ theme: 'modern' })"
-                  >
+                  <button type="button" class="dropdown-item d-flex align-items-center justify-content-between fw-medium" @click="store.setColorTheme({ theme: 'modern' })">
                     <span>Modern</span>
                     <i class="fa fa-circle text-modern"></i>
                   </button>
-                  <button
-                    type="button"
-                    class="dropdown-item d-flex align-items-center justify-content-between fw-medium"
-                    @click="store.setColorTheme({ theme: 'smooth' })"
-                  >
+                  <button type="button" class="dropdown-item d-flex align-items-center justify-content-between fw-medium" @click="store.setColorTheme({ theme: 'smooth' })">
                     <span>Smooth</span>
                     <i class="fa fa-circle text-smooth"></i>
                   </button>
                   <!-- END Color Themes -->
-  
+
                   <div v-if="!store.settings.darkMode">
                     <div class="dropdown-divider"></div>
-  
+
                     <!-- Sidebar Styles -->
-                    <button
-                      type="button"
-                      class="dropdown-item fw-medium"
-                      @click="store.sidebarStyle({ mode: 'light' })"
-                    >
+                    <button type="button" class="dropdown-item fw-medium" @click="store.sidebarStyle({ mode: 'light' })">
                       <span>Sidebar Light</span>
                     </button>
-                    <button
-                      type="button"
-                      class="dropdown-item fw-medium"
-                      @click="store.sidebarStyle({ mode: 'dark' })"
-                    >
+                    <button type="button" class="dropdown-item fw-medium" @click="store.sidebarStyle({ mode: 'dark' })">
                       <span>Sidebar Dark</span>
                     </button>
                     <!-- END Sidebar Styles -->
-  
+
                     <div class="dropdown-divider"></div>
-  
+
                     <!-- Header Styles -->
-                    <button
-                      type="button"
-                      class="dropdown-item fw-medium"
-                      @click="store.headerStyle({ mode: 'light' })"
-                    >
+                    <button type="button" class="dropdown-item fw-medium" @click="store.headerStyle({ mode: 'light' })">
                       <span>Header Light</span>
                     </button>
-                    <button
-                      type="button"
-                      class="dropdown-item fw-medium"
-                      @click="store.headerStyle({ mode: 'dark' })"
-                    >
+                    <button type="button" class="dropdown-item fw-medium" @click="store.headerStyle({ mode: 'dark' })">
                       <span>Header Dark</span>
                     </button>
                     <!-- END Header Styles -->
@@ -304,11 +223,7 @@ onMounted(() => {
               <!-- END Options -->
 
               <!-- Close Sidebar, Visible only on mobile screens -->
-              <button
-                type="button"
-                class="d-lg-none btn btn-sm btn-alt-secondary ms-1"
-                @click="store.sidebar({ mode: 'close' })"
-              >
+              <button type="button" class="d-lg-none btn btn-sm btn-alt-secondary ms-1" @click="store.sidebar({ mode: 'close' })">
                 <i class="fa fa-fw fa-times"></i>
               </button>
               <!-- END Close Sidebar -->

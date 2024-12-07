@@ -40,8 +40,7 @@
     </div>
 </template>
 
-<script setup>
-</script>
+<script setup></script>
 
 <style lang="css" scoped>
 .breadcrumb:last-child > a{

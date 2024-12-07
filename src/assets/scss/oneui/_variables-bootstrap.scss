@@ -26,7 +26,7 @@ $success: #17C653 !default;
 $info: #7239EA !default;
 $warning: #F6B100 !default;
 $danger: #F8285A !default;
-$light: #FFFFFF !default;
+$light: #ebeef2 !default;
 $dark: #1E2129 !default;
 $new-gray: #E3E9FF !default;
 $new-pale-gray: #EFF6FF !default;
@@ -131,12 +131,9 @@ $transition-fade: opacity 0.25s ease-out !default;
 //
 // Font, line-height, and color for body text, headings, and more.
 
-$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
-  "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, "Noto Sans",
-  "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-  "Segoe UI Symbol", "Noto Color Emoji" !default;
-$font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
-  "Liberation Mono", "Courier New", monospace !default;
+$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji",
+  "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
+$font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !default;
 $font-family-base: $font-family-sans-serif !default;
 
 $font-size-root: 16px !default;

@@ -2,15 +2,25 @@ import { createRouter, createWebHashHistory, createWebHistory } from "vue-router
 
 import NProgress from "nprogress/nprogress.js";
 
-const Home = ()=> import("@/views/it-connect/Home.vue");
-const AdminMasterView = ()=> import("@/views/one-ui/AdminMasterView.vue");
+const Blog = () => import("@/views/it-connect/blog/Blog.vue");
+const Detail = () => import("@/views/it-connect/blog/Detail.vue");
+
+const Home = () => import("@/views/it-connect/Home.vue");
+const AdminMasterView = () => import("@/views/one-ui/AdminMasterView.vue");
+const BlogAdmin = () => import("@/views/one-ui/blog/Blog.vue");
+const BlogCreate = () => import("@/views/one-ui/blog/CreateBlog.vue");
+const BlogEdit = () => import("@/views/one-ui/blog/EditBlog.vue");
+const CategoryAdmin = () => import("@/views/one-ui/category/Category.vue");
+const CategoryCreate = () => import("@/views/one-ui/category/CreateCategory.vue");
+const CategoryEdit = () => import("@/views/one-ui/category/EditCategory.vue");
 
 // Import layout
 const MainLayout = () => import("@/layouts/variations/it-connect/MainLayout.vue");
-const MasterPage = () => import("@/layouts/variations/master-page/MasterPage.vue")
-const AdminMasterPage = () => import("@/layouts/variations/master-page/AdminMasterPage.vue")
-const AdminLayout = () =>  import("@/layouts/variations/one-ui/AdminLayout.vue");
-
+const ContentLayout = () => import("@/layouts/variations/it-connect/ContentLayout.vue");
+const MasterPage = () => import("@/layouts/variations/master-page/MasterPage.vue");
+const AdminMasterPage = () => import("@/layouts/variations/master-page/AdminMasterPage.vue");
+const AdminLayout = () => import("@/layouts/variations/one-ui/AdminLayout.vue");
+const BlogLayout = () => import("@/layouts/variations/blog/BlogLayout.vue");
 
 const routes = [
   {
@@ -20,17 +30,52 @@ const routes = [
         path: "administrator",
         name: "AdminPage",
         component: AdminLayout,
-        // children: [
-        //   {
-        //     path: "",
-        //     name: "AdminPage",
-        //     component: Dashboard
-        //   }
-        // ]
+        children: [
+          {
+            path: "blog",
+            children: [
+              {
+                path: "",
+                name: "AdminBlog",
+                component: BlogAdmin,
+              },
+              {
+                path: "create",
+                name: "AdminBlogCreate",
+                component: BlogCreate,
+              },
+              {
+                path: "edit",
+                name: "AdminBlogEdit",
+                component: BlogEdit,
+              },
+            ],
+          },
+          {
+            path: "category",
+            children: [
+              {
+                path: "",
+                name: "AdminCategory",
+                component: CategoryAdmin,
+              },
+              {
+                path: "create",
+                name: "AdminCategoryCreate",
+                component: CategoryCreate,
+              },
+              {
+                path: "edit",
+                name: "AdminCategoryEdit",
+                component: CategoryEdit,
+              },
+            ],
+          },
+        ],
       },
       {
         path: "master",
-        meta: {breadcrumb: "Master"},
+        meta: { breadcrumb: "Master" },
         children: [
           {
             path: "",
@@ -44,28 +89,43 @@ const routes = [
               {
                 path: "",
                 name: "MasterAdminView",
-                component: AdminMasterView
-              }
-            ]
+                component: AdminMasterView,
+              },
+            ],
           },
         ],
       },
       {
         path: "",
         component: MainLayout,
-        children : [
+        children: [
           {
             path: "",
             name: "HomePage",
             component: Home,
-            meta: {breadcrumb: "Home"}
-          }
-        ]
+            meta: { breadcrumb: "Home" },
+          },
+        ],
       },
-    ]
+      {
+        path: "/blog",
+        component: ContentLayout,
+        children: [
+          {
+            path: "",
+            name: "Blog",
+            component: Blog,
+          },
+          {
+            path: "detail",
+            name: "Detail",
+            component: Detail,
+          },
+        ],
+      },
+    ],
   },
 ];
-
 
 const router = createRouter({
   history: createWebHistory(),

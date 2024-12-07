@@ -97,12 +97,12 @@ onMounted(() => {
           <!-- Logo -->
           <RouterLink :to="{ name: 'AdminPage' }" class="fw-semibold text-dual">
             <span class="smini-visible">
-              <div class="position-relative w-25" style="transform: translate(-25%, 50%)">
-                <img src="../../../../public/assets/media/brand/logo-khong-chu.png" class="w-100" style="object-fit: contain" />
+              <div class="position-relative w-25" style="transform:translate(-25%, 50%)">
+                <img src="../../../../../assets/media/brand/logo-khong-chu.png" class="w-100" style="object-fit: contain;"/>
               </div>
             </span>
             <span class="smini-hide fs-5 tracking-wider">
-              <img src="../../../../public/assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="w-75" style="object-fit: contain" />
+              <img src="../../../../../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="w-75" style="object-fit: contain;"/>
             </span>
           </RouterLink>
           <!-- END Logo -->

@@ -2,15 +2,18 @@ import { createRouter, createWebHashHistory, createWebHistory } from "vue-router
 
 import NProgress from "nprogress/nprogress.js";
 
-const Home = ()=> import("@/views/it-connect/Home.vue");
-const AdminMasterView = ()=> import("@/views/one-ui/AdminMasterView.vue");
+const Blog = () => import("@/views/it-connect/blog/Blog.vue");
+
+const Home = () => import("@/views/it-connect/Home.vue");
+const AdminMasterView = () => import("@/views/one-ui/AdminMasterView.vue");
 
 // Import layout
 const MainLayout = () => import("@/layouts/variations/it-connect/MainLayout.vue");
-const MasterPage = () => import("@/layouts/variations/master-page/MasterPage.vue")
-const AdminMasterPage = () => import("@/layouts/variations/master-page/AdminMasterPage.vue")
-const AdminLayout = () =>  import("@/layouts/variations/one-ui/AdminLayout.vue");
-
+const ContentLayout = () => import("@/layouts/variations/it-connect/ContentLayout.vue");
+const MasterPage = () => import("@/layouts/variations/master-page/MasterPage.vue");
+const AdminMasterPage = () => import("@/layouts/variations/master-page/AdminMasterPage.vue");
+const AdminLayout = () => import("@/layouts/variations/one-ui/AdminLayout.vue");
+const BlogLayout = () => import("@/layouts/variations/blog/BlogLayout.vue");
 
 const routes = [
   {
@@ -30,7 +33,7 @@ const routes = [
       },
       {
         path: "master",
-        meta: {breadcrumb: "Master"},
+        meta: { breadcrumb: "Master" },
         children: [
           {
             path: "",
@@ -44,28 +47,38 @@ const routes = [
               {
                 path: "",
                 name: "MasterAdminView",
-                component: AdminMasterView
-              }
-            ]
+                component: AdminMasterView,
+              },
+            ],
           },
         ],
       },
       {
         path: "",
         component: MainLayout,
-        children : [
+        children: [
           {
             path: "",
             name: "HomePage",
             component: Home,
-            meta: {breadcrumb: "Home"}
-          }
-        ]
+            meta: { breadcrumb: "Home" },
+          },
+        ],
       },
-    ]
+      {
+        path: "/blog",
+        component: ContentLayout,
+        children: [
+          {
+            path: "",
+            name: "Blog",
+            component: Blog,
+          },
+        ],
+      },
+    ],
   },
 ];
-
 
 const router = createRouter({
   history: createWebHistory(),

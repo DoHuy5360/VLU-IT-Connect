@@ -3,9 +3,16 @@ import { createRouter, createWebHashHistory, createWebHistory } from "vue-router
 import NProgress from "nprogress/nprogress.js";
 
 const Blog = () => import("@/views/it-connect/blog/Blog.vue");
+const Detail = () => import("@/views/it-connect/blog/Detail.vue");
 
 const Home = () => import("@/views/it-connect/Home.vue");
 const AdminMasterView = () => import("@/views/one-ui/AdminMasterView.vue");
+const BlogAdmin = () => import("@/views/one-ui/blog/Blog.vue");
+const BlogCreate = () => import("@/views/one-ui/blog/CreateBlog.vue");
+const BlogEdit = () => import("@/views/one-ui/blog/EditBlog.vue");
+const CategoryAdmin = () => import("@/views/one-ui/category/Category.vue");
+const CategoryCreate = () => import("@/views/one-ui/category/CreateCategory.vue");
+const CategoryEdit = () => import("@/views/one-ui/category/EditCategory.vue");
 
 // Import layout
 const MainLayout = () => import("@/layouts/variations/it-connect/MainLayout.vue");
@@ -23,13 +30,48 @@ const routes = [
         path: "administrator",
         name: "AdminPage",
         component: AdminLayout,
-        // children: [
-        //   {
-        //     path: "",
-        //     name: "AdminPage",
-        //     component: Dashboard
-        //   }
-        // ]
+        children: [
+          {
+            path: "blog",
+            children: [
+              {
+                path: "",
+                name: "AdminBlog",
+                component: BlogAdmin,
+              },
+              {
+                path: "create",
+                name: "AdminBlogCreate",
+                component: BlogCreate,
+              },
+              {
+                path: "edit",
+                name: "AdminBlogEdit",
+                component: BlogEdit,
+              },
+            ],
+          },
+          {
+            path: "category",
+            children: [
+              {
+                path: "",
+                name: "AdminCategory",
+                component: CategoryAdmin,
+              },
+              {
+                path: "create",
+                name: "AdminCategoryCreate",
+                component: CategoryCreate,
+              },
+              {
+                path: "edit",
+                name: "AdminCategoryEdit",
+                component: CategoryEdit,
+              },
+            ],
+          },
+        ],
       },
       {
         path: "master",
@@ -73,6 +115,11 @@ const routes = [
             path: "",
             name: "Blog",
             component: Blog,
+          },
+          {
+            path: "detail",
+            name: "Detail",
+            component: Detail,
           },
         ],
       },

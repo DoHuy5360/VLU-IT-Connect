@@ -8,15 +8,10 @@
           <h4 class="mb-3 fw-bold">Bài viết mới</h4>
           <div class="featured-article-box d-flex flex-column gap-3">
             <!-- Article Image -->
-            <img
-              :src="featuredArticle.image"
-              alt="Featured Article Image"
-              class="rounded mb-3"
-              style="width: 100%; height: 300px; object-fit: cover"
-            />
+            <img :src="featuredArticle.image" alt="Featured Article Image" class="rounded mb-3" style="width: 100%; height: 300px; object-fit: cover" />
             <!-- Article Details -->
             <div>
-              <h4 class="mb-3 clickable-text">
+              <h4 class="mb-3 clickable-text" @click="$router.push('/blog/detail')">
                 {{ featuredArticle.title }}
               </h4>
               <p class="text-muted mb-3">{{ featuredArticle.details }}</p>
@@ -35,12 +30,8 @@
           <h4 class="mb-3 fw-bold">Bài viết cũ</h4>
           <div>
             <ul class="list-unstyled">
-              <li
-                v-for="(article, index) in oldArticles"
-                :key="index"
-                class="mb-3"
-              >
-                <h6 class="mb-2 clickable-text">
+              <li v-for="(article, index) in oldArticles" :key="index" class="mb-3">
+                <h6 class="mb-2 clickable-text" @click="$router.push('/blog/detail')">
                   {{ article.title }}
                 </h6>
                 <p class="text-muted small mb-1">{{ article.details }}</p>
@@ -61,24 +52,16 @@
     <div class="container py-2 bg-white rounded shadow-sm mt-4">
       <div class="d-flex justify-content-between align-items-center">
         <h4 class="fw-bold mb-3">Clip hướng dẫn sử dụng</h4>
-        <b class="text-danger hover_underline" style="cursor: pointer"
-          >Xem tất cả</b
-        >
+        <b class="text-danger hover_underline" style="cursor: pointer">Xem tất cả</b>
       </div>
       <div class="row gx-4 gy-3">
         <div class="col-12 col-md-4" v-for="index in 3" :key="index">
           <div class="ratio ratio-16x9 mb-3">
-            <iframe
-              :src="'https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6'"
-              allowfullscreen
-            ></iframe>
+            <iframe :src="'https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6'" allowfullscreen></iframe>
           </div>
           <div>
             <strong>Hướng dẫn</strong>
-            <p class="text-muted small">
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime
-              aliquid iusto tempore recusandae obcaecati
-            </p>
+            <p class="text-muted small">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime aliquid iusto tempore recusandae obcaecati</p>
           </div>
         </div>
       </div>

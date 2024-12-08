@@ -41,7 +41,7 @@
               <!-- Title and Details -->
               <div>
                 <!-- Title -->
-                <h6 class="mb-1 p-1 clickable-text text-truncate related-post-title" :title="article.title">
+                <h6 class="mb-1 p-1 clickable-text text-truncate related-post-title" :title="article.title" @click="$router.push('/blog/detail')">
                   {{ truncateText(article.title, 20) }}
                 </h6>
                 <!-- Details -->

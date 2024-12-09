@@ -81,6 +81,15 @@
 </template>
 
 <script setup>
+import { useTemplateStore } from "@/stores/template";
+
+const store = useTemplateStore();
+store.setBreadcrumb([
+    {
+        name: "Kết quả tìm kiếm",
+        path: "/search",
+    },
+]);
 const blogs = [
     {
         id: "b",

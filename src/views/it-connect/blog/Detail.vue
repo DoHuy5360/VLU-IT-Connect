@@ -58,6 +58,23 @@
 </template>
 
 <script>
+import { useTemplateStore } from "@/stores/template";
+
+const store = useTemplateStore();
+store.setBreadcrumb([
+    {
+        name: "Kiến thức CNTT - Sinh viên",
+        path: "/categories",
+    },
+    {
+        name: "Mạng có dây",
+        path: "/categories/LAN",
+    },
+    {
+        name: "Nội Dung Bài Viết",
+        path: "/categories/LAN/Nội Dung Bài Viết",
+    },
+]);
 export default {
   data() {
     return {

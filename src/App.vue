@@ -13,4 +13,8 @@
 @import "@/assets/scss/oneui/themes/flat";
 @import "@/assets/scss/oneui/themes/modern";
 @import "@/assets/scss/oneui/themes/smooth";
+
+.hover_underline:hover {
+    text-decoration: underline;
+}
 </style>

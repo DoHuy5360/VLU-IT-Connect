@@ -26,6 +26,15 @@
 </template>
 
 <script setup>
+import { useTemplateStore } from "@/stores/template";
+
+const store = useTemplateStore();
+store.setBreadcrumb([
+    {
+        name: "Video Clips hướng dẫn",
+        path: "/videos",
+    },
+]);
     const videos = [
         {
             id: "v1",

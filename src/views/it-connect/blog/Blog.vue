@@ -70,6 +70,19 @@
 </template>
 
 <script>
+import { useTemplateStore } from "@/stores/template";
+
+const store = useTemplateStore();
+store.setBreadcrumb([
+    {
+        name: "Kiến thức CNTT - Sinh viên",
+        path: "/blog",
+    },
+    {
+        name: "Mạng có dây",
+        path: "/categories/LAN",
+    }
+]);
 export default {
   data() {
     return {

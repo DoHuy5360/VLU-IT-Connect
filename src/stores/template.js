@@ -11,6 +11,10 @@ export const useTemplateStore = defineStore({
       copyright: new Date().getFullYear(),
     },
 
+    breadcrumb : {
+      path: []
+    },
+
     // Default layout options
     layout: {
       header: true,
@@ -44,6 +48,9 @@ export const useTemplateStore = defineStore({
     },
   }),
   actions: {
+    setBreadcrumb(path){
+      this.breadcrumb.path = path;
+    },
     // Sets the layout, useful for setting different layouts (under layouts/variations/)
     setLayout(payload) {
       this.layout.header = payload.header;

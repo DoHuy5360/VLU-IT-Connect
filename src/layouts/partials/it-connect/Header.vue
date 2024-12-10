@@ -2,9 +2,9 @@
     <div class="bg-secondary d-none d-sm-block">
         <div class="container">
             <div class="d-flex gap-4 justify-content-end align-items-center">
-                <div class="bg-primary text-white p-2">Trang Chủ</div>
+                <div class="bg-primary text-white p-2 text-center">Trang Chủ</div>
                 <div class="text-white">Dịch vụ CNTT dành cho: Khách | Sinh viên | Cán bộ - Giảng viên - Nhân viên</div>
-                <div class="d-flex gap-1 justify-content-end">
+                <div class="d-flex gap-1 justify-content-end align-items-center" style="cursor: pointer">
                     <!-- Viet Nam flag icon -->
                     <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -27,16 +27,18 @@
                 <img src="../../../../../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
                 <div class="col d-flex gap-2 align-items-center justify-content-end d-sm-none">
                     <!-- Search icon -->
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
-                            stroke="#171717"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-                        <path d="M22 22L20 20" stroke="#171717" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
+                    <span @click="toggleSearchBar">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
+                                stroke="#171717"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                            <path d="M22 22L20 20" stroke="#171717" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </span>
                     <!-- Hamburger icon -->
                     <span @click="toggleHeaderInMobileView">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -47,24 +49,34 @@
                         </svg>
                     </span>
                 </div>
-                <div class="col d-none d-sm-flex gap-4 justify-content-end align-items-center text-end" style="font-weight: bold">
-                    <div class="">Các câu hỏi thường gặp</div>
-                    <div class="">Yêu cầu hỗ trợ</div>
-                    <div class="">Quy định - Chính sách</div>
-                    <div class="">Liên hệ</div>
+                <div class="col d-none d-sm-flex gap-4 justify-content-end align-items-center text-end menu" style="font-weight: bold">
+                    <div style="cursor: pointer">Các câu hỏi thường gặp</div>
+                    <div style="cursor: pointer">Yêu cầu hỗ trợ</div>
+                    <div style="cursor: pointer">Quy định - Chính sách</div>
+                    <div style="cursor: pointer">Liên hệ</div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div ref="searchBar" class="container my-2 d-none">
+        <div class="bg-white rounded-pill px-2 py-1 d-flex align-items-center border border-grey">
+            <input type="text" style="outline: none; border: none; width: 400px" autofocus />
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
+                    stroke="#171717"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                />
+                <path d="M22 22L20 20" stroke="#171717" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
         </div>
     </div>
     <div class="d-sm-none position-absolute bg-white w-100 z-2 h-100" style="top: 0; left: 100%; transition: 300ms linear" ref="headerAsSidebar">
         <div class="d-flex justify-content-between p-3">
             <div>
-                <img
-                    src="../../../../../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png"
-                    class="col-sm-2 col-5 image-responsive"
-                    style="object-fit: contain"
-                    alt="Van Lang Logo"
-                />
+                <img src="../../../../../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
             </div>
             <div @click="toggleHeaderInMobileView" style="width: 24px">
                 <!-- Close header sidebar icon -->
@@ -143,20 +155,44 @@
 
 <script setup>
 import { ref } from "vue";
-import { inject } from 'vue';
-const disableScroll = inject('disableScroll');
+import { inject } from "vue";
+const disableScroll = inject("disableScroll");
 
 const headerAsSidebar = ref(null);
+const searchBar = ref(null);
 
 function toggleHeaderInMobileView() {
-    headerAsSidebar.value.classList.toggle("visibility");
-    disableScroll()
+    headerAsSidebar.value.classList.toggle("header_visibility");
+    disableScroll();
+}
+
+function toggleSearchBar() {
+    searchBar.value.classList.toggle("search_bar_visibility")
 }
 </script>
 
 <style lang="css" scoped>
-.visibility {
-    /* transform: translateX(0) !important; */
+.header_visibility {
     left: 0 !important;
+}
+.search_bar_visibility {
+    display: block !important;
+}
+@media (max-width: 576px) {
+    .menu {
+        font-size: 14px;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .menu {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 769px) {
+    .menu {
+        font-size: 0.9rem;
+    }
 }
 </style>

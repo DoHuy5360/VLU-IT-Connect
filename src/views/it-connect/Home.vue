@@ -13,15 +13,14 @@
                 class="w-100 h-100"
                 id="heroOverlay"
                 style="
-                    background: rgba(0, 0, 0, 0.3);
                     display: grid;
                     place-items: center;
                 "
             >
-                <div class="d-none d-sm-flex flex-column align-items-center">
+                <div class="d-none d-sm-flex flex-column align-items-center" id="search">
                     <span
-                        class="text-white mb-2"
-                        style="font-weight: bold; font-size: xx-large"
+                        class="text-white mb-3"
+                        style="font-weight: 600; font-size: xx-large"
                         >Bạn cần giúp đỡ vấn đề gì?</span
                     >
                     <div class="bg-white rounded-pill px-2 py-1 d-flex align-items-center">
@@ -60,7 +59,7 @@
                 style="bottom: 0"
                 id="wrapThreeRepresentItems"
             >
-                <div class="position-absolute w-100" id="threeRepresentItems">
+                <div class="position-absolute w-100" id="threeRepresentItems" style="opacity: .9;">
                     <div class="container">
                         <div
                             class="row justify-content-center bg-white rounded"
@@ -72,7 +71,7 @@
                                         object-fit: cover;
                                         display: block;
                                         width: 100%;
-                                        height: 100px;
+                                        height: 120px;
                                     "
                                     alt=""
                                 />
@@ -91,7 +90,7 @@
                                         object-fit: cover;
                                         display: block;
                                         width: 100%;
-                                        height: 100px;
+                                        height: 120px;
                                     "
                                     alt=""
                                 />
@@ -111,7 +110,7 @@
                                         object-fit: cover;
                                         display: block;
                                         width: 100%;
-                                        height: 100px;
+                                        height: 120px;
                                     "
                                     alt=""
                                 />
@@ -132,7 +131,7 @@
         <div class="d-flex flex-column gap-3">
             <div class="container py-2">
                 <div class="row gap-4" id="wrapQuestionAndNotification">
-                    <div class="col col-sm-7 rounded p-3 bg-white shadow-sm">
+                    <div class="col col-sm-12 col-lg-7 rounded p-3 bg-white shadow-sm">
                         <h4 class="mb-3" style="font-weight: bold">
                             Các câu hỏi thường gặp
                         </h4>
@@ -171,7 +170,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col col-sm  rounded p-3 bg-white shadow-sm">
+                    <div class="col col-sm-12 col-lg rounded p-3 bg-white shadow-sm">
                         <h4 class="mb-3" style="font-weight: bold">
                             Thông báo
                         </h4>
@@ -305,16 +304,13 @@ const notifications = [
 </script>
 
 <style lang="css" scoped>
-.hover_underline:hover {
-    text-decoration: underline;
-}
 .background_gradient {
     background: linear-gradient(to right, #FFEBE9, #FFFFFF);
 }
 /* màn hình nhỏ */
 @media (max-width: 576px) {
     #hero {
-        grid-template-rows: 750px 1fr;
+        grid-template-rows: 800px 1fr;
     }
     #wrapThreeRepresentItems {
         height: 100%;
@@ -328,7 +324,7 @@ const notifications = [
     #heroLandscape {
         background-size: contain;
         background-position: top;
-        background-image: url('../../../assets/media/brand/cropped_landscape.svg');
+        background-image: url('../../../assets/media/brand/cropped_landscape.png');
     }
     #wrapQuestionAndNotification {
         display: flex !important;
@@ -348,14 +344,23 @@ const notifications = [
         bottom: 15px;
     }
     #wrapThreeRepresentItems {
-        height: 100px;
+        height: 120px;
     }
     #heroLandscape {
         background-size: cover;
         background-position: center;
         height: 100%;
         background-image: url('../../../assets/media/brand/vlu_landscape.png');
-
+    }
+    #search{
+        transform: translateY(-50%);
+    }
+}
+/* Tablet */
+@media (min-width: 767px) and (max-width: 885px) {
+    #wrapQuestionAndNotification {
+        display: flex !important;
+        flex-direction: column-reverse;
     }
 }
 </style>

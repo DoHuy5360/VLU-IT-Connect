@@ -7,7 +7,10 @@
       </span>
       {{ category.name }}
     </td>
-    <td class="fw-normal fs-sm">{{ category.slug }}</td>
+    <td class="fw-normal fs-sm text-center">{{ category.detail }}</td>
+    <!-- Updated to show detail -->
+    <td class="fw-normal fs-sm text-center">{{ category.postCount }}</td>
+    <!-- Added post count -->
     <td class="text-center">
       <div class="btn-group">
         <button type="button" class="btn btn-sm btn-warning" title="Edit" v-click-ripple @click="$router.push(`/administrator/category/edit`)">

@@ -14,7 +14,7 @@
         <!-- Parent Category -->
         <div class="mb-4">
           <label class="form-label" for="parentCategory">Parent Category</label>
-          <select class="form-select" id="parentCategory" v-model="formData.parentCategory" @change="checkParentCategory" required>
+          <select class="form-select" id="parentCategory" v-model="formData.parentCategory" @change="checkParentCategory">
             <option value="">Select Parent Category</option>
             <option v-for="category in parentCategories" :key="category.id" :value="category.id">
               {{ category.name }}
@@ -80,6 +80,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import { useToast } from "vue-toastification";
 
 export default {
@@ -88,62 +89,37 @@ export default {
       formData: {
         parentCategory: "",
         childCategory: "",
-        newChildCategory: "",
         grandchildCategory: "",
-        newGrandchildCategory: "",
         categoryName: "",
         categoryDetail: "",
       },
       errors: {},
       warnings: {},
-      categories: [
-        { id: "1", name: "Công nghệ", parentID: null },
-        { id: "1.1", name: "Công nghệ thông tin", parentID: "1" },
-        { id: "1.1.1", name: "Công nghệ thông tin cơ bản", parentID: "1.1" },
-        { id: "1.1.2", name: "Thực hành công nghệ thông tin", parentID: "1.1" },
-        { id: "1.2", name: "Thiết bị điện tử", parentID: "1" },
-        { id: "2", name: "Xã hội", parentID: null },
-        { id: "2.1", name: "Chủ nghĩa", parentID: "2" },
-        { id: "2.1.1", name: "Mac Lenin", parentID: "2.1" },
-        { id: "3", name: "Kinh tế", parentID: null },
-        { id: "3.1", name: "Quản trị kinh doanh", parentID: "3" },
-        { id: "3.1.1", name: "Ngân Hàng", parentID: "3.1" },
-        { id: "4", name: "Y tế", parentID: null },
-        { id: "4.1", name: "Dược phẩm", parentID: "4" },
-        { id: "4.2", name: "Thiết bị y tế", parentID: "4" },
-        { id: "5", name: "Giáo dục", parentID: null },
-        { id: "5.1", name: "Đại học", parentID: "5" },
-        { id: "5.2", name: "Trung học", parentID: "5" },
-        // Additional categories
-        { id: "6", name: "Thể thao", parentID: null },
-        { id: "6.1", name: "Bóng đá", parentID: "6" },
-        { id: "6.2", name: "Bóng rổ", parentID: "6" },
-        { id: "7", name: "Văn hóa", parentID: null },
-        { id: "7.1", name: "Âm nhạc", parentID: "7" },
-        { id: "7.2", name: "Điện ảnh", parentID: "7" },
-        { id: "8", name: "Khoa học", parentID: null },
-        { id: "8.1", name: "Vật lý", parentID: "8" },
-        { id: "8.2", name: "Hóa học", parentID: "8" },
-      ],
+      categories: [],
       showChildCategory: false,
-      showNewChildCategory: false,
       showGrandchildCategory: false,
-      showNewGrandchildCategory: false,
       parentCategories: [],
       childCategories: [],
       grandchildCategories: [],
     };
   },
   methods: {
+    async fetchCategories() {
+      try {
+        const response = await axios.get("/api/Categories/getallcategories");
+        this.categories = response.data;
+        this.parentCategories = this.categories.filter((category) => !category.parentID);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    },
     checkParentCategory() {
       const parentCategory = this.categories.find((category) => category.id === this.formData.parentCategory);
       if (parentCategory) {
         this.childCategories = this.categories.filter((category) => category.parentID === parentCategory.id);
         this.showChildCategory = this.childCategories.length > 0;
-        this.showNewChildCategory = !this.showChildCategory;
       } else {
         this.showChildCategory = false;
-        this.showNewChildCategory = false;
       }
     },
     checkChildCategory() {
@@ -151,25 +127,35 @@ export default {
       if (childCategory) {
         this.grandchildCategories = this.categories.filter((category) => category.parentID === childCategory.id);
         this.showGrandchildCategory = this.grandchildCategories.length > 0;
-        this.showNewGrandchildCategory = !this.showGrandchildCategory;
       } else {
         this.showGrandchildCategory = false;
-        this.showNewGrandchildCategory = false;
       }
     },
     checkCharacterLimit(field, maxLength) {
       if (this.formData[field].length > maxLength) {
-        this.warnings[field] = `Maximum ${maxLength} characters allowed.`;
+        this.errors[field] = `Maximum ${maxLength} characters allowed.`;
       } else {
-        this.warnings[field] = null;
+        delete this.errors[field];
       }
     },
-    handleSubmit() {
+    clearForm() {
+      this.formData = {
+        parentCategory: "",
+        childCategory: "",
+        grandchildCategory: "",
+        categoryName: "",
+        categoryDetail: "",
+      };
+      this.errors = {};
+      this.warnings = {};
+      this.showChildCategory = false;
+      this.showGrandchildCategory = false;
+    },
+    async handleSubmit() {
       const toast = useToast();
       this.errors = {};
 
       // Validation
-
       if (!this.formData.categoryName) {
         this.errors.categoryName = "Category name is required.";
       }
@@ -179,14 +165,31 @@ export default {
 
       // If no errors, submit the form
       if (Object.keys(this.errors).length === 0) {
-        console.log("Form submitted:", this.formData);
-        toast.success("Category created successfully!");
-        this.$router.push("/administrator/category"); // Redirect
+        const payload = {
+          name: this.formData.categoryName,
+          slug: this.formData.categoryName.toLowerCase().replace(/\s+/g, "-"),
+          description: this.formData.categoryDetail,
+          parentId: this.formData.parentCategory || null,
+          nestLeft: 0, // Adjust based on your requirements
+          nestRight: 0, // Adjust based on your requirements
+          nestDepth: this.formData.grandchildCategory ? 2 : this.formData.childCategory ? 1 : 0,
+        };
+
+        try {
+          const response = await axios.post("/api/Categories/createcategory", payload);
+          console.log("Form submitted:", response.data);
+          toast.success("Category created successfully!");
+          this.clearForm();
+          this.$router.push("/administrator/category");
+        } catch (error) {
+          toast.error("Failed to create category. Please try again.");
+          console.error(error);
+        }
       }
     },
   },
   mounted() {
-    this.parentCategories = this.categories.filter((category) => category.parentID === null);
+    this.fetchCategories();
   },
 };
 </script>

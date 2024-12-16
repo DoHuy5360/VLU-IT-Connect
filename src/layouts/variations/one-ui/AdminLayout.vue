@@ -49,7 +49,11 @@ store.mainContent({ mode: "narrow" });
               name: 'Tài khoản',
               icon: 'si si-users',
               to: 'AdminAccount',
-              // Optionally, add sub-navigation
+            },
+            {
+              name: 'Quyền hạn',
+              icon: 'si si-lock',
+              to: 'AdminAccountManager',
             },
           ]"
         />

@@ -350,7 +350,7 @@ const notifications = [
         background-size: cover;
         background-position: center;
         height: 100%;
-        background-image: url('../../../assets/media/brand/vlu_landscape.png');
+        background-image: url('../../../assets/media/brand/vlu_landscape-compressed.jpg');
     }
     #search{
         transform: translateY(-50%);

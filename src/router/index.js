@@ -6,16 +6,22 @@ const Home = () => import("@/views/it-connect/Home.vue");
 const Categories = () => import("@/views/it-connect/Categories.vue");
 const Videos = () => import("@/views/it-connect/Videos.vue");
 const Search = () => import("@/views/it-connect/Search.vue");
-const AdminMasterView = () => import("@/views/one-ui/AdminMasterView.vue");
-const Blog = () => import("@/views/it-connect/blog/Blog.vue");
-const Detail = () => import("@/views/it-connect/blog/Detail.vue");
+const Blog = () => import("@/views/it-connect/blog/BlogView.vue");
+const Detail = () => import("@/views/it-connect/blog/DetailView.vue");
 
-const BlogAdmin = () => import("@/views/one-ui/blog/Blog.vue");
+const BlogAdmin = () => import("@/views/one-ui/blog/BlogAdmin.vue");
 const BlogCreate = () => import("@/views/one-ui/blog/CreateBlog.vue");
 const BlogEdit = () => import("@/views/one-ui/blog/EditBlog.vue");
 const CategoryAdmin = () => import("@/views/one-ui/category/Category.vue");
 const CategoryCreate = () => import("@/views/one-ui/category/CreateCategory.vue");
 const CategoryEdit = () => import("@/views/one-ui/category/EditCategory.vue");
+const AccountAdmin = () => import("@/views/one-ui/account/AccountMain.vue");
+const AccountCreate = () => import("@/views/one-ui/account/CreateAccount.vue");
+const AccountEdit = () => import("@/views/one-ui/account/EditAccount.vue");
+const AuthSignIn = () => import("@/views/one-ui/auth/SignIn.vue");
+const AccountAdminManager = () => import("@/views/one-ui/accountmanager/AccountManager.vue");
+const AccountManagerCreate = () => import("@/views/one-ui/accountmanager/CreateAccountManager.vue");
+const AccountManagerEdit = () => import("@/views/one-ui/accountmanager/EditAccountManager.vue");
 
 // Import layout
 const MainLayout = () => import("@/layouts/variations/it-connect/MainLayout.vue");
@@ -186,7 +192,115 @@ const routes = [
                 ],
             },
         ],
+<<<<<<< HEAD
     },
+=======
+      },
+      {
+        path: "category",
+        children: [
+          {
+            path: "",
+            name: "AdminCategory",
+            component: CategoryAdmin,
+          },
+          {
+            path: "create",
+            name: "AdminCategoryCreate",
+            component: CategoryCreate,
+          },
+          {
+            path: "edit",
+            name: "AdminCategoryEdit",
+            component: CategoryEdit,
+          },
+        ],
+      },
+      {
+        path: "accountmanager",
+        children: [
+          {
+            path: "",
+            name: "AdminAccountManager",
+            component: AccountAdminManager,
+          },
+          {
+            path: "create",
+            name: "AdminAccountManagerCreate",
+            component: AccountManagerCreate,
+          },
+          {
+            path: "edit",
+            name: "AdminAccountManagerEdit",
+            component: AccountManagerEdit,
+          },
+        ],
+      },
+      {
+        path: "account",
+        children: [
+          {
+            path: "",
+            name: "AdminAccount",
+            component: AccountAdmin,
+          },
+          {
+            path: "create",
+            name: "AdminAccountCreate",
+            component: AccountCreate,
+          },
+          {
+            path: "edit",
+            name: "AdminAccountEdit",
+            component: AccountEdit,
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    path: "/",
+    component: MainLayout,
+    children: [
+      {
+        path: "",
+        name: "HomePage",
+        component: Home,
+      },
+      {
+        path: "categories",
+        name: "ListCategories",
+        component: Categories,
+      },
+      {
+        path: "videos",
+        name: "ListVideos",
+        component: Videos,
+      },
+      {
+        path: "search",
+        name: "ListResult",
+        component: Search,
+      },
+      {
+        path: "blog",
+        children: [
+          {
+            path: "",
+            name: "Blog",
+            component: Blog,
+          },
+          {
+            path: "detail",
+            name: "Detail",
+            component: Detail,
+          },
+        ],
+      },
+    ],
+  },
+>>>>>>> 974b6d2 (Feat: kết nối api sign in)
 ];
 
 const router = createRouter({

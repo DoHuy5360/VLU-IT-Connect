@@ -91,32 +91,32 @@ import Swal from "sweetalert2";
 // User data
 const users = ref([
   { id: 1, name: "Nguyễn Văn A", email: "a@vlu.edu.vn", group: "Admin", status: "Active", createdAt: "2024-12-11" },
-  { id: 2, name: "Trần Thị B", email: "b@vlu.edu.vn", group: "User", status: "Inactive", createdAt: "2024-12-10" },
+  { id: 2, name: "Trần Thị B", email: "b@vlu.edu.vn", group: "Admin 2", status: "Inactive", createdAt: "2024-12-10" },
   { id: 3, name: "Phạm Văn C", email: "c@vlu.edu.vn", group: "Editor", status: "Active", createdAt: "2024-12-09" },
   { id: 4, name: "Lê Văn D", email: "d@vlu.edu.vn", group: "Admin", status: "Active", createdAt: "2024-12-08" },
-  { id: 5, name: "Hoàng Thị E", email: "e@vlu.edu.vn", group: "User", status: "Inactive", createdAt: "2024-12-07" },
+  { id: 5, name: "Hoàng Thị E", email: "e@vlu.edu.vn", group: "Admin 2", status: "Inactive", createdAt: "2024-12-07" },
   { id: 6, name: "Ngô Văn F", email: "f@vlu.edu.vn", group: "Editor", status: "Active", createdAt: "2024-12-06" },
   { id: 7, name: "Đỗ Thị G", email: "g@vlu.edu.vn", group: "Admin", status: "Inactive", createdAt: "2024-12-05" },
-  { id: 8, name: "Phan Văn H", email: "h@vlu.edu.vn", group: "User", status: "Active", createdAt: "2024-12-04" },
+  { id: 8, name: "Phan Văn H", email: "h@vlu.edu.vn", group: "Admin 2", status: "Active", createdAt: "2024-12-04" },
   { id: 9, name: "Vũ Thị I", email: "i@vlu.edu.vn", group: "Editor", status: "Inactive", createdAt: "2024-12-03" },
   { id: 10, name: "Bùi Văn J", email: "j@vlu.edu.vn", group: "Admin", status: "Active", createdAt: "2024-12-02" },
-  { id: 11, name: "Nguyễn Thị K", email: "k@vlu.edu.vn", group: "User", status: "Inactive", createdAt: "2024-12-01" },
+  { id: 11, name: "Nguyễn Thị K", email: "k@vlu.edu.vn", group: "Admin 2", status: "Inactive", createdAt: "2024-12-01" },
   { id: 12, name: "Trần Văn L", email: "l@vlu.edu.vn", group: "Editor", status: "Active", createdAt: "2024-11-30" },
   { id: 13, name: "Phạm Thị M", email: "m@vlu.edu.vn", group: "Admin", status: "Inactive", createdAt: "2024-11-29" },
-  { id: 14, name: "Lê Văn N", email: "n@vlu.edu.vn", group: "User", status: "Active", createdAt: "2024-11-28" },
+  { id: 14, name: "Lê Văn N", email: "n@vlu.edu.vn", group: "Admin 2", status: "Active", createdAt: "2024-11-28" },
   { id: 15, name: "Hoàng Thị O", email: "o@vlu.edu.vn", group: "Editor", status: "Inactive", createdAt: "2024-11-27" },
   { id: 16, name: "Ngô Văn P", email: "p@vlu.edu.vn", group: "Admin", status: "Active", createdAt: "2024-11-26" },
-  { id: 17, name: "Đỗ Thị Q", email: "q@vlu.edu.vn", group: "User", status: "Inactive", createdAt: "2024-11-25" },
+  { id: 17, name: "Đỗ Thị Q", email: "q@vlu.edu.vn", group: "Admin 2", status: "Inactive", createdAt: "2024-11-25" },
   { id: 18, name: "Phan Văn R", email: "r@vlu.edu.vn", group: "Editor", status: "Active", createdAt: "2024-11-24" },
   { id: 19, name: "Vũ Thị S", email: "s@vlu.edu.vn", group: "Admin", status: "Inactive", createdAt: "2024-11-23" },
-  { id: 20, name: "Bùi Văn T", email: "t@vlu.edu.vn", group: "User", status: "Active", createdAt: "2024-11-22" },
+  { id: 20, name: "Bùi Văn T", email: "t@vlu.edu.vn", group: "Admin 2", status: "Active", createdAt: "2024-11-22" },
   { id: 21, name: "Nguyễn Văn U", email: "u@vlu.edu.vn", group: "Admin", status: "Active", createdAt: "2024-11-21" },
-  { id: 22, name: "Trần Thị V", email: "v@vlu.edu.vn", group: "User", status: "Inactive", createdAt: "2024-11-20" },
+  { id: 22, name: "Trần Thị V", email: "v@vlu.edu.vn", group: "Admin 2", status: "Inactive", createdAt: "2024-11-20" },
   { id: 23, name: "Phạm Văn W", email: "w@vlu.edu.vn", group: "Editor", status: "Active", createdAt: "2024-11-19" },
   { id: 24, name: "Lê Văn X", email: "x@vlu.edu.vn", group: "Admin", status: "Inactive", createdAt: "2024-12-18" },
-  { id: 25, name: "Hoàng Thị Y", email: "y@vlu.edu.vn", group: "User", status: "Active", createdAt: "2024-11-17" },
+  { id: 25, name: "Hoàng Thị Y", email: "y@vlu.edu.vn", group: "Admin 2", status: "Active", createdAt: "2024-11-17" },
 
-  // Add more users here...
+  // Add more Admin 2s here...
 ]);
 // State
 const searchTerm = ref("");
@@ -127,7 +127,7 @@ const itemsPerPage = ref(20);
 // Groups for filtering
 const groups = [
   { label: "Admin", value: "Admin" },
-  { label: "User", value: "User" },
+  { label: "Admin 2", value: "Admin 2" },
   { label: "Editor", value: "Editor" },
 ];
 
@@ -178,13 +178,6 @@ function onFilterGroup() {
 function deleteUser(userId) {
   users.value = users.value.filter((user) => user.id !== userId);
   Swal.fire("Deleted!", "The user has been deleted.", "success");
-}
-function toggleSelectAll() {
-  if (selectAll.value) {
-    selectedUsers.value = paginatedAccounts.value.map((user) => user.id); // Select all visible users
-  } else {
-    selectedUsers.value = []; // Clear selection
-  }
 }
 
 const swalConfirm = (id) => {

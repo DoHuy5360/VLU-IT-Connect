@@ -1,14 +1,19 @@
 <template>
-  <div class="hero-static d-flex align-items-center position-relative">
-    <div class="position-absolute w-100 h-100" style="background-color: rgba(0, 0, 0, 0.5); z-index: 1"></div>
-    <div class="content position-relative" style="z-index: 2">
+  <div class="hero-static d-flex align-items-center" style="position: relative; min-height: 100vh; background: url('/assets/media/brand/sign.png') no-repeat center center; background-size: cover">
+    <!-- Dark Overlay -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1"></div>
+
+    <!-- Content -->
+    <div class="content" style="position: relative; z-index: 2">
       <div class="row justify-content-center push">
         <div class="col-md-8 col-lg-6 col-xl-4">
-          <BaseBlock title="" class="mb-0">
+          <!-- Sign In Block -->
+          <BaseBlock title="Sign In" class="mb-0">
             <div class="p-sm-3 px-lg-4 px-xxl-5 py-lg-5">
               <div class="text-center mb-4">
-                <img src="/assets/media/brand/logo.png" alt="Logo" style="max-width: 35%; height: auto" />
+                <img src="/assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" alt="VLU Logo" style="max-width: 40%; height: auto" />
               </div>
+              <p class="fw-medium text-muted">Welcome, please login.</p>
               <form @submit.prevent="onSubmit">
                 <div class="py-3">
                   <div class="mb-4">
@@ -51,7 +56,10 @@
                     <span class="bg-white px-3">OR</span>
                   </div>
                   <div class="text-center">
-                    <button type="button" class="btn btn-alt-primary" @click="signInWithMicrosoft" :disabled="isLoading.microsoft">Log In with Microsoft</button>
+                    <button type="button" class="btn btn-alt-primary btn-lg px-4" :disabled="isLoading.microsoft" @click="signInWithMicrosoft">
+                      <i class="fab fa-microsoft me-3"></i>
+                      Log In with Microsoft
+                    </button>
                   </div>
                 </div>
               </form>
@@ -95,8 +103,10 @@ export default {
           username: state.username,
           password: state.password,
         });
+        alert("Login successful!");
         console.log("Login success:", response.data);
       } catch (error) {
+        alert("Login failed. Please check your username and password.");
         console.error("Login failed:", error.response?.data || error.message);
       } finally {
         isLoading.login = false;
@@ -105,8 +115,15 @@ export default {
 
     const signInWithMicrosoft = async () => {
       isLoading.microsoft = true;
-      console.log("Microsoft login not yet implemented");
-      isLoading.microsoft = false;
+      try {
+        const response = await axios.get("/api/Auth/loginMicrosoft");
+        console.log("Microsoft login started:", response.data);
+      } catch (error) {
+        alert("Microsoft login failed.");
+        console.error("Microsoft login failed:", error.response?.data || error.message);
+      } finally {
+        isLoading.microsoft = false;
+      }
     };
 
     return {
@@ -119,7 +136,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/* Add any required styles here */
-</style>

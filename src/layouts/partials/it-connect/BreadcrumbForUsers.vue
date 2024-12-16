@@ -10,21 +10,23 @@
                     />
                 </svg>
             </RouterLink>
-            <div class="breadcrumb d-flex gap-2 align-items-center">
-                <div v-if="store.breadcrumb.path.length != 0" v-for="(crumb, index) in store.breadcrumb.path" :key="index" class="breadcrumb d-flex gap-2 align-items-center">
-                    <div>
-                        <!-- Greater icon -->
-                        <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                fill-rule="evenodd"
-                                clip-rule="evenodd"
-                                d="M0.767518 1.10666C1.07994 0.786508 1.58647 0.786508 1.89889 1.10666L7.23222 6.57201C7.54464 6.89216 7.54464 7.41123 7.23222 7.73138L2.19518 12.8931C1.88277 13.2133 1.37623 13.2133 1.06381 12.8931C0.751395 12.5729 0.751395 12.0539 1.06381 11.7337L5.53517 7.1517L0.767518 2.26604C0.455098 1.94588 0.455098 1.42681 0.767518 1.10666Z"
-                                fill="#252F4A"
-                            />
-                        </svg>
-                    </div>
-                    <div style="transform: translateY(1px);">
-                        <RouterLink :to="crumb.path" style="font-size: 1rem" class="text-black hover_underline">{{ crumb.name }}</RouterLink>
+            <div v-if="store.breadcrumb.path.length != 0">
+                <div class="breadcrumb d-flex gap-2 align-items-center">
+                    <div v-for="(crumb, index) in store.breadcrumb.path" :key="index" class="breadcrumb d-flex gap-2 align-items-center">
+                        <div>
+                            <!-- Greater icon -->
+                            <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M0.767518 1.10666C1.07994 0.786508 1.58647 0.786508 1.89889 1.10666L7.23222 6.57201C7.54464 6.89216 7.54464 7.41123 7.23222 7.73138L2.19518 12.8931C1.88277 13.2133 1.37623 13.2133 1.06381 12.8931C0.751395 12.5729 0.751395 12.0539 1.06381 11.7337L5.53517 7.1517L0.767518 2.26604C0.455098 1.94588 0.455098 1.42681 0.767518 1.10666Z"
+                                    fill="#252F4A"
+                                />
+                            </svg>
+                        </div>
+                        <div style="transform: translateY(1px)">
+                            <RouterLink :to="crumb.path" style="font-size: 1rem" class="text-black hover_underline">{{ crumb.name }}</RouterLink>
+                        </div>
                     </div>
                 </div>
             </div>

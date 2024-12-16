@@ -282,9 +282,6 @@
 </template>
 
 <script setup>
-import { useTemplateStore } from "@/stores/template";
-const store = useTemplateStore();
-
 const frequentlyAskedQuestions = [
     "Truy cập Wifi Văn Lang như thế nào?",
     "Địa chỉ email của em là gì và sử dụng như thế nào?",

@@ -22,7 +22,7 @@
     "@chenfengyuan/vue-countdown": "^2.1.1",
     "@ckeditor/ckeditor5-build-balloon": "^38.1.0",
     "@ckeditor/ckeditor5-build-balloon-block": "^38.1.0",
-    "@ckeditor/ckeditor5-build-classic": "^38.1.0",
+    "@ckeditor/ckeditor5-build-classic": "^38.1.1",
     "@ckeditor/ckeditor5-build-inline": "^38.1.0",
     "@ckeditor/ckeditor5-vue": "^5.1.0",
     "@ckpack/vue-color": "^1.5.0",

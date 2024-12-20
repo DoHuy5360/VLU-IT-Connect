@@ -21,7 +21,9 @@
                     <span
                         class="text-white mb-3"
                         style="font-weight: 600; font-size: xx-large"
-                        >Bạn cần giúp đỡ vấn đề gì?</span
+                        >
+                        {{ store.isVietNamese() ? "Bạn cần giúp đỡ vấn đề gì?" : "What can I assist you?" }}
+                        </span
                     >
                     <div class="bg-white rounded-pill px-2 py-1 d-flex align-items-center">
                         <input
@@ -282,6 +284,10 @@
 </template>
 
 <script setup>
+
+import { useTemplateStore } from '../../stores/template';
+const store = useTemplateStore()
+
 const frequentlyAskedQuestions = [
     "Truy cập Wifi Văn Lang như thế nào?",
     "Địa chỉ email của em là gì và sử dụng như thế nào?",

@@ -60,7 +60,7 @@ export default {
   },
   async created() {
     try {
-      const response = await axios.get("https://localhost:7017/api/posts", {
+      const response = await axios.get("/api/posts", {
         params: { PageNumber: 1, PageSize: 10 },
       });
       const posts = response.data?.data?.$values || [];

@@ -1,7 +1,7 @@
 <template>
   <BasePageHeading title="Category" subtitle="Welcome Admin!">
     <template #extra>
-      <button type="button" class="btn btn-alt-primary bg-success text-white" @click="$router.push('/administrator/category/create')"><i class="fa fa-plus opacity-50 me-1"></i> Thêm danh mục</button>
+      <button type="button" class="btn btn-success" @click="$router.push('/administrator/category/create')"><i class="fa fa-plus opacity-50 me-1"></i> Thêm danh mục</button>
     </template>
   </BasePageHeading>
 

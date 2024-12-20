@@ -1,16 +1,16 @@
 <template>
   <div ref="body" class="position-relative d-flex flex-column" style="height: 100dvh; overflow-x: hidden; ">
-      <Header></Header>
+      <WebHeader></WebHeader>
       <div style="flex-grow: 1;" class="bg-skin">
           <RouterView />
       </div>
-      <Footer></Footer>
+      <WebFooter></WebFooter>
   </div>
 </template>
 
 <script setup>
-  import Header from "@/layouts/partials/it-connect/Header.vue"
-  import Footer from "@/layouts/partials/it-connect/Footer.vue"
+  import WebHeader from "@/layouts/partials/it-connect/WebHeader.vue"
+  import WebFooter from "@/layouts/partials/it-connect/WebFooter.vue"
   import { ref, provide } from 'vue';
   const body = ref(null)
 

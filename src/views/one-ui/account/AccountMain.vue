@@ -1,7 +1,7 @@
 <template>
   <BasePageHeading title="Quản lý tài khoản" subtitle="Hiển thị danh sách tài khoản chi tiết">
     <template #extra>
-      <button type="button" class="btn btn-alt-success" v-click-ripple @click="$router.push('/administrator/account/create')">
+      <button type="button" class="btn btn-success" v-click-ripple @click="$router.push('/administrator/account/create')">
         <i class="fa fa-plus opacity-50 me-1"></i>
         Thêm tài khoản
       </button>

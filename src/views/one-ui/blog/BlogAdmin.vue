@@ -1,7 +1,7 @@
 <template>
   <BasePageHeading title="Blog" subtitle="Welcome Admin!">
     <template #extra>
-      <button type="button" class="btn btn-alt-primary bg-success text-white d-flex align-items-center" v-click-ripple @click="$router.push('/administrator/blog/create')">
+      <button type="button" class="btn btn-success d-flex align-items-center" v-click-ripple @click="$router.push('/administrator/blog/create')">
         <i class="fa fa-plus opacity-50 me-2"></i>
         Thêm bài viết mới
       </button>

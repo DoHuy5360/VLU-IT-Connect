@@ -1,7 +1,7 @@
 <template>
   <BasePageHeading title="Master" subtitle="Welcome Admin!">
     <template #extra>
-      <button type="button" class="btn btn-alt-success" @click="$router.push('/administrator/accountmanager/create')">
+      <button type="button" class="btn btn-success" @click="$router.push('/administrator/accountmanager/create')">
         <i class="fa fa-plus opacity-50 me-1"></i>
         Thêm
       </button>

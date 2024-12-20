@@ -8,10 +8,12 @@ const Videos = () => import("@/views/it-connect/Videos.vue");
 const Search = () => import("@/views/it-connect/Search.vue");
 const Blog = () => import("@/views/it-connect/blog/BlogView.vue");
 const Detail = () => import("@/views/it-connect/blog/DetailView.vue");
+const BlogSimulate = () => import("@/views/one-ui/blog/BlogSimulate.vue");
 
 const BlogAdmin = () => import("@/views/one-ui/blog/BlogAdmin.vue");
 const BlogCreate = () => import("@/views/one-ui/blog/CreateBlog.vue");
 const BlogEdit = () => import("@/views/one-ui/blog/EditBlog.vue");
+const BlogViewDetail = () => import("@/views/one-ui/blog/BlogViewDetail.vue");
 const CategoryAdmin = () => import("@/views/one-ui/category/Category.vue");
 const CategoryCreate = () => import("@/views/one-ui/category/CreateCategory.vue");
 const CategoryEdit = () => import("@/views/one-ui/category/EditCategory.vue");
@@ -64,6 +66,16 @@ const routes = [
             name: "AdminBlogEdit",
             component: BlogEdit,
           },
+          {
+            path: "viewdetail",
+            name: "AdminBlogViewDetail",
+            component: BlogViewDetail,
+          },
+          {
+            path:"simulate",
+            name:"AdminBlogSimulate",
+            component: BlogSimulate,
+          }
         ],
       },
       {

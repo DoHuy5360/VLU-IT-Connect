@@ -7,185 +7,141 @@
           <h4 class="mb-3 fw-bold">Nội Dung Bài Viết</h4>
           <div class="blog-detail-box">
             <div class="text-muted mb-3">
-              <strong>{{ featuredArticle.date }}</strong> |
-              <span class="text-primary clickable-text">{{ featuredArticle.category }}</span>
+              <strong>{{ featuredArticle?.date }}</strong> |
+              <span class="text-primary clickable-text">{{ featuredArticle?.category }}</span>
             </div>
-            <img :src="featuredArticle.image" alt="Blog Article Image" class="rounded mb-3" style="width: 100%; height: 400px; object-fit: cover" />
-            <h4 class="mb-3">{{ featuredArticle.title }}</h4>
-            <p class="text-muted mb-3">{{ featuredArticle.details }}</p>
-            <div class="text-muted"><strong>Tác giả:</strong> {{ featuredArticle.author }}</div>
+            <img :src="featuredArticle?.image" alt="Blog Article Image" class="rounded mb-3" style="width: 100%; height: 400px; object-fit: cover" />
+            <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
+            <p class="text-muted mb-3">{{ featuredArticle?.details }}</p>
+            <div class="text-muted"><strong>Tác giả:</strong> {{ featuredArticle?.author }}</div>
           </div>
         </div>
       </div>
 
-      <!-- Right Column: Category List and Related Posts -->
+      <!-- Right Column: Category List -->
       <div class="col-lg-4">
-        <!-- Category List -->
         <div class="rounded p-3 bg-white mb-3">
           <h4 class="mb-3 fw-bold">Danh Mục</h4>
-          <ul class="list-unstyled">
-            <li v-for="(category, index) in categories" :key="index" class="d-flex justify-content-between align-items-center mb-2">
-              <span class="clickable-text">{{ category.name }}</span>
-              <span class="custom-badge clickable-text">{{ category.count }}</span>
-            </li>
+          <ul v-if="formattedCategories.length" class="list-unstyled">
+            <CategoryItem v-for="(category, index) in formattedCategories" :key="index" :category="category" />
           </ul>
+          <p v-else class="text-muted">Không có danh mục nào để hiển thị.</p>
         </div>
 
         <!-- Related Posts -->
         <div class="rounded p-3 bg-white">
           <h4 class="mb-3 fw-bold">Bài Viết Liên Quan</h4>
-          <ul class="list-unstyled">
-            <li v-for="(article, index) in relatedPosts" :key="index" class="d-flex gap-2 align-items-start mb-3">
-              <!-- Image -->
+          <ul v-if="relatedArticles.length" class="list-unstyled">
+            <li v-for="(article, index) in relatedArticles" :key="index" class="d-flex gap-2 align-items-start mb-3">
               <img :src="article.image" alt="Related Post Image" class="rounded" style="width: 100px; height: 100px; object-fit: cover" />
-              <!-- Title and Details -->
               <div>
-                <!-- Title -->
-                <h6 class="mb-1 p-1 clickable-text text-truncate related-post-title" :title="article.title" @click="$router.push('/blog/detail')">
-                  {{ truncateText(article.title, 20) }}
+                <h6 class="mb-1 clickable-text text-truncate" @click="navigateToArticle(article.id)" :title="article.title">
+                  {{ truncateText(article.title, 30) }}
                 </h6>
-                <!-- Details -->
-                <p class="text-muted small mb-0">
+                <p class="text-muted small mb-1">
                   {{ truncateText(article.details, 60) }}
                 </p>
+                <div class="text-muted small">
+                  <strong>{{ article.author }}</strong
+                  >, {{ article.date }}
+                </div>
               </div>
             </li>
           </ul>
+          <p v-else class="text-muted">Không có bài viết liên quan nào.</p>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 <script>
-import { useTemplateStore } from "@/stores/template";
+import axios from "axios";
+import CategoryItem from "./CategoryItem.vue";
 
-const store = useTemplateStore();
-store.setBreadcrumb([
-    {
-        name: "Kiến thức CNTT - Sinh viên",
-        path: "/categories",
-    },
-    {
-        name: "Mạng có dây",
-        path: "/categories/LAN",
-    },
-    {
-        name: "Nội Dung Bài Viết",
-        path: "/categories/LAN/Nội Dung Bài Viết",
-    },
-]);
 export default {
+  components: {
+    CategoryItem,
+  },
   data() {
     return {
-      featuredArticle: {
-        title: "Mastering Vue 3 for Frontend Development",
-        details:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit ante eu pulvinar semper. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse ac lorem magna. Donec venenatis, ipsum in porta pretium, leo purus dictum dolor, at convallis mi nulla quis sem. Maecenas vel risus vestibulum, accumsan eros non, vestibulum ligula. Nulla tincidunt ac nunc a malesuada. Vestibulum nec purus dignissim tellus sagittis auctor in sed diam. Nunc dignissim at lacus sit amet mollis. Morbi arcu lacus, elementum sed arcu id, laoreet mollis nisi. Duis dolor nisl, imperdiet eget urna a, vestibulum cursus mi.Quisque tincidunt commodo sapien, non viverra ante auctor ut. Sed at tempus justo. Curabitur at scelerisque mi. Aenean pellentesque arcu nulla, ac laoreet ipsum elementum aliquam. Mauris sit amet diam velit. Pellentesque posuere dictum lacinia. Cras egestas sapien neque, in gravida nibh semper ut. Duis interdum massa a turpis vestibulum tincidunt. Integer vehicula nibh et turpis bibendum ultricies ac ut dui. Nunc eu fermentum ex. Nunc volutpat orci eu leo feugiat lobortis. Cras hendrerit quis urna venenatis iaculis.In venenatis neque eget est rutrum, id porttitor orci posuere. Quisque facilisis libero id molestie elementum. Praesent cursus eget lacus eu tempus. Fusce id tempus ex, ac porta urna. Fusce cursus, ipsum ac mollis fermentum, purus lorem maximus justo, at pharetra lacus eros quis dui. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Phasellus et fringilla arcu. Cras elit nisi, sagittis ac egestas vitae, dapibus ac dolor. Vestibulum ut faucibus mauris. Integer magna dui, dignissim eu enim nec, tincidunt sollicitudin libero. Aenean nec aliquet urna. Ut venenatis id ante non finibus. Integer aliquet enim ut dolor rutrum eleifend. Fusce lacinia tempus commodo. Phasellus at augue",
-        date: "12-10-2024",
-        category: "Công nghệ",
-        author: "Dat Tran",
-        image: "https://via.placeholder.com/720x360",
-      },
-      categories: [
-        { name: "Văn Lang ID - VLID", count: 2 },
-        { name: "Các dịch vụ trực tuyến - Online", count: 26 },
-        { name: "Thư viện", count: 3 },
-        { name: "Phòng Lab", count: 10 },
-        { name: "Mạng không dây", count: 8 },
-        { name: "Mạng có dây", count: 7 },
-        { name: "Email", count: 6 },
-        { name: "One Drive", count: 2 },
-        { name: "MS Teams", count: 5 },
-      ],
-      relatedPosts: [
-        {
-          title: "Lorem ipsum dolor sit amet",
-          details: "Sed blandit ante eu pulvinar semper.",
-          image: "https://via.placeholder.com/100x100",
-        },
-        {
-          title: "Aliquam tincidunt mauris eu risus",
-          details: "Vestibulum auctor dapibus neque. Vivamus eget nibh et sapien eleifend.",
-          image: "https://via.placeholder.com/100x100",
-        },
-        {
-          title: "Phasellus ultrices nulla quis nibh",
-          details: "Quisque facilisis libero et nisi placerat blandit. Morbi eget nisi id libero dapibus volutpat.",
-          image: "https://via.placeholder.com/100x100",
-        },
-      ],
+      featuredArticle: null, // Store the main article data
+      categories: {}, // Holds the raw categories data
+      relatedArticles: [], // Store related articles
     };
   },
   computed: {
-    truncatedPosts() {
-      return this.relatedPosts.map((post) => ({
-        ...post,
-        truncatedTitle: this.truncateText(post.title, 18),
-        truncatedDetails: this.truncateText(post.details, 60),
-      }));
+    formattedCategories() {
+      if (!this.categories || !this.categories.leftChild) return [];
+      // Format and include only the children of the root category
+      return [...(this.categories.leftChild ? [this.formatCategory(this.categories.leftChild)] : []), ...(this.categories.rightChild ? [this.formatCategory(this.categories.rightChild)] : [])];
     },
   },
   methods: {
+    async fetchFeaturedArticle() {
+      try {
+        const response = await axios.get("/api/posts", {
+          params: { PageNumber: 1, PageSize: 10 },
+        });
+        const posts = response.data.data?.$values || [];
+        if (posts.length > 0) {
+          this.featuredArticle = {
+            id: posts[0].id,
+            title: posts[0].title || "No Title Available",
+            details: posts[0].content || "No details available.",
+            date: new Date(posts[0].publishedAt).toLocaleDateString(),
+            author: posts[0].userId || "Unknown author",
+            image: posts[0].metadata || "https://via.placeholder.com/600x400",
+          };
+
+          this.relatedArticles = posts.slice(1).map((post) => ({
+            id: post.id,
+            title: post.title || "No Title Available",
+            details: post.excerpt || "No excerpt available.",
+            date: new Date(post.publishedAt).toLocaleDateString(),
+            author: post.userId || "Unknown author",
+            image: post.metadata || "https://via.placeholder.com/100x100",
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching posts:", error.message);
+      }
+    },
+    async getCategories() {
+      try {
+        const response = await axios.get("/api/Categories/getallcategories", {
+          params: {
+            cateName: this.searchTerm || "",
+            indexPage: 1,
+            limitRange: 10,
+          },
+        });
+        this.categories = response.data?.data?.categories || null;
+        console.log("Categories Fetched:", this.categories);
+      } catch (error) {
+        console.error("Error fetching categories:", error.response?.data || error.message);
+        this.categories = null;
+      }
+    },
+    formatCategory(category) {
+      if (!category) return { children: [] };
+      return {
+        id: category.id,
+        name: category.name,
+        postCount: category.code || "0",
+        isExpanded: false,
+        children: [...(category.leftChild ? [this.formatCategory(category.leftChild)] : []), ...(category.rightChild ? [this.formatCategory(category.rightChild)] : [])],
+      };
+    },
     truncateText(text, maxLength) {
-      return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+      return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
     },
-    getImage(src) {
-      return src || "https://via.placeholder.com/100x100";
+    navigateToArticle(id) {
+      this.$router.push(`/blog/detail/${id}`);
     },
+  },
+  async created() {
+    await this.fetchFeaturedArticle();
+    await this.getCategories();
   },
 };
 </script>
-
-<style scoped>
-.custom-badge {
-  background-color: transparent;
-  color: black;
-  font-size: inherit; /* Make the font size inherit from the parent */
-}
-.clickable-text:hover {
-  color: black;
-  cursor: pointer;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-.clickable-text:hover {
-  color: blue;
-}
-
-ul li {
-  list-style-type: none;
-}
-.text-truncate {
-  white-space: normal; /* Allow wrapping */
-  overflow: hidden;
-  text-overflow: ellipsis; /* Optional for long words */
-  display: -webkit-box; /* Enable line clamping */
-  -webkit-line-clamp: 2; /* Limit to 2 lines */
-  -webkit-box-orient: vertical;
-}
-
-h6.clickable-text {
-  font-size: 1rem; /* Adjust font size */
-  line-height: 1.3; /* Improve readability */
-  margin-bottom: 0.5rem; /* Add space between title and description */
-}
-
-.small {
-  font-size: 0.875rem;
-}
-.related-post-title {
-  font-size: 1rem; /* Adjust the font size */
-  font-weight: bold; /* Set font weight */
-  color: #333; /* Define a default color */
-  text-overflow: ellipsis; /* Ensure ellipsis for truncated text */
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.related-post-title:hover {
-  color: #0056b3; /* Add hover color */
-  text-decoration: underline; /* Optional: underline on hover */
-  cursor: pointer;
-}
-</style>

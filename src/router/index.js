@@ -72,10 +72,10 @@ const routes = [
             component: BlogViewDetail,
           },
           {
-            path:"simulate",
-            name:"AdminBlogSimulate",
+            path: "simulate",
+            name: "AdminBlogSimulate",
             component: BlogSimulate,
-          }
+          },
         ],
       },
       {

@@ -1,191 +1,103 @@
 <template>
   <BasePageHeading title="Category" subtitle="Welcome Admin!">
     <template #extra>
-      <button type="button" class="btn btn-alt-primary bg-success" v-click-ripple @click="$router.push('/administrator/category/create')">
-        <i class="fa fa-plus opacity-50 me-1"></i>
-        Add
-      </button>
+      <button type="button" class="btn btn-alt-primary bg-success text-white" @click="$router.push('/administrator/category/create')"><i class="fa fa-plus opacity-50 me-1"></i> Thêm danh mục</button>
     </template>
   </BasePageHeading>
 
-  <BaseBlock title="Category Overview">
+  <BaseBlock>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h5 class="mb-0">Bảng danh mục</h5>
+      <div class="col-md-4">
+        <input v-model="searchTerm" type="text" placeholder="Tìm kiếm (Tên danh mục)..." class="form-control" @input="onSearch" />
+      </div>
+    </div>
+
     <table class="table table-bordered table-striped table-hover table-vcenter">
       <thead class="bg-primary text-light">
         <tr>
-          <th class="text-center" style="width: 50px">#</th>
-          <th>Category</th>
-          <th>Slug</th>
-          <th class="text-center">Actions</th>
+          <!-- <th class="text-center">#</th> -->
+          <th class="text-left">Danh mục</th>
+          <th class="text-center">Nội dung</th>
+          <th class="text-center">Số lượng bài viết</th>
+          <th class="text-center">Sửa/Xóa</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- Render each category -->
-        <CategoryRow
-          v-for="(category, index) in flattenedCategories"
-          :key="category.nestLeft"
-          :category="category"
-          :index="index + 1"
-          :depth="category.nestDepth"
-          :is-visible="category.visible"
-          @toggle="toggleVisibility(category)"
-          @delete="swalConfirm"
-        />
+      <tbody v-if="categories">
+        <CategoryRow v-if="categories" :category="categories" :index="1" @edit="toggleVisibility" @delete="swalConfirm" />
+      </tbody>
+      <tbody v-else>
+        <tr>
+          <td colspan="5" class="text-center">Không có dữ liệu.</td>
+        </tr>
       </tbody>
     </table>
+    <nav>
+      <ul class="pagination justify-content-center mt-4">
+        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+          <button class="page-link" @click="changePage(currentPage - 1)">Trước</button>
+        </li>
+        <li v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }" class="page-item">
+          <button class="page-link" @click="changePage(page)">{{ page }}</button>
+        </li>
+        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+          <button class="page-link" @click="changePage(currentPage + 1)">Tiếp</button>
+        </li>
+      </ul>
+    </nav>
   </BaseBlock>
 </template>
 
 <script>
-import { ref } from "vue";
-import Swal from "sweetalert2";
-import CategoryRow from "./CategoryRow.vue";
+import axios from "axios";
+import CategoryRow from "@/views/one-ui/category/compononts/CategoryRow.vue";
 import BasePageHeading from "@/components/BasePageHeading.vue";
 import BaseBlock from "@/components/BaseBlock.vue";
 
 export default {
-  components: { CategoryRow },
-  setup() {
-    const rawData = {
-      categories: [
-        {
-          name: "Root Category 1",
-          slug: "root-1",
-          parentID: null,
-          nestLeft: 1,
-          nestRight: 14,
-          nestDepth: 0,
-        },
-        {
-          name: "Child 1-1",
-          slug: "child-1-1",
-          parentID: "root-1",
-          nestLeft: 2,
-          nestRight: 7,
-          nestDepth: 1,
-        },
-        {
-          name: "Grandchild 1-1-1",
-          slug: "grandchild-1-1-1",
-          parentID: "child-1-1",
-          nestLeft: 3,
-          nestRight: 4,
-          nestDepth: 2,
-        },
-        {
-          name: "Grandchild 1-1-2",
-          slug: "grandchild-1-1-2",
-          parentID: "child-1-1",
-          nestLeft: 5,
-          nestRight: 6,
-          nestDepth: 2,
-        },
-        {
-          name: "Child 1-2",
-          slug: "child-1-2",
-          parentID: "root-1",
-          nestLeft: 8,
-          nestRight: 13,
-          nestDepth: 1,
-        },
-        {
-          name: "Grandchild 1-2-1",
-          slug: "grandchild-1-2-1",
-          parentID: "child-1-2",
-          nestLeft: 9,
-          nestRight: 10,
-          nestDepth: 2,
-        },
-        {
-          name: "Grandchild 1-2-2",
-          slug: "grandchild-1-2-2",
-          parentID: "child-1-2",
-          nestLeft: 11,
-          nestRight: 12,
-          nestDepth: 2,
-        },
-        {
-          name: "Root Category 2",
-          slug: "root-2",
-          parentID: null,
-          nestLeft: 15,
-          nestRight: 20,
-          nestDepth: 0,
-        },
-        {
-          name: "Child 2-1",
-          slug: "child-2-1",
-          parentID: "root-2",
-          nestLeft: 16,
-          nestRight: 19,
-          nestDepth: 1,
-        },
-        {
-          name: "Grandchild 2-1-1",
-          slug: "grandchild-2-1-1",
-          parentID: "child-2-1",
-          nestLeft: 17,
-          nestRight: 18,
-          nestDepth: 2,
-        },
-        {
-          name: "Root Category 3",
-          slug: "root-3",
-          parentID: null,
-          nestLeft: 21,
-          nestRight: 26,
-          nestDepth: 0,
-        },
-        {
-          name: "Child 3-1",
-          slug: "child-3-1",
-          parentID: "root-3",
-          nestLeft: 22,
-          nestRight: 25,
-          nestDepth: 1,
-        },
-        {
-          name: "Grandchild 3-1-1",
-          slug: "grandchild-3-1-1",
-          parentID: "child-3-1",
-          nestLeft: 23,
-          nestRight: 24,
-          nestDepth: 2,
-        },
-      ],
+  name: "SimpleCategoryTable",
+  components: {
+    CategoryRow,
+    BasePageHeading,
+    BaseBlock,
+  },
+  data() {
+    return {
+      searchTerm: "",
+      categories: null,
     };
-    const flattenedCategories = ref(
-      rawData.categories.map((category) => ({
-        ...category,
-        visible: category.nestDepth === 0, // Initially, only root categories are visible
-      }))
-    );
-
-    const toggleVisibility = (category) => {
-      flattenedCategories.value.forEach((cat) => {
-        if (cat.nestLeft > category.nestLeft && cat.nestRight < category.nestRight) {
-          cat.visible = !cat.visible;
-        }
-      });
-    };
-
-    const swalConfirm = (category) => {
-      Swal.fire({
-        title: `Are you sure to delete "${category.name}"?`,
-        text: "This action cannot be undone.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "Cancel",
-        customClass: { confirmButton: "btn btn-danger m-1", cancelButton: "btn btn-secondary m-1" },
-        buttonsStyling: false,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire("Deleted!", `"${category.name}" has been deleted.`, "success");
-        }
-      });
-    };
-
-    return { flattenedCategories, toggleVisibility, swalConfirm };
+  },
+  mounted() {
+    this.getCategories();
+  },
+  methods: {
+    async getCategories() {
+      try {
+        const res = await axios.get("/api/Categories/getallcategories", {
+          params: {
+            cateName: this.searchTerm || "",
+            indexPage: 1,
+            limitRange: 10,
+          },
+        });
+        this.totalPages = res.data?.data?.totalPages || 1;
+        this.categories = res.data?.data?.categories || null;
+      } catch (error) {
+        console.error("Error fetching categories:", error.response?.data || error.message);
+        this.categories = null;
+      }
+    },
+    onSearch() {
+      this.getCategories();
+    },
+    toggleVisibility(category) {
+      console.log("Toggling visibility:", category);
+    },
+    swalConfirm(category) {
+      if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.name}"?`)) {
+        alert("Danh mục đã được xóa!");
+      }
+    },
   },
 };
 </script>

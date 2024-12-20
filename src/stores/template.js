@@ -9,6 +9,7 @@ export const useTemplateStore = defineStore({
       name: "IT-Connect",
       version: "1.0",
       copyright: new Date().getFullYear(),
+      language: "VN",
     },
 
     breadcrumb : {
@@ -48,6 +49,9 @@ export const useTemplateStore = defineStore({
     },
   }),
   actions: {
+    setLanguage(language){
+      this.app.language = language
+    },
     setBreadcrumb(path){
       this.breadcrumb.path = path;
     },

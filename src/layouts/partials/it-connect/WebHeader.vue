@@ -4,19 +4,88 @@
             <div class="d-flex gap-4 justify-content-end align-items-center">
                 <div class="bg-primary text-white p-2 text-center">Trang Chủ</div>
                 <div class="text-white">Dịch vụ CNTT dành cho: Khách | Sinh viên | Cán bộ - Giảng viên - Nhân viên</div>
-                <div class="d-flex gap-1 justify-content-end align-items-center" style="cursor: pointer">
-                    <!-- Viet Nam flag icon -->
-                    <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M10.872 1.18918H2.73747C1.33166 1.18918 0.192017 2.27254 0.192017 3.60892V16.3921C0.192017 17.7284 1.33166 18.8118 2.73747 18.8118H25.4544C26.8602 18.8118 27.9999 17.7284 27.9999 16.3921V3.60892C27.9999 2.27254 26.8602 1.18918 25.4544 1.18918H10.872Z"
-                            fill="#D80027"
-                        />
-                        <path
-                            d="M14.0956 4.90355L15.3264 8.50457H19.3095L16.0871 10.7301L17.318 14.3312L14.0955 12.1056L10.8731 14.3312L12.104 10.7301L8.88153 8.50457H12.8647L14.0955 4.90355H14.0956Z"
-                            fill="#FFDA44"
-                        />
-                    </svg>
-                    <span class="text-white">VN</span>
+                <div class="position-relative">
+                    <div @click="toggleLanguageChoice" style="cursor: pointer">
+                        <div v-if="store.app.language==='VN'" class="d-flex gap-1 justify-content-end align-items-center">
+                            <!-- Viet Nam flag icon -->
+                            <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M10.872 1.18918H2.73747C1.33166 1.18918 0.192017 2.27254 0.192017 3.60892V16.3921C0.192017 17.7284 1.33166 18.8118 2.73747 18.8118H25.4544C26.8602 18.8118 27.9999 17.7284 27.9999 16.3921V3.60892C27.9999 2.27254 26.8602 1.18918 25.4544 1.18918H10.872Z"
+                                    fill="#D80027"
+                                />
+                                <path
+                                    d="M14.0956 4.90355L15.3264 8.50457H19.3095L16.0871 10.7301L17.318 14.3312L14.0955 12.1056L10.8731 14.3312L12.104 10.7301L8.88153 8.50457H12.8647L14.0955 4.90355H14.0956Z"
+                                    fill="#FFDA44"
+                                />
+                            </svg>
+                            <span class="text-white">VN</span>
+                        </div>
+                        <div v-if="store.app.language==='EN'" class="d-flex gap-1 justify-content-end align-items-center">
+                            <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_1241_1955)">
+                                    <path
+                                        d="M25.9031 1.28175H2.097C0.938815 1.28175 0 2.17406 0 3.27488V16.7249C0 17.8256 0.938815 18.718 2.097 18.718H25.9031C27.0611 18.718 28 17.8256 28 16.7249V3.27488C28 2.17406 27.0612 1.28175 25.9031 1.28175Z"
+                                        fill="#41479B"
+                                    />
+                                    <path
+                                        d="M27.971 2.94543C27.8057 2.00155 26.943 1.28175 25.9031 1.28175H25.3575L16.4139 6.85111V1.2818H11.5862V6.85118L2.64264 1.2818H2.09702C1.05702 1.2818 0.19433 2.00155 0.029054 2.94548L7.67315 7.7057H0V12.2942H7.67315L0.029054 17.0543C0.19433 17.9982 1.05702 18.718 2.09702 18.718H2.64264L11.5862 13.1486V18.718H16.4139V13.1486L25.3575 18.718H25.9031C26.943 18.718 27.8057 17.9982 27.971 17.0543L20.3269 12.2941H28V7.7056H20.3269L27.971 2.94543Z"
+                                        fill="#F5F5F5"
+                                    />
+                                    <path d="M15.4482 1.28175H12.5517V8.62328H0V11.3764H12.5517V18.7179H15.4482V11.3764H28V8.62328H15.4482V1.28175Z" fill="#FF4B55" />
+                                    <path d="M1.3562 18.5895L11.5599 12.2941H9.78654L0.504761 18.0207C0.731883 18.2727 1.02376 18.4701 1.3562 18.5895Z" fill="#FF4B55" />
+                                    <path d="M18.9429 12.2942H17.1696L27.0525 18.3915C27.329 18.2189 27.5598 17.9858 27.7245 17.7119L18.9429 12.2942Z" fill="#FF4B55" />
+                                    <path d="M0.221558 2.38375L8.84743 7.7057H10.6208L0.846427 1.67512C0.583987 1.86079 0.369234 2.10354 0.221558 2.38375Z" fill="#FF4B55" />
+                                    <path d="M18.1872 7.70566L27.486 1.96849C27.2562 1.71738 26.9621 1.52111 26.6274 1.404L16.4138 7.70564H18.1872L18.1872 7.70566Z" fill="#FF4B55" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_1241_1955">
+                                        <rect width="28" height="19.355" fill="white" transform="translate(0 0.322502)" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                            <span class="text-white">EN</span>
+                        </div>
+                    </div>
+                    <div v-if="isShowLanguageChoice" class="language_choice_wrapper bg-white rounded position-absolute shadow" style="overflow: hidden;">
+                        <div @click="selectLanguage('VN')" :class="(store.app.language==='VN' && 'bg-primary ') + 'language_option d-flex gap-1 px-3 py-1'" style="cursor: pointer;">
+                            <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M10.872 1.18918H2.73747C1.33166 1.18918 0.192017 2.27254 0.192017 3.60892V16.3921C0.192017 17.7284 1.33166 18.8118 2.73747 18.8118H25.4544C26.8602 18.8118 27.9999 17.7284 27.9999 16.3921V3.60892C27.9999 2.27254 26.8602 1.18918 25.4544 1.18918H10.872Z"
+                                    fill="#D80027"
+                                />
+                                <path
+                                    d="M14.0956 4.90355L15.3264 8.50457H19.3095L16.0871 10.7301L17.318 14.3312L14.0955 12.1056L10.8731 14.3312L12.104 10.7301L8.88153 8.50457H12.8647L14.0955 4.90355H14.0956Z"
+                                    fill="#FFDA44"
+                                />
+                            </svg>
+                            <span>VN</span>
+                        </div>
+                        <div @click="selectLanguage('EN')" :class="(store.app.language==='EN' && 'bg-primary ') + 'language_option d-flex gap-1 px-3 py-1'" style="cursor: pointer;">
+                            <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_1241_1955)">
+                                    <path
+                                        d="M25.9031 1.28175H2.097C0.938815 1.28175 0 2.17406 0 3.27488V16.7249C0 17.8256 0.938815 18.718 2.097 18.718H25.9031C27.0611 18.718 28 17.8256 28 16.7249V3.27488C28 2.17406 27.0612 1.28175 25.9031 1.28175Z"
+                                        fill="#41479B"
+                                    />
+                                    <path
+                                        d="M27.971 2.94543C27.8057 2.00155 26.943 1.28175 25.9031 1.28175H25.3575L16.4139 6.85111V1.2818H11.5862V6.85118L2.64264 1.2818H2.09702C1.05702 1.2818 0.19433 2.00155 0.029054 2.94548L7.67315 7.7057H0V12.2942H7.67315L0.029054 17.0543C0.19433 17.9982 1.05702 18.718 2.09702 18.718H2.64264L11.5862 13.1486V18.718H16.4139V13.1486L25.3575 18.718H25.9031C26.943 18.718 27.8057 17.9982 27.971 17.0543L20.3269 12.2941H28V7.7056H20.3269L27.971 2.94543Z"
+                                        fill="#F5F5F5"
+                                    />
+                                    <path d="M15.4482 1.28175H12.5517V8.62328H0V11.3764H12.5517V18.7179H15.4482V11.3764H28V8.62328H15.4482V1.28175Z" fill="#FF4B55" />
+                                    <path d="M1.3562 18.5895L11.5599 12.2941H9.78654L0.504761 18.0207C0.731883 18.2727 1.02376 18.4701 1.3562 18.5895Z" fill="#FF4B55" />
+                                    <path d="M18.9429 12.2942H17.1696L27.0525 18.3915C27.329 18.2189 27.5598 17.9858 27.7245 17.7119L18.9429 12.2942Z" fill="#FF4B55" />
+                                    <path d="M0.221558 2.38375L8.84743 7.7057H10.6208L0.846427 1.67512C0.583987 1.86079 0.369234 2.10354 0.221558 2.38375Z" fill="#FF4B55" />
+                                    <path d="M18.1872 7.70566L27.486 1.96849C27.2562 1.71738 26.9621 1.52111 26.6274 1.404L16.4138 7.70564H18.1872L18.1872 7.70566Z" fill="#FF4B55" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_1241_1955">
+                                        <rect width="28" height="19.355" fill="white" transform="translate(0 0.322502)" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                            <span>EN</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -154,12 +223,19 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { inject } from "vue";
+import {useTemplateStore} from '@/stores/template';
+
+const isShowLanguageChoice = ref(false)
+
+const store = useTemplateStore()
+
 const disableScroll = inject("disableScroll");
 
 const headerAsSidebar = ref(null);
 const searchBar = ref(null);
+const isSelectLanguageChoice = ref(false)
 
 function toggleHeaderInMobileView() {
     headerAsSidebar.value.classList.toggle("header_visibility");
@@ -167,8 +243,34 @@ function toggleHeaderInMobileView() {
 }
 
 function toggleSearchBar() {
-    searchBar.value.classList.toggle("search_bar_visibility")
+    searchBar.value.classList.toggle("search_bar_visibility");
 }
+
+function toggleLanguageChoice(e) {
+    e.stopPropagation()
+    isSelectLanguageChoice.value = true
+    isShowLanguageChoice.value = !isShowLanguageChoice.value
+}
+
+function selectLanguage(lang){
+    store.setLanguage(lang)
+    isShowLanguageChoice.value = false
+}
+
+function handleClickOutside(e){
+    e.stopPropagation()
+    if(isShowLanguageChoice.value && isSelectLanguageChoice.value){
+        isShowLanguageChoice.value = false
+    }
+}
+
+onMounted(()=>{
+    window.addEventListener('click', handleClickOutside)
+})
+onBeforeUnmount(()=>{
+    window.removeEventListener('click', handleClickOutside)
+})
+
 </script>
 
 <style lang="css" scoped>
@@ -178,6 +280,7 @@ function toggleSearchBar() {
 .search_bar_visibility {
     display: block !important;
 }
+
 @media (max-width: 576px) {
     .menu {
         font-size: 14px;

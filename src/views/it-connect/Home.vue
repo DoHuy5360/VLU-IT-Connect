@@ -282,9 +282,6 @@
 </template>
 
 <script setup>
-import { useTemplateStore } from "@/stores/template";
-const store = useTemplateStore();
-
 const frequentlyAskedQuestions = [
     "Truy cập Wifi Văn Lang như thế nào?",
     "Địa chỉ email của em là gì và sử dụng như thế nào?",
@@ -350,7 +347,7 @@ const notifications = [
         background-size: cover;
         background-position: center;
         height: 100%;
-        background-image: url('../../../assets/media/brand/vlu_landscape.png');
+        background-image: url('../../../assets/media/brand/vlu_landscape-compressed.jpg');
     }
     #search{
         transform: translateY(-50%);

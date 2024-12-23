@@ -62,14 +62,16 @@ const routes = [
             component: BlogCreate,
           },
           {
-            path: "edit",
+            path: "edit/:id", //đây là route để edit bài viết
             name: "AdminBlogEdit",
             component: BlogEdit,
+            props: true,
           },
           {
-            path: "viewdetail",
+            path: "viewdetail/:id", //đây là route để xem chi tiết bài viết
             name: "AdminBlogViewDetail",
-            component: BlogViewDetail,
+            component: () => import("@/views/AdminBlogView.vue"),
+            props: true,
           },
           {
             path: "simulate",

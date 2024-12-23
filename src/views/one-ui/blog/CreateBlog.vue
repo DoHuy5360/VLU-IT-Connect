@@ -10,7 +10,7 @@
 
   <BaseBlock title="Create Blog">
     <div class="col-lg-8 space-y-5">
-      <form @submit.prevent="submitForm">
+      <form @submit.prevent="saveNewBlog()">
         <!-- Author Field -->
         <div class="mb-4">
           <label class="form-label" for="author">Author</label>
@@ -93,6 +93,7 @@ import CKEditor from "@ckeditor/ckeditor5-vue";
 
 // You can import one of the following CKEditor variation (only one at a time)
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import axios from "axios";
 // CKEditor 5 variables
 let ckeditor = CKEditor.component;
 
@@ -107,13 +108,23 @@ const formData = ref({
   content: "",
 });
 
-const uploadOption = ref({
-  type: "", // 'link' or 'file'
-});
-
-function submitForm() {
-  console.log("Form submitted:", formData.value);
-}
+// const uploadOption = ref({
+//   type: "", // 'link' or 'file'
+// });
+// async saveNewBlog() {
+//       try {
+//         const res = await axios.post("/api/admin/posts", this formData);  {
+//           .then(res => {
+//             console.log(res.data);
+//             alert("Blog created successfully!");
+//           })
+// };
+// methods: {
+//   saveNewBlog(){
+//     axios.post()
+//     .then
+//   }
+// },
 </script>
 
 <style scoped>

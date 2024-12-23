@@ -11,26 +11,22 @@
   <BaseBlock title="Blog Overview">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <input v-model="searchTerm" type="text" placeholder="Tìm kiếm bài viết..." class="form-control flex-grow-1 me-2" @input="onSearch" />
-      <select v-model="selectedCategory" class="form-control w-25 me-2" @change="onFilter">
-        <option value="">Tất cả danh mục</option>
-        <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
-      </select>
       <select v-model="selectedStatus" class="form-control w-25" @change="onFilter">
         <option value="">Tất cả trạng thái</option>
-        <option value="Draft">Draft</option>
-        <option value="Visibility">Visibility</option>
-        <option value="Published">Published</option>
+        <option value="1">Public</option>
+        <option value="0">Unpublic</option>
       </select>
     </div>
 
     <div v-if="filteredUsers.length === 0 && !loading" class="text-center p-5">
       <p class="text-muted fs-lg">Không tìm thấy kết quả phù hợp.</p>
     </div>
+
     <div v-else class="table-responsive">
       <table class="table table-bordered table-hover">
         <thead class="bg-primary text-white">
           <tr>
-            <th class="text-center" style="width: 80px">ID</th>
+            <th class="text-center" style="width: 80px">#</th>
             <th>Tác giả</th>
             <th>Tiêu đề</th>
             <th style="width: 15%">Trạng thái</th>
@@ -38,13 +34,15 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in paginatedUsers" :key="user.id" @click="$router.push('/administrator/blog/viewdetail')" class="clickable-row">
-            <td class="text-center fw-bold text-primary">#{{ user.id }}</td>
+          <tr v-for="(user, index) in paginatedUsers" :key="user.id" @click="viewBlog(user.id)" class="clickable-row">
+            <td class="text-center fw-bold text-primary">
+              {{ (currentPage - 1) * itemsPerPage + index + 1 }}
+            </td>
             <td class="fw-semibold fs-sm">{{ user.author }}</td>
             <td class="fs-sm">{{ user.title }}</td>
             <td>
-              <span :class="`fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill ${getStatusClass(user.status)}`">
-                {{ user.status }}
+              <span :class="`fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill ${getStatusClass(user.state)}`">
+                {{ user.state === 1 ? "Public" : "Unpublic" }}
               </span>
             </td>
             <td class="text-center">
@@ -66,10 +64,12 @@
             <button class="page-link" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Trước</button>
           </li>
           <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }">
-            <button class="page-link" @click="changePage(page)">{{ page }}</button>
+            <button class="page-link" @click="changePage(page)">
+              {{ page }}
+            </button>
           </li>
-          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-            <button class="page-link" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">Tiếp</button>
+          <li class="page-item" :class="{ disabled: currentPage === totalPages.value }">
+            <button class="page-link" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages.value">Tiếp</button>
           </li>
         </ul>
       </nav>
@@ -78,136 +78,98 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import Swal from "sweetalert2";
 import { useRouter } from "vue-router";
+import axios from "axios";
 
 export default {
   name: "BlogAdmin",
   setup() {
     const router = useRouter();
-
-    const users = ref([
-      { id: 1, author: "John Doe", title: "Introduction to Vue 3", category: "Technology", status: "Published", publishDate: "2024-12-01" },
-      { id: 2, author: "Jane Smith", title: "Health Benefits of Yoga", category: "Health", status: "Draft", publishDate: "2024-11-28" },
-      { id: 3, author: "Alice Johnson", title: "Top 10 Lifestyle Hacks", category: "Lifestyle", status: "Visibility", publishDate: "2024-12-05" },
-      { id: 4, author: "Bob Brown", title: "Advanced JavaScript Techniques", category: "Technology", status: "Published", publishDate: "2024-12-10" },
-      { id: 5, author: "Carol White", title: "Meditation for Beginners", category: "Health", status: "Draft", publishDate: "2024-11-20" },
-      { id: 6, author: "David Green", title: "Minimalist Living Tips", category: "Lifestyle", status: "Visibility", publishDate: "2024-12-15" },
-      { id: 7, author: "Eve Black", title: "Understanding TypeScript", category: "Technology", status: "Published", publishDate: "2024-12-18" },
-      { id: 8, author: "Frank Blue", title: "Healthy Eating Habits", category: "Health", status: "Draft", publishDate: "2024-11-25" },
-      { id: 9, author: "Grace Yellow", title: "Traveling on a Budget", category: "Lifestyle", status: "Visibility", publishDate: "2024-12-20" },
-      { id: 10, author: "Hank Purple", title: "React vs Vue: A Comparison", category: "Technology", status: "Published", publishDate: "2024-12-22" },
-      { id: 11, author: "Ivy Orange", title: "Yoga for Flexibility", category: "Health", status: "Draft", publishDate: "2024-11-30" },
-      { id: 12, author: "Jack Pink", title: "Home Organization Tips", category: "Lifestyle", status: "Visibility", publishDate: "2024-12-25" },
-      { id: 13, author: "Karen Red", title: "Building REST APIs with Node.js", category: "Technology", status: "Published", publishDate: "2024-12-28" },
-      { id: 14, author: "Leo Gray", title: "Mental Health Awareness", category: "Health", status: "Draft", publishDate: "2024-11-15" },
-      { id: 15, author: "Mona Blue", title: "Sustainable Living Practices", category: "Lifestyle", status: "Visibility", publishDate: "2024-12-30" },
-      { id: 16, author: "Nina Green", title: "CSS Grid Layout", category: "Technology", status: "Published", publishDate: "2024-12-31" },
-      { id: 17, author: "Oscar Brown", title: "Benefits of Regular Exercise", category: "Health", status: "Draft", publishDate: "2024-11-10" },
-      { id: 18, author: "Paul White", title: "Decluttering Your Home", category: "Lifestyle", status: "Visibility", publishDate: "2024-12-02" },
-      { id: 19, author: "Quincy Black", title: "Introduction to GraphQL", category: "Technology", status: "Published", publishDate: "2024-12-03" },
-      { id: 20, author: "Rachel Blue", title: "Healthy Sleep Habits", category: "Health", status: "Draft", publishDate: "2024-11-05" },
-      { id: 21, author: "Steve Yellow", title: "Mindfulness Techniques", category: "Lifestyle", status: "Visibility", publishDate: "2024-12-06" },
-      { id: 22, author: "Tina Purple", title: "Vue 3 Composition API", category: "Technology", status: "Published", publishDate: "2024-12-07" },
-      { id: 23, author: "Uma Orange", title: "Nutrition for Athletes", category: "Health", status: "Draft", publishDate: "2024-11-01" },
-      { id: 24, author: "Victor Pink", title: "Creating a Capsule Wardrobe", category: "Lifestyle", status: "Visibility", publishDate: "2024-12-08" },
-    ]);
-
-    const categories = ref(["Technology", "Health", "Lifestyle"]);
+    const users = ref([]);
     const searchTerm = ref("");
-    const selectedCategory = ref("");
     const selectedStatus = ref("");
-    const itemsPerPage = 20;
+    const itemsPerPage = ref(10);
     const currentPage = ref(1);
+    const loading = ref(true);
+
+    onMounted(async () => {
+      try {
+        const response = await axios.get("https://localhost:7017/api/admin/posts");
+        users.value = response.data.data.$values.map((post) => ({
+          id: post.id,
+          author: post.userId,
+          title: post.title,
+          state: post.published ? 1 : 0,
+          publishDate: post.publishedAt,
+        }));
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      } finally {
+        loading.value = false;
+      }
+    });
 
     const filteredUsers = computed(() => {
-      const search = searchTerm.value
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
-      const matchesSearchTerm = (user) =>
-        user.title
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .includes(search);
-      const matchesCategory = (user) => selectedCategory.value === "" || user.category === selectedCategory.value;
-      const matchesStatus = (user) => selectedStatus.value === "" || user.status === selectedStatus.value;
-
-      return users.value.filter((user) => matchesSearchTerm(user) && matchesCategory(user) && matchesStatus(user)).sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+      const search = searchTerm.value.toLowerCase();
+      return users.value
+        .filter((user) => user.title.toLowerCase().includes(search) && (selectedStatus.value === "" || user.state.toString() === selectedStatus.value))
+        .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
     });
 
     const paginatedUsers = computed(() => {
-      const start = (currentPage.value - 1) * itemsPerPage;
-      return filteredUsers.value.slice(start, start + itemsPerPage);
+      const start = (currentPage.value - 1) * itemsPerPage.value;
+      return filteredUsers.value.slice(start, start + itemsPerPage.value);
     });
 
-    const totalPages = computed(() => Math.ceil(filteredUsers.value.length / itemsPerPage));
+    const totalPages = computed(() => Math.ceil(filteredUsers.value.length / itemsPerPage.value));
 
-    const getStatusClass = (status) => {
-      switch (status) {
-        case "Draft":
-          return "bg-warning-light text-warning";
-        case "Visibility":
-          return "bg-info-light text-info";
-        case "Published":
-          return "bg-success-light text-success";
-        default:
-          return "bg-secondary-light text-secondary";
-      }
-    };
+    const getStatusClass = (state) => (state === 1 ? "bg-success-light text-success" : "bg-warning-light text-warning");
 
-    const swalConfirm = (id) => {
+    const swalConfirm = async (id) => {
       Swal.fire({
-        title: "Are you sure?",
-        text: "This action cannot be undone.",
+        title: "Bạn có chắc chắn?",
+        text: "Hành động này không thể hoàn tác.",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "Cancel",
+        confirmButtonText: "Đồng ý xóa!",
+        cancelButtonText: "Hủy",
         customClass: {
           confirmButton: "btn btn-danger m-1",
           cancelButton: "btn btn-secondary m-1",
         },
         buttonsStyling: false,
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          Swal.fire("Deleted!", `Blog with ID: ${id} has been deleted.`, "success");
-          // Add deletion logic here
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          Swal.fire("Cancelled", "The blog remains safe.", "info");
+          try {
+            loading.value = true;
+            await axios.delete(`https://localhost:7017/api/admin/posts/${id}`);
+            users.value = users.value.filter((user) => user.id !== id);
+            Swal.fire("Đã xóa!", `Bài viết với ID: ${id} đã được xóa.`, "success");
+          } catch (error) {
+            Swal.fire("Lỗi", "Xóa bài viết thất bại. Vui lòng thử lại.", "error");
+            console.error("Error deleting post:", error);
+          } finally {
+            loading.value = false;
+          }
         }
       });
     };
 
-    const viewBlog = (id) => {
-      router.push({ name: "AdminBlogView", params: { id } });
-    };
-
-    const editBlog = (id) => {
-      router.push({ name: "AdminBlogEdit", params: { id } });
-    };
-
+    const viewBlog = (id) => router.push({ name: "AdminBlogView", params: { id } });
+    const editBlog = (id) => router.push({ name: "AdminBlogEdit", params: { id } });
     const changePage = (page) => {
       if (page >= 1 && page <= totalPages.value) {
         currentPage.value = page;
       }
     };
-
-    const onSearch = () => {
-      currentPage.value = 1;
-    };
-
-    const onFilter = () => {
-      currentPage.value = 1;
-    };
+    const onSearch = () => (currentPage.value = 1);
+    const onFilter = () => (currentPage.value = 1);
 
     return {
       users,
-      categories,
       searchTerm,
-      selectedCategory,
       selectedStatus,
       filteredUsers,
       paginatedUsers,
@@ -220,6 +182,8 @@ export default {
       onFilter,
       changePage,
       currentPage,
+      loading,
+      itemsPerPage,
     };
   },
 };
@@ -229,7 +193,40 @@ export default {
 @import "sweetalert2/dist/sweetalert2.min.css";
 
 .table-bordered {
-  /* Your table styles here */
+  border: 1px solid #dee2e6;
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #dee2e6;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem;
+  vertical-align: top;
+}
+
+.table-responsive {
+  margin-top: 20px;
+}
+
+.table th {
+  background-color: #007bff;
+  color: white;
+}
+
+.table td {
+  background-color: #f8f9fa;
 }
 
 .clickable-row {

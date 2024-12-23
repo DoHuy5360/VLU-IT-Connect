@@ -16,19 +16,18 @@
     <table class="table table-bordered table-striped table-hover table-vcenter">
       <thead class="bg-primary text-light">
         <tr>
-          <!-- <th class="text-center">#</th> -->
           <th class="text-left">Danh mục</th>
           <th class="text-center">Nội dung</th>
           <th class="text-center">Số lượng bài viết</th>
           <th class="text-center">Sửa/Xóa</th>
         </tr>
       </thead>
-      <tbody v-if="categories">
-        <CategoryRow v-if="categories" :category="categories" :index="1" @edit="toggleVisibility" @delete="swalConfirm" />
+      <tbody v-if="categories.length">
+        <CategoryRow v-for="(category, index) in categories" :key="category.id" :category="category" @edit="toggleVisibility" @delete="swalConfirm" />
       </tbody>
       <tbody v-else>
         <tr>
-          <td colspan="5" class="text-center">Không có dữ liệu.</td>
+          <td colspan="4" class="text-center">Không có dữ liệu.</td>
         </tr>
       </tbody>
     </table>
@@ -64,31 +63,58 @@ export default {
   data() {
     return {
       searchTerm: "",
-      categories: null,
+      categories: [],
+      currentPage: 1,
+      totalPages: 1,
     };
   },
-  mounted() {
-    this.getCategories();
+  async mounted() {
+    await this.getCategories();
   },
   methods: {
     async getCategories() {
       try {
-        const res = await axios.get("/api/Categories/getallcategories", {
+        const response = await axios.get("/api/Categories/getallcategories", {
           params: {
             cateName: this.searchTerm || "",
-            indexPage: 1,
+            indexPage: this.currentPage,
             limitRange: 10,
           },
         });
-        this.totalPages = res.data?.data?.totalPages || 1;
-        this.categories = res.data?.data?.categories || null;
+
+        console.log("API Response:", response.data);
+
+        const rootCategory = response.data?.data?.categories || null;
+
+        if (rootCategory) {
+          // Flatten the tree structure
+          this.categories = this.flattenCategories(rootCategory.leftChild).concat(this.flattenCategories(rootCategory.rightChild));
+        } else {
+          this.categories = [];
+        }
+
+        console.log("Categories:", this.categories);
+        this.totalPages = response.data?.data?.totalPages || 1;
       } catch (error) {
         console.error("Error fetching categories:", error.response?.data || error.message);
-        this.categories = null;
+        this.categories = [];
       }
+    },
+    flattenCategories(category) {
+      if (!category) return [];
+      const children = [];
+      if (category.leftChild) children.push(...this.flattenCategories(category.leftChild));
+      if (category.rightChild) children.push(...this.flattenCategories(category.rightChild));
+      return [{ ...category }, ...children];
     },
     onSearch() {
       this.getCategories();
+    },
+    changePage(page) {
+      if (page > 0 && page <= this.totalPages) {
+        this.currentPage = page;
+        this.getCategories();
+      }
     },
     toggleVisibility(category) {
       console.log("Toggling visibility:", category);

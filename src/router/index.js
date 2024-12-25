@@ -29,6 +29,7 @@ const AccountManagerEdit = () => import("@/views/one-ui/accountmanager/EditAccou
 const MainLayout = () => import("@/layouts/variations/it-connect/MainLayout.vue");
 const AdminLayout = () => import("@/layouts/variations/one-ui/AdminLayout.vue");
 const LayoutSimple = () => import("@/layouts/variations/one-ui/Simple.vue");
+const ContentLayout = () => import("@/layouts/variations/it-connect/ContentLayout.vue");
 
 // Routes
 const routes = [
@@ -144,43 +145,46 @@ const routes = [
   },
 
   {
-    path: "/",
-    component: MainLayout,
+    path: "/blog",
+    component: ContentLayout,
+
     children: [
       {
         path: "",
-        name: "HomePage",
-        component: Home,
+        name: "Blog",
+        component: Blog,
+        meta: {
+          breadcrumb: "Videos",
+          heroTitles: {
+            website: ["Kiến thức Công Nghệ Thông Tin", "Dành cho Sinh viên"],
+            mobile: ["Kiến thức CNTT", "Dành cho Sinh viên"],
+          },
+        },
       },
       {
-        path: "categories",
-        name: "ListCategories",
-        component: Categories,
-      },
-      {
-        path: "videos",
-        name: "ListVideos",
-        component: Videos,
+        path: "detail",
+        name: "Detail",
+        component: Detail,
+        meta: {
+          breadcrumb: "Videos",
+          heroTitles: {
+            website: [],
+            mobile: [],
+          },
+        },
       },
       {
         path: "search",
-        name: "ListResult",
+
+        name: "Search",
         component: Search,
-      },
-      {
-        path: "blog",
-        children: [
-          {
-            path: "",
-            name: "Blog",
-            component: Blog,
+        meta: {
+          breadcrumb: "Videos",
+          heroTitles: {
+            website: [],
+            mobile: [],
           },
-          {
-            path: "detail",
-            name: "Detail",
-            component: Detail,
-          },
-        ],
+        },
       },
     ],
   },

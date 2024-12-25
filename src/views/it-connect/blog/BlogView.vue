@@ -60,9 +60,7 @@ export default {
   },
   async created() {
     try {
-      const response = await axios.get("/api/posts", {
-        params: { PageNumber: 1, PageSize: 10 },
-      });
+      const response = await axios.get("/api/posts", {});
       const posts = response.data?.data?.$values || [];
 
       if (posts.length > 0) {

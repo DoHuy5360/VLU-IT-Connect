@@ -63,7 +63,7 @@ const routes = [
             component: BlogCreate,
           },
           {
-            path: "edit/:id", //đây là route để edit bài viết
+            path: "edit", //đây là route để edit bài viết
             name: "AdminBlogEdit",
             component: BlogEdit,
             props: true,

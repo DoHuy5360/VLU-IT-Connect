@@ -96,10 +96,15 @@ export default {
 
     onMounted(async () => {
       try {
-        const response = await axios.get("https://localhost:7017/api/admin/posts");
+        const token = localStorage.getItem("authToken");
+        const response = await axios.get("/api/admin/posts", {
+          headers: {
+            Authorization: token,
+          },
+        });
         users.value = response.data.data.$values.map((post) => ({
           id: post.id,
-          author: post.userId,
+          author: post.userName,
           title: post.title,
           state: post.published ? 1 : 0,
           publishDate: post.publishedAt,
@@ -126,7 +131,7 @@ export default {
     const totalPages = computed(() => Math.ceil(filteredUsers.value.length / itemsPerPage.value));
 
     const getStatusClass = (state) => (state === 1 ? "bg-success-light text-success" : "bg-warning-light text-warning");
-
+    
     const swalConfirm = async (id) => {
       Swal.fire({
         title: "Bạn có chắc chắn?",

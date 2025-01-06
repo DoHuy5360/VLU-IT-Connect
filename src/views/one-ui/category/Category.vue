@@ -74,8 +74,10 @@ export default {
   methods: {
     async getCategories() {
       try {
+        const token = localStorage.getItem("authToken");
         const response = await axios.get("/api/Categories/getallcategories", {
           params: {
+            Authorization: token,
             cateName: this.searchTerm || "",
             indexPage: this.currentPage,
             limitRange: 10,

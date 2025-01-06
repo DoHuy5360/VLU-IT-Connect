@@ -1,5 +1,5 @@
 <template>
-  <BasePageHeading title="Master" subtitle="Welcome Admin!">//trang  nhận id sau khi nhấn bên blog admin và hiển thị thông tin của bài viết theo bảng này
+  <BasePageHeading title="Master" subtitle="Welcome Admin!">
     <template #extra>
       <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/blog/create')">
         <i class="fa fa-arrow-left opacity-50 me-1"></i>

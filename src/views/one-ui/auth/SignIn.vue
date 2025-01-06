@@ -18,16 +18,16 @@
                 <div class="py-3">
                   <div class="mb-4">
                     <input
-                      type="text"
+                      type="email"
                       class="form-control form-control-alt form-control-lg"
-                      v-model="state.username"
-                      placeholder="Username"
-                      :class="{ 'is-invalid': v$.username.$errors.length }"
-                      @blur="v$.username.$touch"
+                      v-model="state.email"
+                      placeholder="Email"
+                      :class="{ 'is-invalid': v$.email.$errors.length }"
+                      @blur="v$.email.$touch"
                     />
-                    <div v-if="v$.username.$errors.length" class="invalid-feedback">
-                      <span v-if="v$.username.$errors[0].$validator === 'required'">Username is required.</span>
-                      <span v-if="v$.username.$errors[0].$validator === 'minLength'">Username must be at least 3 characters.</span>
+                    <div v-if="v$.email.$errors.length" class="invalid-feedback">
+                      <span v-if="v$.email.$errors[0].$validator === 'required'">Email is required.</span>
+                      <span v-if="v$.email.$errors[0].$validator === 'email'">Enter a valid email address.</span>
                     </div>
                   </div>
                   <div class="mb-4">
@@ -75,17 +75,17 @@
 import axios from "axios";
 import { reactive } from "vue";
 import useVuelidate from "@vuelidate/core";
-import { required, minLength } from "@vuelidate/validators";
+import { required, minLength, email } from "@vuelidate/validators";
 
 export default {
   setup() {
     const state = reactive({
-      username: "",
+      email: "",
       password: "",
     });
 
     const rules = {
-      username: { required, minLength: minLength(3) },
+      email: { required, email },
       password: { required, minLength: minLength(5) },
     };
 
@@ -95,18 +95,40 @@ export default {
       login: false,
       microsoft: false,
     });
+    // const startTokenRefresh = (refreshToken) => {
+    //   // Set an interval to refresh the token every 30 minutes
+    //   refreshInterval = setInterval(async () => {
+    //     try {
+    //       const response = await axios.post("https://localhost:7017/refresh", { refreshToken });
+    //       const { tokenType, accessToken } = response.data;
+
+    //       // Update the token in localStorage
+    //       localStorage.setItem("authToken", `${tokenType} ${accessToken}`);
+    //       console.log("Access token refreshed.");
+    //     } catch (error) {
+    //       console.error("Token refresh failed:", error.response?.data || error.message);
+    //     }
+    //   }, 30 * 60 * 1000); // 30 minutes
+    // };
 
     const onSubmit = async () => {
       isLoading.login = true;
       try {
-        const response = await axios.post("/api/Auth/login", {
-          username: state.username,
+        const response = await axios.post("https://localhost:7017/login", {
+          email: state.email,
           password: state.password,
+          twoFactorCode: "string",
+          twoFactorRecoveryCode: "string",
         });
         alert("Login successful!");
         console.log("Login success:", response.data);
+
+        // Save token to a shared state/store or localStorage
+        const { tokenType, accessToken } = response.data;
+        localStorage.setItem("authToken", `${tokenType} ${accessToken}`);
+        // localStorage.setItem("refreshToken", refreshToken);
       } catch (error) {
-        alert("Login failed. Please check your username and password.");
+        alert("Login failed. Please check your email and password.");
         console.error("Login failed:", error.response?.data || error.message);
       } finally {
         isLoading.login = false;
@@ -114,17 +136,27 @@ export default {
     };
 
     const signInWithMicrosoft = async () => {
-      isLoading.microsoft = true;
-      try {
-        const response = await axios.get("/api/Auth/loginMicrosoft");
-        console.log("Microsoft login started:", response.data);
-      } catch (error) {
-        alert("Microsoft login failed.");
-        console.error("Microsoft login failed:", error.response?.data || error.message);
-      } finally {
-        isLoading.microsoft = false;
-      }
+      // isLoading.microsoft = true;
+      // try {
+      //   const response = await axios.get("/api/Auth/loginMicrosoft");
+      //   console.log("Microsoft login started:", response.data);
+      // } catch (error) {
+      //   alert("Microsoft login failed.");
+      //   console.error("Microsoft login failed:", error.response?.data || error.message);
+      // } finally {
+      //   isLoading.microsoft = false;
+      // }
     };
+    // onMounted(() => {
+    //   const storedRefreshToken = localStorage.getItem("refreshToken");
+    //   if (storedRefreshToken) {
+    //     startTokenRefresh(storedRefreshToken);
+    //   }
+    // });
+
+    // onBeforeUnmount(() => {
+    //   if (refreshInterval) clearInterval(refreshInterval);
+    // });
 
     return {
       state,

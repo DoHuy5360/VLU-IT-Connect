@@ -71,7 +71,7 @@ const routes = [
           {
             path: "viewdetail/:id", //đây là route để xem chi tiết bài viết
             name: "AdminBlogViewDetail",
-            component: () => import("@/views/AdminBlogView.vue"),
+            component: BlogViewDetail,
             props: true,
           },
           {

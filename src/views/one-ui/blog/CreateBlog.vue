@@ -12,230 +12,314 @@
     </template>
   </BasePageHeading>
 
-  <BaseBlock title="Thêm Bài Viết">
+  <BaseBlock title="THÊM BÀI VIẾT">
     <div class="col-lg-8 space-y-5">
-      <form @submit.prevent="submitForm">
-        <!-- Title Field -->
-        <div class="mb-4">
-          <label class="form-label" for="title">Tiêu Đề</label>
-          <input
-            type="text"
-            class="form-control"
-            id="title"
-            v-model="formData.title"
-            placeholder="Thêm Tiêu Đề Bài Viết"
-            required
-          />
+      <form @submit.prevent="submitForm" class="space-y-4">
+        <!-- Tiêu đề -->
+        <div>
+          <label>Tiêu đề</label>
+          <input v-model="formData.title" required class="form-control" />
         </div>
 
-        <!-- Slug Field -->
-        <SlugInput :title="formData.title" v-model="formData.slug" />
+        <!-- Slug -->
+        <div>
+          <label>Slug</label>
+          <input v-model="formData.slug" class="form-control" />
+        </div>
 
-        <!-- Category Field -->
-        <div class="mb-4">
-          <label class="form-label" for="example-select">Thể Loại</label>
-          <select class="form-select" id="example-select" v-model="formData.categoryId" required>
-            <option value="">Chọn Thể Loại</option>
-            <option v-for="category in categories" :key="category.Id" :value="category.Id">
-              {{ category.Name }}
+        <!-- Thể loại -->
+        <div>
+          <label>Thể loại</label>
+          <select v-model="formData.categoryId" required class="form-control">
+            <option value="">Chọn thể loại</option>
+            <option
+              v-for="category in categories"
+              :key="category.id"
+              :value="category.id"
+            >
+              {{ category.name }}
             </option>
           </select>
         </div>
 
-        <!-- Content Editor -->
-        <BaseBlock title="Editor" content-full>
+        <!-- Editor -->
+        <div>
+          <label>Nội dung</label>
           <ckeditor
-            :editor="ClassicEditor"
-            :config="editorConfig"
+            :editor="editor"
             v-model="formData.contentHtml"
-          />
-        </BaseBlock>
+            required
+          ></ckeditor>
+        </div>
 
-        <!-- Video Type -->
-        <div class="mb-4">
-          <label class="form-label" for="video-type">Loại Video</label>
-          <input
-            type="text"
+        <!-- Excerpt -->
+        <div>
+          <label>Tóm tắt</label>
+          <textarea
+            v-model="formData.excerpt"
             class="form-control"
-            id="video-type"
-            v-model="formData.VideoType"
-            placeholder="Nhập loại video"
-          />
+            rows="3"
+          ></textarea>
         </div>
 
-        <!-- Video URL -->
-        <div class="mb-4">
-          <label class="form-label" for="video-url">URL Video</label>
+        <!-- Video -->
+        <div>
+          <label>Loại Video</label>
+          <input v-model="formData.videoType" class="form-control" />
+        </div>
+
+        <div>
+          <label>URL Video</label>
+          <input v-model="formData.videoUrl" class="form-control" />
+        </div>
+
+        <div>
+          <label>File Video</label>
           <input
-            type="url"
+            type="file"
+            id="video-file"
+            accept="video/*"
             class="form-control"
-            id="video-url"
-            v-model="formData.VideoUrl"
-            placeholder="Nhập URL video"
           />
         </div>
 
-        <!-- Video File -->
-        <div class="mb-4">
-          <label class="form-label" for="video-file">Tải lên Video</label>
-          <input type="file" class="form-control" id="video-file" @change="handleFileUpload" />
+        <!-- Checkboxes -->
+        <div class="flex space-x-4">
+          <label>
+            <input type="checkbox" v-model="formData.enableComments" />
+            Cho phép bình luận
+          </label>
+
+          <label>
+            <input type="checkbox" v-model="formData.published" />
+            Công bố
+          </label>
         </div>
 
-        <!-- Enable Comments -->
-        <div class="mb-4 form-check">
-          <input
-            type="checkbox"
-            class="form-check-input"
-            id="enable-comments"
-            v-model="formData.EnableComments"
-          />
-          <label class="form-check-label" for="enable-comments">Cho phép bình luận</label>
-        </div>
-
-        <!-- Published -->
-        <div class="mb-4 form-check">
-          <input
-            type="checkbox"
-            class="form-check-input"
-            id="published"
-            v-model="formData.Published"
-          />
-          <label class="form-check-label" for="published">Công bố</label>
-        </div>
-
-        <!-- Submit Button -->
-        <div class="mb-4">
-          <button type="submit" class="btn btn-alt-primary bg-success">Hoàn tất</button>
-          <button
-            type="button"
-            class="btn btn-alt-secondary bg-info"
-            @click="$router.push('/administrator/blog/simulate')"
-          >
-            Mô phỏng
-          </button>
-        </div>
+        <button type="submit" class="btn btn-alt-primary bg-success">
+          Hoàn tất
+        </button>
+        <button type="button" class="btn btn-alt-secondary ms-2">
+          Mở phòng
+        </button>
       </form>
     </div>
   </BaseBlock>
 </template>
 
-<script setup>
+<script>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import axios from "axios";
-import SlugInput from "./components/SlugInput.vue";
-import CKEditor from "@ckeditor/ckeditor5-vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import SlugInput from "./components/SlugInput.vue";
 
-// Editor and form data
-const formData = ref({
-  title: "",
-  slug: "",
-  categoryId: "",
-  contentHtml: "<p>Thêm Nội Dung Bài Viết</p>",
-  VideoType: "",
-  VideoUrl: "",
-  VideoFile: null,
-  EnableComments: false,
-  Published: false,
-});
+export default {
+  setup() {
+    const router = useRouter();
+    const editor = ClassicEditor;
+    const categories = ref([]);
 
-const categories = ref([]);
-const token = localStorage.getItem("authToken");
-
-const editorConfig = ref({});
-let ckeditor = CKEditor.component;
-
-// Fetch categories
-onMounted(() => {
-  axios
-    .get("/api/Categories/getallcategories", {
-      headers: { Authorization: `Bearer ${token}` },
-      params: {
-        cateName: "",
-        indexPage: 1,
-        limitRange: 10,
-      },
-    })
-    .then((response) => {
-      categories.value = response.data;
-    })
-    .catch((error) => {
-      console.error("Lỗi khi tải thể loại:", error);
-      alert("Không thể tải danh sách thể loại. Vui lòng thử lại.");
+    const formData = ref({
+      title: "",
+      slug: "",
+      categoryId: "",
+      contentHtml: "",
+      excerpt: "",
+      videoType: "",
+      videoUrl: "",
+      published: false,
+      enableComments: false,
     });
-});
 
-// File upload handler
-function handleFileUpload(event) {
-  const file = event.target.files[0];
-  const validFormats = ["video/mp4", "video/avi", "video/mkv"];
-  if (file && !validFormats.includes(file.type)) {
-    alert("Định dạng video không được hỗ trợ. Vui lòng tải lên tệp MP4, AVI hoặc MKV.");
-    return;
-  }
-  if (file && file.size > 50 * 1024 * 1024) {
-    alert("Kích thước tệp video vượt quá 50MB.");
-    return;
-  }
-  formData.value.VideoFile = file;
-}
+    const fetchCategories = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          console.error("Token not found");
+          return;
+        }
 
-// Validate form
-function validateForm() {
-  if (!formData.value.title.trim()) {
-    alert("Tiêu đề không được để trống.");
-    return false;
-  }
-  if (!formData.value.categoryId) {
-    alert("Vui lòng chọn thể loại.");
-    return false;
-  }
-  if (formData.value.VideoUrl && !isValidURL(formData.value.VideoUrl)) {
-    alert("URL video không hợp lệ.");
-    return false;
-  }
-  return true;
-}
+        const response = await axios.get("/api/Categories/getallcategories", {
+          params: {
+            cateName: "",
+            indexPage: 1,
+            limitRange: 100,
+          },
+        });
 
-function isValidURL(url) {
-  const regex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
-  return regex.test(url);
-}
+        console.log("API Response:", response.data);
 
-// Form submission
-function submitForm() {
-  if (!token) {
-    alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
-    $router.push("/auth/signin");
-    return;
-  }
+        if (response.data?.data?.categories) {
+          const mainCategory = response.data.data.categories;
+          const allCategories = [];
 
-  if (!validateForm()) return;
+          allCategories.push({
+            id: mainCategory.Id,
+            name: mainCategory.Name,
+          });
 
-  const formPayload = new FormData();
-  Object.entries(formData.value).forEach(([key, value]) => {
-    formPayload.append(key, value);
-  });
+          if (mainCategory.LeftChild) {
+            allCategories.push({
+              id: mainCategory.LeftChild.Id,
+              name: mainCategory.LeftChild.Name,
+            });
+          }
 
-  axios
-    .post("/api/admin/posts", formPayload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    })
-    .then((response) => {
-      console.log("Bài viết đã được lưu:", response.data);
-      alert("Bài viết đã được thêm thành công!");
-      $router.push("/administrator/blog");
-    })
-    .catch((error) => {
-      console.error("Đã xảy ra lỗi khi thêm bài viết:", error.response?.data || error);
-      alert(error.response?.data?.message || "Đã xảy ra lỗi! Vui lòng thử lại.");
+          if (mainCategory.RightChild) {
+            allCategories.push({
+              id: mainCategory.RightChild.Id,
+              name: mainCategory.RightChild.Name,
+            });
+          }
+
+          categories.value = allCategories;
+          console.log("Processed Categories:", categories.value);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        if (error.response) {
+          console.error("Error Response:", error.response.data);
+        }
+        alert("Không thể tải danh sách thể loại. Vui lòng thử lại.");
+      }
+    };
+
+    onMounted(() => {
+      fetchCategories();
     });
-}
+
+    const submitForm = async () => {
+      try {
+        // Validate token first
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          alert("Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn");
+          router.push("/login");
+          return;
+        }
+
+        // Validate required fields
+        if (!formData.value.title?.trim()) {
+          alert("Vui lòng nhập tiêu đề bài viết");
+          return;
+        }
+        if (!formData.value.contentHtml?.trim()) {
+          alert("Vui lòng nhập nội dung bài viết");
+          return;
+        }
+        if (!formData.value.categoryId) {
+          alert("Vui lòng chọn thể loại bài viết");
+          return;
+        }
+
+        const formDataToSend = new FormData();
+
+        // Required fields
+        formDataToSend.append("Title", formData.value.title.trim());
+        formDataToSend.append(
+          "Slug",
+          formData.value.slug?.trim() ||
+            formData.value.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+        );
+        formDataToSend.append(
+          "CategoryIds[0]",
+          formData.value.categoryId.toString()
+        );
+        formDataToSend.append("ContentHtml", formData.value.contentHtml.trim());
+
+        // Optional fields
+        formDataToSend.append("Excerpt", formData.value.excerpt?.trim() || "");
+        formDataToSend.append("Published", formData.value.published.toString());
+        formDataToSend.append(
+          "EnableComments",
+          formData.value.enableComments.toString()
+        );
+        formDataToSend.append(
+          "VideoType",
+          formData.value.videoType?.trim() || ""
+        );
+        formDataToSend.append(
+          "VideoUrl",
+          formData.value.videoUrl?.trim() || ""
+        );
+
+        const videoFileInput = document.getElementById("video-file");
+        if (videoFileInput?.files[0]) {
+          const fileSize = videoFileInput.files[0].size;
+          const maxSize = 5 * 1024 * 1024; // 5MB
+          if (fileSize > maxSize) {
+            alert("File video không được vượt quá 5MB");
+            return;
+          }
+          formDataToSend.append("VideoFile", videoFileInput.files[0]);
+        }
+
+        // Log request data
+        console.log("Form data being sent:");
+        for (let pair of formDataToSend.entries()) {
+          console.log(`${pair[0]}: ${pair[1]}`);
+        }
+
+        // Token đã có prefix từ localStorage
+        const response = await axios.post("/api/admin/posts", formDataToSend, {
+          headers: {
+            Authorization: token, // Không thêm 'Bearer' vì token đã có prefix
+          },
+          timeout: 10000,
+        });
+
+        console.log("Response:", response.data);
+
+        if (response.data) {
+          alert("Bài viết đã được tạo thành công!");
+          router.push("/administrator/blog");
+        }
+      } catch (error) {
+        console.error("Error creating post:", error);
+
+        // Handle different types of errors
+        if (error.response) {
+          // Server responded with error
+          console.error("Server error response:", error.response);
+          if (error.response.status === 401 || error.response.status === 403) {
+            alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.");
+            router.push("/login");
+            return;
+          }
+          alert(
+            `Lỗi: ${error.response.data?.message || error.response.statusText}`
+          );
+        } else if (error.request) {
+          // Request was made but no response
+          console.error("No response received:", error.request);
+          alert(
+            "Không thể kết nối đến server. Vui lòng:\n1. Đăng nhập lại để lấy token mới\n2. Kiểm tra server đang chạy\n3. Kiểm tra địa chỉ https://localhost:7017"
+          );
+        } else {
+          // Error setting up request
+          console.error("Error:", error.message);
+          alert("Lỗi khi gửi yêu cầu: " + error.message);
+        }
+      }
+    };
+
+    return {
+      editor,
+      formData,
+      categories,
+      submitForm,
+    };
+  },
+};
 </script>
 
 <style scoped>
-/* Add any specific styles here */
+.ck-editor__editable {
+  min-height: 300px;
+}
+
+.form-check {
+  margin-left: 1.25rem;
+}
 </style>

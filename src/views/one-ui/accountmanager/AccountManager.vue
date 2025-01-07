@@ -74,7 +74,7 @@ const fetchUsers = async () => {
     const token = localStorage.getItem("authToken");
     const response = await axios.get("/api/AccountGroup/list", {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
       },
     });
     users.value = response.data.data.$values || [];

@@ -27,11 +27,11 @@
       </div>
       <div class="col-md-4">
         <select class="form-select" v-model="selectedGroup" @change="onFilterGroup">
-          <option value="">Tất cả nhóm tài khoản</option>
-          <option v-for="group in groups" :key="group.value" :value="group.value">
-            {{ group.label }}
-          </option>
-        </select>
+    <option value="">Tất cả nhóm tài khoản</option>
+    <option v-for="group in groups" :key="group.value" :value="group.value">
+      {{ group.label }}
+    </option>
+  </select>
       </div>
     </div>
 
@@ -60,9 +60,9 @@
                   {{ user.status }}
                 </span>
               </td>
-              <td>{{ user.name }}</td>
-              <td>{{ user.email }}</td>
-              <td>{{ user.group }}</td>
+              <td>{{ user.FullName }}</td>
+              <td>{{ user.Email }}</td>
+              <td>{{ user.Role }}</td>
               <td class="text-center">
                 <button
                   class="btn btn-sm btn-alt-warning"
@@ -119,84 +119,99 @@ const users = ref([]);
 const searchTerm = ref("");
 const selectedGroup = ref("");
 const currentPage = ref(1);
-const itemsPerPage = ref(20);
+const itemsPerPage = 20; // Keep constant instead of ref for better performance
+const groups = ref([]);
 const loading = ref(true);
 
-// Groups for filtering
-const groups = [
-  { label: "Admin", value: "Admin" },
-  { label: "Admin 2", value: "Admin 2" },
-  { label: "Editor", value: "Editor" },
-];
-
-// Fetch users on mount
-onMounted(async () => {
+// Fetch Groups
+const fetchGroups = async () => {
   try {
     const token = localStorage.getItem("authToken");
-    console.log(token)
+    const response = await axios.get("/api/AccountGroup/list", {
+      headers: { Authorization: token },
+    });
+    groups.value = response.data.data.$values.map((group) => ({
+      value: group.Id, // Ensure consistent string comparison
+      label: group.GroupName,
+    }));
+  } catch (error) {
+    Swal.fire("Error", "Không thể tải danh sách nhóm tài khoản.", "error");
+    console.error("Error fetching groups:", error);
+  }
+};
 
+// Fetch Users
+const fetchUsers = async () => {
+  try {
+    const token = localStorage.getItem("authToken");
     const response = await axios.get("/api/UserManagement/users", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: token },
     });
     users.value = response.data.data.$values.map((user) => ({
-      id: user.id,
-      name: user.fullName,
-      email: user.email,
-      group: user.role,
+      id: user.Id,
+      FullName: user.FullName,
+      Email: user.Email,
+      Role: user.Role.toString(), // Ensure consistent string comparison
       status: user.state ? "Active" : "Inactive",
     }));
   } catch (error) {
+    Swal.fire("Error", "Không thể tải dữ liệu tài khoản.", "error");
     console.error("Error fetching users:", error);
   } finally {
     loading.value = false;
   }
+};
+
+// Lifecycle Hooks
+onMounted(() => {
+  fetchGroups();
+  fetchUsers();
 });
 
 // Computed Properties
 const filteredUsers = computed(() => {
-  let result = [...users.value];
-
-  // Filter by group
-  if (selectedGroup.value) {
-    result = result.filter((user) => user.group === selectedGroup.value);
-  }
-
-  // Search functionality
-  if (searchTerm.value) {
-    const keyword = searchTerm.value.toLowerCase();
-    result = result.filter(
-      (user) =>
-        user.name.toLowerCase().includes(keyword) ||
-        user.email.toLowerCase().includes(keyword) ||
-        user.group.toLowerCase().includes(keyword)
-    );
-  }
-
-  return result;
+  return users.value
+    .filter((user) =>
+      !selectedGroup.value || user.Role === selectedGroup.value
+    )
+    .filter((user) => {
+      const keyword = searchTerm.value.trim().toLowerCase();
+      return (
+        !keyword ||
+        user.FullName.toLowerCase().includes(keyword) ||
+        user.Email.toLowerCase().includes(keyword) ||
+        user.Role.toLowerCase().includes(keyword)
+      );
+    });
 });
 
-const totalPages = computed(() => Math.ceil(filteredUsers.value.length / itemsPerPage.value));
+const totalPages = computed(() => Math.ceil(filteredUsers.value.length / itemsPerPage));
 const paginatedAccounts = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value;
-  return filteredUsers.value.slice(start, start + itemsPerPage.value);
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return filteredUsers.value.slice(start, start + itemsPerPage);
 });
-const currentPageIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value);
+const currentPageIndex = computed(() => (currentPage.value - 1) * itemsPerPage);
 
 // Methods
 const changePage = (page) => {
-  if (page > 0 && page <= totalPages.value) {
-    currentPage.value = page;
-  }
+  if (page >= 1 && page <= totalPages.value) currentPage.value = page;
 };
 
 const onSearch = () => (currentPage.value = 1);
-const onFilterGroup = () => (currentPage.value = 1);
 
-const deleteUser = (userId) => {
-  users.value = users.value.filter((user) => user.id !== userId);
-  Swal.fire("Deleted!", "The user has been deleted.", "success");
+
+const deleteUser = async (id) => {
+  try {
+    await axios.delete(`/api/UserManagement/users/${id}`);
+    users.value = users.value.filter((user) => user.id !== id);
+    Swal.fire("Deleted!", "The user has been deleted.", "success");
+  } catch (error) {
+    Swal.fire("Error", "Không thể xóa tài khoản.", "error");
+    console.error("Error deleting user:", error);
+  }
+};
+const onFilterGroup = () => {
+  currentPage.value = 1; // Reset to the first page whenever the filter changes
 };
 
 const swalConfirm = (id) => {
@@ -213,9 +228,7 @@ const swalConfirm = (id) => {
     },
     buttonsStyling: false,
   }).then((result) => {
-    if (result.isConfirmed) {
-      deleteUser(id);
-    }
+    if (result.isConfirmed) deleteUser(id);
   });
 };
 </script>
@@ -224,7 +237,6 @@ const swalConfirm = (id) => {
 .table th {
   white-space: nowrap;
 }
-
 .pagination .page-link {
   cursor: pointer;
 }

@@ -104,7 +104,7 @@ export default {
         });
         users.value = response.data.data.$values.map((post) => ({
           id: post.id,
-          author: post.userName,
+          author: post.author ,
           title: post.title,
           state: post.published ? 1 : 0,
           publishDate: post.publishedAt,

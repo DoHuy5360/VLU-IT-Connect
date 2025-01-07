@@ -22,10 +22,11 @@
         </div>
 
         <!-- Slug -->
-        <div>
-          <label>Slug</label>
-          <input v-model="formData.slug" class="form-control" />
-        </div>
+        <SlugInput
+          :title="formData.title"
+          v-model="formData.slug"
+          @update:modelValue="formData.slug = $event"
+        />
 
         <!-- Thể loại -->
         <div>
@@ -41,6 +42,14 @@
             </option>
           </select>
         </div>
+        <div>
+          <label>Mô tả ngắn</label>
+          <textarea
+            v-model="formData.excerpt"
+            class="form-control"
+            placeholder="Mô tả ngắn bài viết"
+          ></textarea>
+        </div>
 
         <!-- Editor -->
         <div>
@@ -50,16 +59,6 @@
             v-model="formData.contentHtml"
             required
           ></ckeditor>
-        </div>
-
-        <!-- Excerpt -->
-        <div>
-          <label>Tóm tắt</label>
-          <textarea
-            v-model="formData.excerpt"
-            class="form-control"
-            rows="3"
-          ></textarea>
         </div>
 
         <!-- Video -->
@@ -99,8 +98,8 @@
         <button type="submit" class="btn btn-alt-primary bg-success">
           Hoàn tất
         </button>
-        <button type="button" class="btn btn-alt-secondary ms-2">
-          Mở phòng
+        <button type="button" class="btn btn-alt-secondary ms-2" @click="$router.push('/administrator/blog/simulate')">
+          Mở Mô Phỏng
         </button>
       </form>
     </div>
@@ -108,18 +107,20 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import SlugInput from "./components/SlugInput.vue";
 
 export default {
+  components: {
+    SlugInput, 
+  },
   setup() {
     const router = useRouter();
     const editor = ClassicEditor;
     const categories = ref([]);
-
     const formData = ref({
       title: "",
       slug: "",
@@ -132,6 +133,7 @@ export default {
       enableComments: false,
     });
 
+    // Fetch categories from API
     const fetchCategories = async () => {
       try {
         const token = localStorage.getItem("authToken");
@@ -147,8 +149,6 @@ export default {
             limitRange: 100,
           },
         });
-
-        console.log("API Response:", response.data);
 
         if (response.data?.data?.categories) {
           const mainCategory = response.data.data.categories;
@@ -174,14 +174,9 @@ export default {
           }
 
           categories.value = allCategories;
-          console.log("Processed Categories:", categories.value);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
-        if (error.response) {
-          console.error("Error Response:", error.response.data);
-        }
-        alert("Không thể tải danh sách thể loại. Vui lòng thử lại.");
       }
     };
 
@@ -189,6 +184,7 @@ export default {
       fetchCategories();
     });
 
+    // Form submission logic
     const submitForm = async () => {
       try {
         // Validate token first
@@ -323,6 +319,3 @@ export default {
   margin-left: 1.25rem;
 }
 </style>
-headers: { Authorization: token // token đã có dạng "Bearer xxx" hoặc "tokenType
-xxx" }headers: { Authorization: token // token đã có dạng "Bearer xxx" hoặc
-"tokenType xxx" }

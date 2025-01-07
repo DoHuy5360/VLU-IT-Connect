@@ -14,9 +14,12 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, defineEmits } from "vue";
 
-// Nhận các props từ component cha
+// Emitting data to parent component
+const emit = defineEmits();
+
+// Receiving props from parent component
 const props = defineProps({
   title: {
     type: String,
@@ -28,41 +31,38 @@ const props = defineProps({
   },
 });
 
-// Sử dụng `emit` để cập nhật giá trị slug cho cha
-const emit = defineEmits(["update:modelValue"]);
-
-// Local state của slug
+// Create a reactive reference for slug
 const slug = ref(props.modelValue);
 
-// Hàm tạo slug
-function generateSlug(title) {
-  return title
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Loại bỏ dấu
-    .replace(/[^a-z0-9\s-]/g, "") // Loại bỏ ký tự đặc biệt
-    .trim()
-    .replace(/\s+/g, "-"); // Thay khoảng trắng bằng dấu gạch ngang
-}
-
-// Watcher cho `title` để cập nhật slug tự động
+// Watch for changes in the title and generate the slug
 watch(
   () => props.title,
   (newTitle) => {
     if (!slug.value || slug.value === generateSlug(props.modelValue)) {
       slug.value = generateSlug(newTitle);
-      emit("update:modelValue", slug.value); // Đồng bộ giá trị về cha
+      emit("update:modelValue", slug.value); // Emit updated slug value to parent
     }
   },
-  { immediate: true } // Kích hoạt ngay khi component được mount
+  { immediate: true }
 );
 
-// Xử lý khi người dùng chỉnh sửa slug thủ công
+// Function to handle manual input changes
 function onInputChange() {
   emit("update:modelValue", slug.value);
+}
+
+// Function to generate a slug from a title
+function generateSlug(title) {
+  return title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Remove accents
+    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
+    .trim()
+    .replace(/\s+/g, "-"); // Replace spaces with dashes
 }
 </script>
 
 <style scoped>
-/* Style tùy chỉnh */
+/* Custom styles (if any) */
 </style>

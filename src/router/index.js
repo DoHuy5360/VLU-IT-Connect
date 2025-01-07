@@ -63,16 +63,16 @@ const routes = [
             component: BlogCreate,
           },
           {
-            path: "edit", //đây là route để edit bài viết
+            path: "edit/:id", // đã sửa
             name: "AdminBlogEdit",
             component: BlogEdit,
             props: true,
           },
           {
-            path: "viewdetail/:id", //đây là route để xem chi tiết bài viết
+            path: "viewdetail/:id", // route để xem chi tiết bài viết
             name: "AdminBlogViewDetail",
             component: BlogViewDetail,
-            props: true,
+            props: true, // truyền props để truy cập trực tiếp `id` trong component
           },
           {
             path: "simulate",

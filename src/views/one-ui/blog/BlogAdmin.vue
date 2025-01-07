@@ -1,7 +1,7 @@
 <template>
   <BasePageHeading title="Blog" subtitle="Welcome Admin!">
     <template #extra>
-      <button type="button" class="btn btn-success d-flex align-items-center" v-click-ripple @click="$router.push('/administrator/blog/create')">
+      <button type="button" class="btn btn-success d-flex align-items-center" @click="$router.push('/administrator/blog/create')">
         <i class="fa fa-plus opacity-50 me-2"></i>
         Thêm bài viết mới
       </button>
@@ -41,7 +41,7 @@
             <td class="fw-semibold fs-sm">{{ user.author }}</td>
             <td class="fs-sm">{{ user.title }}</td>
             <td>
-              <span :class="`fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill ${getStatusClass(user.state)}`">
+              <span :class="'fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill ' + getStatusClass(user.state)">
                 {{ user.state === 1 ? "Public" : "Unpublic" }}
               </span>
             </td>
@@ -104,7 +104,8 @@ export default {
         });
         users.value = response.data.data.$values.map((post) => ({
           id: post.id,
-          author: post.author ,
+          author: post.author,
+          slug: post.slug,
           title: post.title,
           state: post.published ? 1 : 0,
           publishDate: post.publishedAt,
@@ -131,39 +132,49 @@ export default {
     const totalPages = computed(() => Math.ceil(filteredUsers.value.length / itemsPerPage.value));
 
     const getStatusClass = (state) => (state === 1 ? "bg-success-light text-success" : "bg-warning-light text-warning");
-    
-    const swalConfirm = async (id) => {
-      Swal.fire({
-        title: "Bạn có chắc chắn?",
-        text: "Hành động này không thể hoàn tác.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Đồng ý xóa!",
-        cancelButtonText: "Hủy",
-        customClass: {
-          confirmButton: "btn btn-danger m-1",
-          cancelButton: "btn btn-secondary m-1",
-        },
-        buttonsStyling: false,
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            loading.value = true;
-            await axios.delete(`https://localhost:7017/api/admin/posts/${id}`);
-            users.value = users.value.filter((user) => user.id !== id);
-            Swal.fire("Đã xóa!", `Bài viết với ID: ${id} đã được xóa.`, "success");
-          } catch (error) {
-            Swal.fire("Lỗi", "Xóa bài viết thất bại. Vui lòng thử lại.", "error");
-            console.error("Error deleting post:", error);
-          } finally {
-            loading.value = false;
-          }
-        }
-      });
-    };
 
-    const viewBlog = (id) => router.push({ name: "AdminBlogView", params: { id } });
-    const editBlog = (id) => router.push({ name: "AdminBlogEdit", params: { id } });
+    const swalConfirm = async (id) => {
+  Swal.fire({
+    title: "Bạn có chắc chắn?",
+    text: "Hành động này không thể hoàn tác.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Đồng ý xóa!",
+    cancelButtonText: "Hủy",
+    customClass: {
+      confirmButton: "btn btn-danger m-1",
+      cancelButton: "btn btn-secondary m-1",
+    },
+    buttonsStyling: false,
+  }).then(async (result) => {
+    const token = localStorage.getItem("authToken");
+    if (result.isConfirmed) {
+      try {
+        loading.value = true;
+        // Use a template literal to dynamically inject the ID
+        await axios.delete(`/api/admin/posts/${id}`, {
+          headers: {
+            Authorization: token,
+          },
+        });
+        users.value = users.value.filter((user) => user.id !== id);
+        Swal.fire("Đã xóa!", `Bài viết với ID: ${id} đã được xóa.`, "success");
+      } catch (error) {
+        Swal.fire("Lỗi", "Xóa bài viết thất bại. Vui lòng thử lại.", "error");
+        console.error("Error deleting post:", error);
+      } finally {
+        loading.value = false;
+      }
+    }
+  });
+};
+
+
+const viewBlog = (id) => {
+  router.push({ name: "AdminBlogViewDetail", params: { id: String(id) } });
+};
+const editBlog = (id) => router.push({ name: "AdminBlogEdit", params: { id: String(id) } });
+
     const changePage = (page) => {
       if (page >= 1 && page <= totalPages.value) {
         currentPage.value = page;

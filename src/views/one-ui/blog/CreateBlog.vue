@@ -323,3 +323,6 @@ export default {
   margin-left: 1.25rem;
 }
 </style>
+headers: { Authorization: token // token đã có dạng "Bearer xxx" hoặc "tokenType
+xxx" }headers: { Authorization: token // token đã có dạng "Bearer xxx" hoặc
+"tokenType xxx" }

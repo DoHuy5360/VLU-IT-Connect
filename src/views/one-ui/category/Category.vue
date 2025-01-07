@@ -76,8 +76,8 @@ export default {
       try {
         const token = localStorage.getItem("authToken");
         const response = await axios.get("/api/Categories/getallcategories", {
+          headers: { Authorization: `Bearer ${token}` },
           params: {
-            Authorization: token,
             cateName: this.searchTerm || "",
             indexPage: this.currentPage,
             limitRange: 10,
@@ -86,28 +86,31 @@ export default {
 
         console.log("API Response:", response.data);
 
-        const rootCategory = response.data?.data?.categories || null;
+        if (response.data?.data?.categories) {
+          const mainCategory = response.data.data.categories;
+          this.categories = [{
+            id: mainCategory.Id,
+            name: mainCategory.Name,
+            description: mainCategory.Description,
+            code: mainCategory.Code
+          }];
 
-        if (rootCategory) {
-          // Flatten the tree structure
-          this.categories = this.flattenCategories(rootCategory.leftChild).concat(this.flattenCategories(rootCategory.rightChild));
-        } else {
-          this.categories = [];
+          if (mainCategory.LeftChild) {
+            this.categories.push({
+              id: mainCategory.LeftChild.Id,
+              name: mainCategory.LeftChild.Name,
+              description: mainCategory.LeftChild.Description,
+              code: mainCategory.LeftChild.Code
+            });
+          }
+
+          console.log("Processed Categories:", this.categories);
+          this.totalPages = response.data?.data?.totalPages || 1;
         }
-
-        console.log("Categories:", this.categories);
-        this.totalPages = response.data?.data?.totalPages || 1;
       } catch (error) {
         console.error("Error fetching categories:", error.response?.data || error.message);
         this.categories = [];
       }
-    },
-    flattenCategories(category) {
-      if (!category) return [];
-      const children = [];
-      if (category.leftChild) children.push(...this.flattenCategories(category.leftChild));
-      if (category.rightChild) children.push(...this.flattenCategories(category.rightChild));
-      return [{ ...category }, ...children];
     },
     onSearch() {
       this.getCategories();

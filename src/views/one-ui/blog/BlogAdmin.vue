@@ -18,6 +18,17 @@
       </select>
     </div>
 
+    <div class="d-flex justify-content-end mb-3">
+      <button
+        type="button"
+        class="btn btn-danger"
+        :disabled="selectedUsers.length === 0"
+        @click="deleteMultiple"
+      >
+        Xóa nhiều
+      </button>
+    </div>
+
     <div v-if="filteredUsers.length === 0 && !loading" class="text-center p-5">
       <p class="text-muted fs-lg">Không tìm thấy kết quả phù hợp.</p>
     </div>
@@ -25,7 +36,11 @@
     <div v-else class="table-responsive">
       <table class="table table-bordered table-hover">
         <thead class="bg-primary text-white">
+          
           <tr>
+            <th class="text-center" style="width: 50px">
+              <input type="checkbox" :checked="isAllSelected" @click="selectAll($event)" />
+            </th>
             <th class="text-center" style="width: 80px">#</th>
             <th>Tác giả</th>
             <th>Tiêu đề</th>
@@ -35,6 +50,9 @@
         </thead>
         <tbody>
           <tr v-for="(user, index) in paginatedUsers" :key="user.id" @click="viewBlog(user.id)" class="clickable-row">
+            <td class="text-center">
+              <input type="checkbox" :value="user.id" v-model="selectedUsers" @click.stop />
+            </td>
             <td class="text-center fw-bold text-primary">
               {{ (currentPage - 1) * itemsPerPage + index + 1 }}
             </td>
@@ -78,7 +96,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import Swal from "sweetalert2";
 import { useRouter } from "vue-router";
 import axios from "axios";
@@ -93,6 +111,7 @@ export default {
     const itemsPerPage = ref(10);
     const currentPage = ref(1);
     const loading = ref(true);
+    const selectedUsers = ref([]);
 
     onMounted(async () => {
       try {
@@ -120,7 +139,10 @@ export default {
     const filteredUsers = computed(() => {
       const search = searchTerm.value.toLowerCase();
       return users.value
-        .filter((user) => user.title.toLowerCase().includes(search) && (selectedStatus.value === "" || user.state.toString() === selectedStatus.value))
+        .filter((user) =>
+          user.title.toLowerCase().includes(search) &&
+          (selectedStatus.value === "" || user.state.toString() === selectedStatus.value)
+        )
         .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
     });
 
@@ -133,47 +155,102 @@ export default {
 
     const getStatusClass = (state) => (state === 1 ? "bg-success-light text-success" : "bg-warning-light text-warning");
 
-    const swalConfirm = async (id) => {
-  Swal.fire({
-    title: "Bạn có chắc chắn?",
-    text: "Hành động này không thể hoàn tác.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Đồng ý xóa!",
-    cancelButtonText: "Hủy",
-    customClass: {
-      confirmButton: "btn btn-danger m-1",
-      cancelButton: "btn btn-secondary m-1",
-    },
-    buttonsStyling: false,
-  }).then(async (result) => {
-    const token = localStorage.getItem("authToken");
-    if (result.isConfirmed) {
-      try {
-        loading.value = true;
-        // Use a template literal to dynamically inject the ID
-        await axios.delete(`/api/admin/posts/${id}`, {
-          headers: {
-            Authorization: token,
-          },
-        });
-        users.value = users.value.filter((user) => user.id !== id);
-        Swal.fire("Đã xóa!", `Bài viết với ID: ${id} đã được xóa.`, "success");
-      } catch (error) {
-        Swal.fire("Lỗi", "Xóa bài viết thất bại. Vui lòng thử lại.", "error");
-        console.error("Error deleting post:", error);
-      } finally {
-        loading.value = false;
+    const isAllSelected = computed(() => {
+      return paginatedUsers.value.length > 0 &&
+             paginatedUsers.value.every(user => selectedUsers.value.includes(user.id));
+    });
+
+    const selectAll = (event) => {
+      if (event.target.checked) {
+        selectedUsers.value = paginatedUsers.value.map(user => user.id);
+      } else {
+        selectedUsers.value = [];
       }
-    }
-  });
-};
+    };
 
+    const deleteMultiple = async () => {
+      if (selectedUsers.value.length === 0) {
+        Swal.fire("Thông báo", "Vui lòng chọn ít nhất một bài viết để xóa!", "info");
+        return;
+      }
 
-const viewBlog = (id) => {
-  router.push({ name: "AdminBlogViewDetail", params: { id: String(id) } });
-};
-const editBlog = (id) => router.push({ name: "AdminBlogEdit", params: { id: String(id) } });
+      const confirmation = await Swal.fire({
+        title: "Bạn có chắc chắn?",
+        text: `Bạn sẽ xóa ${selectedUsers.value.length} bài viết đã chọn.`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Xóa",
+        cancelButtonText: "Hủy",
+        customClass: {
+          confirmButton: "btn btn-danger m-1",
+          cancelButton: "btn btn-secondary m-1",
+        },
+        buttonsStyling: false,
+      });
+
+      if (confirmation.isConfirmed) {
+        try {
+          const token = localStorage.getItem("authToken");
+          loading.value = true;
+
+          await axios.request({
+        url: "/api/admin/posts/multiple",
+        method: "DELETE",
+        headers: { Authorization: token },
+        data: selectedUsers.value, // Direct array as the body
+      });
+          users.value = users.value.filter(user => !selectedUsers.value.includes(user.id));
+          selectedUsers.value = [];
+
+          Swal.fire("Thành công", "Các bài viết đã được xóa.", "success");
+        } catch (error) {
+          console.error("Error deleting multiple posts:", error);
+          Swal.fire("Lỗi", "Xóa bài viết thất bại. Vui lòng thử lại.", "error");
+        } finally {
+          loading.value = false;
+        }
+      }
+    };
+
+    const swalConfirm = async (id) => {
+      Swal.fire({
+        title: "Bạn có chắc chắn?",
+        text: "Hành động này không thể hoàn tác.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Đồng ý xóa!",
+        cancelButtonText: "Hủy",
+        customClass: {
+          confirmButton: "btn btn-danger m-1",
+          cancelButton: "btn btn-secondary m-1",
+        },
+        buttonsStyling: false,
+      }).then(async (result) => {
+        const token = localStorage.getItem("authToken");
+        if (result.isConfirmed) {
+          try {
+            loading.value = true;
+            await axios.delete(`/api/admin/posts/${id}`, {
+              headers: {
+                Authorization: token,
+              },
+            });
+            users.value = users.value.filter((user) => user.id !== id);
+            Swal.fire("Đã xóa!", `Bài viết với ID: ${id} đã được xóa.`, "success");
+          } catch (error) {
+            Swal.fire("Lỗi", "Xóa bài viết thất bại. Vui lòng thử lại.", "error");
+            console.error("Error deleting post:", error);
+          } finally {
+            loading.value = false;
+          }
+        }
+      });
+    };
+
+    const viewBlog = (id) => {
+      router.push({ name: "AdminBlogViewDetail", params: { id: String(id) } });
+    };
+    const editBlog = (id) => router.push({ name: "AdminBlogEdit", params: { id: String(id) } });
 
     const changePage = (page) => {
       if (page >= 1 && page <= totalPages.value) {
@@ -200,6 +277,10 @@ const editBlog = (id) => router.push({ name: "AdminBlogEdit", params: { id: Stri
       currentPage,
       loading,
       itemsPerPage,
+      selectAll,
+      selectedUsers,
+      isAllSelected,
+      deleteMultiple,
     };
   },
 };

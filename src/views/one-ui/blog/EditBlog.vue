@@ -112,7 +112,13 @@
         <!-- Submit Buttons -->
         <div class="mb-4">
           <button type="submit" class="btn btn-alt-primary bg-success">Save</button>
-          <button type="button" class="btn btn-alt-secondary bg-info" @click="handleSimulate">Simulate</button>
+          <button
+  type="button"
+  class="btn btn-alt-secondary ms-2"
+  @click="navigateToSimulation"
+>
+  Mở Mô Phỏng
+</button>
         </div>
       </form>
     </div>
@@ -285,6 +291,18 @@ const submitForm = async () => {
 const handleSimulate = () => {
   router.push("/administrator/blog/simulate");
 };
+const navigateToSimulation = () => {
+      console.log("Navigating to simulation with data:", formData.value);
+      router.push({
+        path: "/administrator/blog/simulate",
+        query: {
+          ...formData.value,
+          image:
+            formData.value.image || "https://via.placeholder.com/800x400", // URL hình ảnh mặc định
+          videoUrl: formData.value.videoUrl || "", // URL video (nếu có)
+        },
+      });
+    };
 </script>
 
 <style scoped>

@@ -63,16 +63,16 @@ const routes = [
             component: BlogCreate,
           },
           {
-            path: "edit/:id", // đã sửa
+            path: "edit/:id",
             name: "AdminBlogEdit",
             component: BlogEdit,
             props: true,
           },
           {
-            path: "viewdetail/:id", // route để xem chi tiết bài viết
+            path: "viewdetail/:id",
             name: "AdminBlogViewDetail",
             component: BlogViewDetail,
-            props: true, // truyền props để truy cập trực tiếp `id` trong component
+            props: true,
           },
           {
             path: "simulate",
@@ -204,10 +204,40 @@ const router = createRouter({
 // NProgress configuration
 NProgress.configure({ showSpinner: false });
 
+// Session timeout setup
+const SESSION_TIMEOUT_MINUTES = 1000;
+const SESSION_TIMEOUT_MS = SESSION_TIMEOUT_MINUTES * 60 * 1000;
+
+let sessionTimeout;
+
+const resetSessionTimeout = () => {
+  clearTimeout(sessionTimeout);
+  sessionTimeout = setTimeout(() => {
+    localStorage.removeItem("authToken");
+    router.push({ name: "AuthSignIn" });
+    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.");
+  }, SESSION_TIMEOUT_MS);
+};
+
+// Start/reset session timeout on each interaction
+window.addEventListener("mousemove", resetSessionTimeout);
+window.addEventListener("keydown", resetSessionTimeout);
+window.addEventListener("click", resetSessionTimeout);
+resetSessionTimeout();
+
 router.beforeResolve((to, from, next) => {
   if (to.name) {
     NProgress.start();
   }
+
+  // Kiểm tra xác thực
+  const isAuthenticated = !!localStorage.getItem("authToken");
+
+  // Nếu người dùng truy cập trang quản trị nhưng chưa đăng nhập
+  if (to.path.startsWith("/administrator") && !isAuthenticated) {
+    return next({ name: "AuthSignIn" });
+  }
+
   next();
 });
 
@@ -216,3 +246,4 @@ router.afterEach(() => {
 });
 
 export default router;
+  

@@ -11,14 +11,27 @@
   <BaseBlock :title="isEditMode ? 'Edit User' : 'Create New User'">
     <div class="col-lg-8 space-y-5">
       <form @submit.prevent="handleSubmit">
+        <!-- Full Name -->
         <div class="mb-4">
           <label class="form-label" for="name">Họ và Tên*</label>
           <input type="text" class="form-control" id="name" v-model="formData.name" placeholder="Họ và Tên..." required />
+          <small v-if="formData.errors?.FullName" class="text-danger">{{ formData.errors.FullName[0] }}</small>
         </div>
+
+        <!-- Email -->
         <div class="mb-4">
           <label class="form-label" for="email">Email*</label>
           <input type="email" class="form-control" id="email" v-model="formData.email" placeholder="Email..." required />
+          <small v-if="formData.errors?.UserName" class="text-danger">{{ formData.errors.UserName[0] }}</small>
         </div>
+
+        <!-- Phone -->
+        <div class="mb-4">
+          <label class="form-label" for="phone">Số điện thoại*</label>
+          <input type="text" class="form-control" id="phone" v-model="formData.phone" placeholder="Số điện thoại..." required />
+        </div>
+
+        <!-- Role -->
         <div class="mb-4">
           <label class="form-label" for="role">Role*</label>
           <select class="form-select" v-model="formData.role" @change="handleRoleChange" required>
@@ -27,13 +40,16 @@
               {{ group.label }}
             </option>
           </select>
+          <small v-if="formData.errors?.RoleId" class="text-danger">{{ formData.errors.RoleId[0] }}</small>
         </div>
 
+        <!-- Role Name -->
         <div class="mb-4">
           <label class="form-label" for="roleName">Selected Role</label>
           <input type="text" class="form-control" id="roleName" v-model="formData.roleName" placeholder="Role Name" readonly />
         </div>
 
+        <!-- Submit Button -->
         <button type="submit" class="btn btn-alt-primary bg-success">
           {{ isEditMode ? "Cập nhật" : "Tạo mới" }}
         </button>
@@ -57,8 +73,10 @@ export default {
       id: "",
       name: "",
       email: "",
+      phone: "",
       role: "",
       roleName: "",
+      errors: {}, // API validation errors
     });
     const groups = ref([]);
 
@@ -78,24 +96,25 @@ export default {
     };
 
     const fetchAccountDetails = async () => {
-  if (!isEditMode.value) return;
-  const id = route.params.id; // Ensure we have the ID to fetch details
-  try {
-    const token = localStorage.getItem("authToken");
-    const response = await axios.get(`/api/UserManagement/user-detail/${id}`, {
-      headers: { Authorization: token },
-    });
-    const account = response.data.data;
+      if (!isEditMode.value) return;
+      const id = route.params.id;
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await axios.get(`/api/UserManagement/user-detail/${id}`, {
+          headers: { Authorization: token },
+        });
+        const account = response.data.data;
 
-    formData.value.id = account.Id;
-    formData.value.name = account.UserName;
-    formData.value.email = account.Email;
-    formData.value.role = account.GroupName; // Đặt giá trị Role từ API
-    formData.value.roleName = groups.value.find((group) => group.value === account.Role)?.label || ""; // Đặt RoleName tương ứng
-  } catch (error) {
-    console.error("Error fetching account details:", error);
-  }
-};
+        formData.value.id = account.Id;
+        formData.value.name = account.FullName;
+        formData.value.email = account.Email;
+        formData.value.phone = account.PhoneNumber || "";
+        formData.value.role = account.Groups?.$values[0]?.GroupId || "";
+        formData.value.roleName = account.Groups?.$values[0]?.GroupName || "";
+      } catch (error) {
+        console.error("Error fetching account details:", error);
+      }
+    };
 
     const handleRoleChange = () => {
       const selectedRole = groups.value.find((group) => group.value === formData.value.role);
@@ -106,64 +125,34 @@ export default {
       try {
         const token = localStorage.getItem("authToken");
 
-        // Kiểm tra dữ liệu đầy đủ và thông báo lỗi chi tiết
-        if (!formData.value.name) {
-          alert("Thiếu thông tin: Họ và Tên");
-          return;
-        }
-        if (!formData.value.email) {
-          alert("Thiếu thông tin: Email");
-          return;
-        }
-        if (!formData.value.role) {
-          alert("Thiếu thông tin: Role");
-          return;
-        }
+        const payload = {
+          Id: formData.value.id || "00000000-0000-0000-0000-000000000000",
+          Email: formData.value.email,
+          FullName: formData.value.name,
+          PhoneNumber: formData.value.phone,
+          RoleId: formData.value.role,
+          UserName: formData.value.email,
+        };
 
         if (isEditMode.value) {
-          // Update account
-          if (!formData.value.id) {
-            alert("ID là bắt buộc khi cập nhật tài khoản!");
-            return;
-          }
-
-          const payload = {
-            Id: formData.value.id,
-            Email: formData.value.email,
-            FullName: formData.value.name,
-            Role: formData.value.roleName,
-          };
-
-          console.log("Payload (PUT):", payload);
-
           await axios.put(`/api/UserManagement/users/${formData.value.id}`, payload, {
             headers: { Authorization: token },
           });
           alert("Cập nhật tài khoản thành công!");
         } else {
-          // Create account
-          const payload = {
-            Id: formData.value.id || "00000000-0000-0000-0000-000000000000",
-            Email: formData.value.email,
-            FullName: formData.value.name,
-            Role: formData.value.role,
-          };
-
-          console.log("Payload (POST):", payload);
-
           await axios.post("/api/UserManagement/users", payload, {
-            headers: {
-              Authorization: token,
-              "Content-Type": "application/json",
-            },
+            headers: { Authorization: token },
           });
           alert("Tạo tài khoản thành công!");
         }
 
         router.push("/administrator/account");
       } catch (error) {
-        console.error("Error submitting form:", error);
-        alert(`Đã xảy ra lỗi: ${error.response?.data?.message || error.message}`);
+        if (error.response?.data?.errors) {
+          formData.value.errors = error.response.data.errors;
+        } else {
+          alert(`Đã xảy ra lỗi: ${error.response?.data?.message || error.message}`);
+        }
       }
     };
 
@@ -182,7 +171,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
-/* Add specific styles here if needed */
+/* Add specific styles if needed */
 </style>

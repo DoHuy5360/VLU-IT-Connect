@@ -24,11 +24,19 @@
           <input type="email" class="form-control" id="email" v-model="formData.email" placeholder="VLU Email..." required />
           <small v-if="errors.email" class="text-danger">{{ errors.email }}</small>
         </div>
-        <!-- password -->
+
+        <!-- Password -->
         <div class="mb-4">
           <label class="form-label" for="password">Mật khẩu*</label>
           <input type="password" class="form-control" id="password" v-model="formData.password" placeholder="Mật khẩu..." required />
           <small v-if="errors.password" class="text-danger">{{ errors.password }}</small>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="mb-4">
+          <label class="form-label" for="phone">Số điện thoại*</label>
+          <input type="text" class="form-control" id="phone" v-model="formData.phone" placeholder="Số điện thoại..." required />
+          <small v-if="errors.phone" class="text-danger">{{ errors.phone }}</small>
         </div>
 
         <!-- Role -->
@@ -66,14 +74,16 @@ export default {
       formData: {
         name: "",
         email: "",
+        password: "",
+        phone: "", // Phone number field
         role: "",
-        roleName: "", // Tên Role sẽ tự động điền khi chọn Role
+        roleName: "", // Role name will auto-fill based on selection
       },
       errors: {},
       maxLengths: {
         name: 50,
       },
-      groups: [], // Data for roles
+      groups: [], // Roles data fetched from API
     };
   },
   methods: {
@@ -84,8 +94,9 @@ export default {
         const response = await axios.get("/api/AccountGroup/list", {
           headers: { Authorization: token },
         });
-        // Map API response to dropdown options
-        this.groups = response.data.data.$values.map((group) => ({
+
+        const groups = response.data.data?.$values || [];
+        this.groups = groups.map((group) => ({
           value: group.Id,
           label: group.GroupName,
         }));
@@ -99,7 +110,7 @@ export default {
     handleRoleChange() {
       const selectedRole = this.groups.find((group) => group.value === this.formData.role);
       if (selectedRole) {
-        this.formData.roleName = selectedRole.label; // Điền tên Role vào
+        this.formData.roleName = selectedRole.label;
       } else {
         this.formData.roleName = "";
       }
@@ -115,16 +126,29 @@ export default {
         return;
       }
 
-      // Validate role selection
+      // Validate phone number
+      if (!/^\d{10,15}$/.test(this.formData.phone)) {
+        this.errors.phone = "Số điện thoại không hợp lệ. Vui lòng nhập 10-15 chữ số.";
+        return;
+      }
 
       try {
         const authToken = localStorage.getItem("authToken") || "Bearer your-auth-token";
 
-        // Prepare payload for API
+        // Prepare payload matching your JSON structure
         const payload = {
-          email: this.formData.email,
-          fullName: this.formData.name,
-          role: this.formData.roleName, // Gửi tên Role
+          UserName: this.formData.email,
+          Email: this.formData.email,
+          FullName: this.formData.name,
+          Password: this.formData.password,
+          PhoneNumber: this.formData.phone,
+          EmailConfirmed: true,
+          PhoneNumberConfirmed: false,
+          TwoFactorEnabled: false,
+          LockoutEnd: null,
+          LockoutEnabled: false,
+          AccessFailedCount: 0,
+          RoleId: this.formData.role,
         };
 
         // Log payload for debugging
@@ -133,7 +157,7 @@ export default {
         const response = await axios.post("/api/UserManagement/users/add", payload, {
           headers: {
             Authorization: authToken,
-            "Content-Type": "application/json", // Đảm bảo gửi dạng JSON
+            "Content-Type": "application/json",
           },
         });
 

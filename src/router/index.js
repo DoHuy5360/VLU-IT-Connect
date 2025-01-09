@@ -115,9 +115,10 @@ const routes = [
             component: AccountManagerCreate,
           },
           {
-            path: "edit",
+            path: "edit/:id",
             name: "AdminAccountManagerEdit",
             component: AccountManagerEdit,
+            props: true,
           },
         ],
       },
@@ -135,9 +136,10 @@ const routes = [
             component: AccountCreate,
           },
           {
-            path: "edit",
+            path: "edit/:id",
             name: "AdminAccountEdit",
             component: AccountEdit,
+            props: true,
           },
         ],
       },

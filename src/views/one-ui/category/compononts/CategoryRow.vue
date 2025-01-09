@@ -1,5 +1,8 @@
 <template>
   <tr>
+    <td class="text-center">
+      <input type="checkbox" v-model="selected" @change="emitSelection" />
+    </td>
     <td class="text-left" :style="{ paddingLeft: `${20 * category.nestDepth}px` }">
       <button v-if="hasChildren" class="btn btn-sm btn-link p-0" @click="toggleChildren">
         <i :class="isExpanded ? 'fa fa-chevron-down' : 'fa fa-chevron-right'"></i>
@@ -23,6 +26,15 @@ export default {
       type: Object,
       required: true,
     },
+    isSelected: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      selected: this.isSelected,
+    };
   },
   computed: {
     hasChildren() {
@@ -35,6 +47,9 @@ export default {
   methods: {
     toggleChildren() {
       this.isExpanded = !this.isExpanded;
+    },
+    emitSelection() {
+      this.$emit("select", { id: this.category.id, selected: this.selected });
     },
   },
 };

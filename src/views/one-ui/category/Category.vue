@@ -16,6 +16,10 @@
     <table class="table table-bordered table-striped table-hover table-vcenter">
       <thead class="bg-primary text-light">
         <tr>
+          
+            <th class="text-center" style="width: 50px">
+             
+            </th>
           <th class="text-left">Danh mục</th>
           <th class="text-center">Nội dung</th>
           <th class="text-center">Số lượng bài viết</th>

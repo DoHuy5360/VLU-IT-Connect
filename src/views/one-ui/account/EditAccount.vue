@@ -1,119 +1,188 @@
 <template>
-  <BasePageHeading title="Sửa tài khoản" subtitle="">
+  <BasePageHeading :title="isEditMode ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản'" subtitle="">
     <template #extra>
       <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/account')">
         <i class="fa fa-arrow-left opacity-50 me-1"></i>
-        Về danh sách
+        Về danh sách
       </button>
     </template>
   </BasePageHeading>
 
-  <BaseBlock title="Edit User">
+  <BaseBlock :title="isEditMode ? 'Edit User' : 'Create New User'">
     <div class="col-lg-8 space-y-5">
       <form @submit.prevent="handleSubmit">
         <div class="mb-4">
           <label class="form-label" for="name">Họ và Tên*</label>
-          <input type="text" class="form-control" id="name" v-model="formData.name" placeholder="Họ và Tên..." :maxlength="maxLengths.name" @input="clearError('name')" required />
-          <small v-if="errors.name" class="text-danger">{{ errors.name }}</small>
+          <input type="text" class="form-control" id="name" v-model="formData.name" placeholder="Họ và Tên..." required />
         </div>
-
         <div class="mb-4">
           <label class="form-label" for="email">Email*</label>
-          <input type="email" class="form-control" id="email" v-model="formData.email" placeholder="VLU Email..." @input="clearError('email')" required />
-          <small v-if="errors.email" class="text-danger">{{ errors.email }}</small>
+          <input type="email" class="form-control" id="email" v-model="formData.email" placeholder="Email..." required />
         </div>
-
         <div class="mb-4">
-          <label class="form-label" for="password">Mật Khẩu*</label>
-          <input
-            type="password"
-            class="form-control"
-            id="password"
-            v-model="formData.password"
-            placeholder="Enter Password..."
-            :maxlength="maxLengths.password"
-            @input="clearError('password')"
-            required
-          />
-          <small v-if="errors.password" class="text-danger">{{ errors.password }}</small>
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label" for="accountType">Account Type*</label>
-          <select class="form-select" id="accountType" v-model="formData.role" @change="clearError('role')" required>
-            <option value="">Select Account Type</option>
-            <option value="admin">Admin</option>
-            <option value="user">User</option>
-            <option value="viewer">Viewer</option>
+          <label class="form-label" for="role">Role*</label>
+          <select class="form-select" v-model="formData.role" @change="handleRoleChange" required>
+            <option value="" disabled>Chọn Role</option>
+            <option v-for="group in groups" :key="group.value" :value="group.value">
+              {{ group.label }}
+            </option>
           </select>
-          <small v-if="errors.role" class="text-danger">{{ errors.role }}</small>
         </div>
 
-        <button type="submit" class="btn btn-alt-primary bg-success">Done</button>
+        <div class="mb-4">
+          <label class="form-label" for="roleName">Selected Role</label>
+          <input type="text" class="form-control" id="roleName" v-model="formData.roleName" placeholder="Role Name" readonly />
+        </div>
+
+        <button type="submit" class="btn btn-alt-primary bg-success">
+          {{ isEditMode ? "Cập nhật" : "Tạo mới" }}
+        </button>
       </form>
     </div>
   </BaseBlock>
 </template>
 
 <script>
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 
 export default {
-  data() {
-    return {
-      formData: {
-        name: "",
-        email: "",
-        password: "",
-        role: "",
-      },
-      errors: {},
-      maxLengths: {
-        name: 50,
-        password: 20,
-      },
-    };
-  },
-  methods: {
-    async handleSubmit() {
-      this.clearErrors();
+  setup() {
+    const route = useRoute();
+    const router = useRouter();
 
-      // Validate email domain
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(this.formData.email)) {
-        this.errors.email = "Invalid email format.";
-        return;
-      }
+    const isEditMode = computed(() => !!route.params.id);
+    const formData = ref({
+      id: "",
+      name: "",
+      email: "",
+      role: "",
+      roleName: "",
+    });
+    const groups = ref([]);
 
-      if (!this.formData.email.endsWith("@vlu.edu.vn")) {
-        this.errors.email = "Email must belong to the VLU domain.";
-        return;
-      }
-
+    const fetchGroups = async () => {
       try {
-        const response = await axios.post("/api/users", this.formData);
-        if (response.data.success) {
-          alert("User created successfully!");
-          this.$router.push("/administrator/users");
-        }
+        const token = localStorage.getItem("authToken");
+        const response = await axios.get("/api/AccountGroup/list", {
+          headers: { Authorization: token },
+        });
+        groups.value = response.data.data.$values.map((group) => ({
+          value: group.Id,
+          label: group.GroupName,
+        }));
       } catch (error) {
-        if (error.response?.status === 409) {
-          this.errors.email = "This email already exists.";
-        } else {
-          alert("An error occurred while creating the user.");
-        }
+        console.error("Error fetching groups:", error);
       }
-    },
-    clearErrors() {
-      this.errors = {};
-    },
-    clearError(field) {
-      this.errors[field] = null;
-    },
+    };
+
+    const fetchAccountDetails = async () => {
+  if (!isEditMode.value) return;
+  const id = route.params.id; // Ensure we have the ID to fetch details
+  try {
+    const token = localStorage.getItem("authToken");
+    const response = await axios.get(`/api/UserManagement/user-detail/${id}`, {
+      headers: { Authorization: token },
+    });
+    const account = response.data.data;
+
+    formData.value.id = account.Id;
+    formData.value.name = account.UserName;
+    formData.value.email = account.Email;
+    formData.value.role = account.GroupName; // Đặt giá trị Role từ API
+    formData.value.roleName = groups.value.find((group) => group.value === account.Role)?.label || ""; // Đặt RoleName tương ứng
+  } catch (error) {
+    console.error("Error fetching account details:", error);
+  }
+};
+
+    const handleRoleChange = () => {
+      const selectedRole = groups.value.find((group) => group.value === formData.value.role);
+      formData.value.roleName = selectedRole ? selectedRole.label : formData.value.roleName;
+    };
+
+    const handleSubmit = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+
+        // Kiểm tra dữ liệu đầy đủ và thông báo lỗi chi tiết
+        if (!formData.value.name) {
+          alert("Thiếu thông tin: Họ và Tên");
+          return;
+        }
+        if (!formData.value.email) {
+          alert("Thiếu thông tin: Email");
+          return;
+        }
+        if (!formData.value.role) {
+          alert("Thiếu thông tin: Role");
+          return;
+        }
+
+        if (isEditMode.value) {
+          // Update account
+          if (!formData.value.id) {
+            alert("ID là bắt buộc khi cập nhật tài khoản!");
+            return;
+          }
+
+          const payload = {
+            Id: formData.value.id,
+            Email: formData.value.email,
+            FullName: formData.value.name,
+            Role: formData.value.roleName,
+          };
+
+          console.log("Payload (PUT):", payload);
+
+          await axios.put(`/api/UserManagement/users/${formData.value.id}`, payload, {
+            headers: { Authorization: token },
+          });
+          alert("Cập nhật tài khoản thành công!");
+        } else {
+          // Create account
+          const payload = {
+            Id: formData.value.id || "00000000-0000-0000-0000-000000000000",
+            Email: formData.value.email,
+            FullName: formData.value.name,
+            Role: formData.value.role,
+          };
+
+          console.log("Payload (POST):", payload);
+
+          await axios.post("/api/UserManagement/users", payload, {
+            headers: {
+              Authorization: token,
+              "Content-Type": "application/json",
+            },
+          });
+          alert("Tạo tài khoản thành công!");
+        }
+
+        router.push("/administrator/account");
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        alert(`Đã xảy ra lỗi: ${error.response?.data?.message || error.message}`);
+      }
+    };
+
+    onMounted(async () => {
+      await fetchGroups();
+      await fetchAccountDetails();
+    });
+
+    return {
+      formData,
+      groups,
+      isEditMode,
+      handleSubmit,
+      handleRoleChange,
+    };
   },
 };
 </script>
 
 <style scoped>
-/* Add any specific styles */
+/* Add specific styles here if needed */
 </style>

@@ -78,7 +78,10 @@ export const useTemplateStore = defineStore({
     setLanguage(language) {
       this.app.language = language;
     },
-    setBreadcrumb(path) {
+    isVietNamese(){
+      return this.app.language==="VN"
+    },
+    setBreadcrumb(path){
       this.breadcrumb.path = path;
     },
     // Sets the layout, useful for setting different layouts (under layouts/variations/)

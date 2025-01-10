@@ -2,32 +2,32 @@
     <div class="bg-secondary text-white">
         <div class="container py-4">
             <h4 class="mb-3" style="font-weight: bold">
-                PHÒNG CÔNG NGHỆ THÔNG TIN
+                {{ store.isVietNamese() ? "PHÒNG CÔNG NGHỆ THÔNG TIN" : "Information Technology Department" }}
             </h4>
             <div class="d-flex flex-column" id="wrapCampusAddress">
                 <div>
                     <div class="d-sm-inline" style="font-weight: 500; text-decoration: underline"
-                        >Cơ sở chính:</div
+                        >{{ store.isVietNamese() ? "Cơ sở chính: " : "Main campus: " }}</div
                     >
                     <span style="font-weight: lighter">
-                        Phòng B.01, Tòa nhà A, 69/68 Đặng Thùy Trâm, P.13, Q.Bình
-                        Thạnh, Tp.HCM</span
+                        {{ store.isVietNamese() ? "Phòng B.01, Tòa nhà A, 69/68 Đặng Thùy Trâm, P.13, Q.Bình Thạnh, Tp.HCM" : "Room B.01, Toa nha A, 69/68 Dang Thuy Tram, P.13, Q.Binh Thanh, Tp.HCM" }}
+                        </span
                     >
                 </div>
                 <div>
                     <div class="d-sm-inline" style="font-weight: 500; text-decoration: underline"
-                        >Cơ sở 1:</div
+                        >{{ store.isVietNamese() ? "Cơ sở 1: " : "Campus 1: " }}</div
                     >
                     <span style="font-weight: lighter">
-                        Phòng 4.11, 45 Nguyễn Khắc nhu, P.Cô Giang, Q.1, Tp.HCM
+                        {{ store.isVietNamese() ? "Phòng 4.11, 45 Nguyễn Khắc nhu, P.Cô Giang, Q.1, Tp.HCM" : "Room 4.11, 45 Nguyen Khac nhu, P.Co Giang, Q.1, Tp.HCM" }}
                     </span>
                 </div>
                 <div>
                     <div class="d-sm-inline" style="font-weight: 500; text-decoration: underline"
-                        >Cơ sở 2:</div
+                        >{{ store.isVietNamese() ? "Cơ sở 2: " : "Campus 2: " }}</div
                     >
                     <span style="font-weight: lighter">
-                        Phòng C.02, 233A Phan Văn Trị, P.11, Q.Bình Thạnh, Tp.HCM
+                        {{ store.isVietNamese() ? "Phòng C.02, 233A Phan Văn Trị, P.11, Q.Bình Thạnh, Tp.HCM" : "Room C.02, 233A Phan Van Tri, P.11, Q.Binh Thanh, Tp.HCM" }}
                     </span>
                 </div>
                 <div class="d-flex gap-1 mt-2">
@@ -87,16 +87,19 @@
             <div class="d-flex mt-5" id="webAuthor">
                 <div>2024 © P.CNTT</div>
                 <div class="d-none d-sm-flex gap-3">
-                    <span>Giới thiệu</span>
-                    <span>Quy định - Chính sách</span>
-                    <span>Liên hệ</span>
+                    <span>{{ store.isVietNamese() ? "Giới thiệu" : "Introduction" }}</span>
+                    <span>{{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}</span>
+                    <span>{{ store.isVietNamese() ? "Liên hệ" : "Contact" }}</span>
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { useTemplateStore } from '../../../stores/template';
+const store = useTemplateStore()
+</script>
 
 <style lang="css" scoped>
 @media (max-width: 576px) {

@@ -2,11 +2,19 @@
     <div class="bg-secondary d-none d-sm-block">
         <div class="container">
             <div class="d-flex gap-4 justify-content-end align-items-center">
-                <div class="bg-primary text-white p-2 text-center">Trang Chủ</div>
-                <div class="text-white">Dịch vụ CNTT dành cho: Khách | Sinh viên | Cán bộ - Giảng viên - Nhân viên</div>
+                <div class="bg-primary text-white p-2 text-center">
+                    {{ store.isVietNamese() ? "Trang Chủ" : "Home" }}
+                </div>
+                <div class="text-white">
+                    {{
+                        store.isVietNamese()
+                            ? "Dịch vụ CNTT dành cho: Khách | Sinh viên | Cán bộ - Giảng viên - Nhân viên"
+                            : "Information Technology services for: Guest | Student | Staff - Lecture - Employee"
+                    }}
+                </div>
                 <div class="position-relative">
                     <div @click="toggleLanguageChoice" style="cursor: pointer">
-                        <div v-if="store.app.language==='VN'" class="d-flex gap-1 justify-content-end align-items-center">
+                        <div v-if="store.app.language === 'VN'" class="d-flex gap-1 justify-content-end align-items-center">
                             <!-- Viet Nam flag icon -->
                             <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -20,7 +28,7 @@
                             </svg>
                             <span class="text-white">VN</span>
                         </div>
-                        <div v-if="store.app.language==='EN'" class="d-flex gap-1 justify-content-end align-items-center">
+                        <div v-if="store.app.language === 'EN'" class="d-flex gap-1 justify-content-end align-items-center">
                             <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <g clip-path="url(#clip0_1241_1955)">
                                     <path
@@ -46,8 +54,8 @@
                             <span class="text-white">EN</span>
                         </div>
                     </div>
-                    <div v-if="isShowLanguageChoice" class="language_choice_wrapper bg-white rounded position-absolute shadow" style="overflow: hidden;">
-                        <div @click="selectLanguage('VN')" :class="(store.app.language==='VN' && 'bg-primary ') + 'language_option d-flex gap-1 px-3 py-1'" style="cursor: pointer;">
+                    <div v-if="isShowLanguageChoice" class="language_choice_wrapper bg-white rounded position-absolute shadow" style="overflow: hidden">
+                        <div @click="selectLanguage('VN')" :class="(store.app.language === 'VN' && 'bg-primary ') + 'language_option d-flex gap-1 px-3 py-1'" style="cursor: pointer">
                             <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M10.872 1.18918H2.73747C1.33166 1.18918 0.192017 2.27254 0.192017 3.60892V16.3921C0.192017 17.7284 1.33166 18.8118 2.73747 18.8118H25.4544C26.8602 18.8118 27.9999 17.7284 27.9999 16.3921V3.60892C27.9999 2.27254 26.8602 1.18918 25.4544 1.18918H10.872Z"
@@ -60,7 +68,7 @@
                             </svg>
                             <span>VN</span>
                         </div>
-                        <div @click="selectLanguage('EN')" :class="(store.app.language==='EN' && 'bg-primary ') + 'language_option d-flex gap-1 px-3 py-1'" style="cursor: pointer;">
+                        <div @click="selectLanguage('EN')" :class="(store.app.language === 'EN' && 'bg-primary ') + 'language_option d-flex gap-1 px-3 py-1'" style="cursor: pointer">
                             <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <g clip-path="url(#clip0_1241_1955)">
                                     <path
@@ -119,10 +127,18 @@
                     </span>
                 </div>
                 <div class="col d-none d-sm-flex gap-4 justify-content-end align-items-center text-end menu" style="font-weight: bold">
-                    <div style="cursor: pointer">Các câu hỏi thường gặp</div>
-                    <div style="cursor: pointer">Yêu cầu hỗ trợ</div>
-                    <div style="cursor: pointer">Quy định - Chính sách</div>
-                    <div style="cursor: pointer">Liên hệ</div>
+                    <div style="cursor: pointer">
+                        {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
+                    </div>
+                    <div style="cursor: pointer">
+                        {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
+                    </div>
+                    <div style="cursor: pointer">
+                        {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
+                    </div>
+                    <div style="cursor: pointer">
+                        {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -225,17 +241,17 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { inject } from "vue";
-import {useTemplateStore} from '@/stores/template';
+import { useTemplateStore } from "@/stores/template";
 
-const isShowLanguageChoice = ref(false)
+const isShowLanguageChoice = ref(false);
 
-const store = useTemplateStore()
+const store = useTemplateStore();
 
 const disableScroll = inject("disableScroll");
 
 const headerAsSidebar = ref(null);
 const searchBar = ref(null);
-const isSelectLanguageChoice = ref(false)
+const isSelectLanguageChoice = ref(false);
 
 function toggleHeaderInMobileView() {
     headerAsSidebar.value.classList.toggle("header_visibility");
@@ -247,30 +263,29 @@ function toggleSearchBar() {
 }
 
 function toggleLanguageChoice(e) {
-    e.stopPropagation()
-    isSelectLanguageChoice.value = true
-    isShowLanguageChoice.value = !isShowLanguageChoice.value
+    e.stopPropagation();
+    isSelectLanguageChoice.value = true;
+    isShowLanguageChoice.value = !isShowLanguageChoice.value;
 }
 
-function selectLanguage(lang){
-    store.setLanguage(lang)
-    isShowLanguageChoice.value = false
+function selectLanguage(lang) {
+    store.setLanguage(lang);
+    isShowLanguageChoice.value = false;
 }
 
-function handleClickOutside(e){
-    e.stopPropagation()
-    if(isShowLanguageChoice.value && isSelectLanguageChoice.value){
-        isShowLanguageChoice.value = false
+function handleClickOutside(e) {
+    e.stopPropagation();
+    if (isShowLanguageChoice.value && isSelectLanguageChoice.value) {
+        isShowLanguageChoice.value = false;
     }
 }
 
-onMounted(()=>{
-    window.addEventListener('click', handleClickOutside)
-})
-onBeforeUnmount(()=>{
-    window.removeEventListener('click', handleClickOutside)
-})
-
+onMounted(() => {
+    window.addEventListener("click", handleClickOutside);
+});
+onBeforeUnmount(() => {
+    window.removeEventListener("click", handleClickOutside);
+});
 </script>
 
 <style lang="css" scoped>

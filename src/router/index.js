@@ -29,6 +29,7 @@ const AccountManagerEdit = () => import("@/views/one-ui/accountmanager/EditAccou
 const MainLayout = () => import("@/layouts/variations/it-connect/MainLayout.vue");
 const AdminLayout = () => import("@/layouts/variations/one-ui/AdminLayout.vue");
 const LayoutSimple = () => import("@/layouts/variations/one-ui/Simple.vue");
+const ContentLayout = () => import("@/layouts/variations/it-connect/ContentLayout.vue");
 
 // Routes
 const routes = [
@@ -62,14 +63,16 @@ const routes = [
             component: BlogCreate,
           },
           {
-            path: "edit",
+            path: "edit/:id",
             name: "AdminBlogEdit",
             component: BlogEdit,
+            props: true,
           },
           {
-            path: "viewdetail",
+            path: "viewdetail/:id",
             name: "AdminBlogViewDetail",
             component: BlogViewDetail,
+            props: true,
           },
           {
             path: "simulate",
@@ -112,9 +115,10 @@ const routes = [
             component: AccountManagerCreate,
           },
           {
-            path: "edit",
+            path: "edit/:id",
             name: "AdminAccountManagerEdit",
             component: AccountManagerEdit,
+            props: true,
           },
         ],
       },
@@ -132,9 +136,10 @@ const routes = [
             component: AccountCreate,
           },
           {
-            path: "edit",
+            path: "edit/:id",
             name: "AdminAccountEdit",
             component: AccountEdit,
+            props: true,
           },
         ],
       },
@@ -149,34 +154,83 @@ const routes = [
         path: "",
         name: "HomePage",
         component: Home,
+        meta: { breadcrumb: "Home" },
       },
       {
         path: "categories",
         name: "ListCategories",
         component: Categories,
+        meta: {
+          breadcrumb: "Categories",
+          heroTitles: {
+            website: ["Kiến thức CNTT", "Dành cho Sinh viên"],
+            mobile: ["Kiến thức CNTT", "Dành cho Sinh viên"],
+          },
+        },
       },
       {
         path: "videos",
         name: "ListVideos",
         component: Videos,
+        meta: {
+          breadcrumb: "Videos",
+          heroTitles: {
+            website: ["Video Clips Công Nghệ Thông Tin"],
+            mobile: ["Video Clips Công Nghệ Thông Tin"],
+          },
+        },
       },
       {
         path: "search",
         name: "ListResult",
         component: Search,
+        meta: {
+          breadcrumb: "Search",
+          heroTitles: {
+              website: [],
+              mobile: ["Kết quả tìm kiếm"],
+          },
+        },
       },
       {
         path: "blog",
+        component: ContentLayout,
         children: [
           {
             path: "",
             name: "Blog",
             component: Blog,
+            meta: {
+              breadcrumb: "Videos",
+              heroTitles: {
+                website: ["Kiến thức Công Nghệ Thông Tin", "Dành cho Sinh viên"],
+                mobile: ["Kiến thức CNTT", "Dành cho Sinh viên"],
+              },
+            },
           },
           {
             path: "detail",
             name: "Detail",
             component: Detail,
+            meta: {
+              breadcrumb: "Videos",
+              heroTitles: {
+                website: [],
+                mobile: [],
+              },
+            },
+          },
+          {
+            path: "search",
+            name: "Search",
+            component: Search,
+            meta: {
+              breadcrumb: "Videos",
+              heroTitles: {
+                website: [],
+                mobile: [],
+              },
+            },
           },
         ],
       },
@@ -196,10 +250,40 @@ const router = createRouter({
 // NProgress configuration
 NProgress.configure({ showSpinner: false });
 
+// Session timeout setup
+const SESSION_TIMEOUT_MINUTES = 1000;
+const SESSION_TIMEOUT_MS = SESSION_TIMEOUT_MINUTES * 60 * 1000;
+
+let sessionTimeout;
+
+const resetSessionTimeout = () => {
+  clearTimeout(sessionTimeout);
+  sessionTimeout = setTimeout(() => {
+    localStorage.removeItem("authToken");
+    router.push({ name: "AuthSignIn" });
+    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.");
+  }, SESSION_TIMEOUT_MS);
+};
+
+// Start/reset session timeout on each interaction
+window.addEventListener("mousemove", resetSessionTimeout);
+window.addEventListener("keydown", resetSessionTimeout);
+window.addEventListener("click", resetSessionTimeout);
+resetSessionTimeout();
+
 router.beforeResolve((to, from, next) => {
   if (to.name) {
     NProgress.start();
   }
+
+  // Kiểm tra xác thực
+  const isAuthenticated = !!localStorage.getItem("authToken");
+
+  // Nếu người dùng truy cập trang quản trị nhưng chưa đăng nhập
+  if (to.path.startsWith("/administrator") && !isAuthenticated) {
+    return next({ name: "AuthSignIn" });
+  }
+
   next();
 });
 

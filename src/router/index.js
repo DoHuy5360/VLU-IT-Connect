@@ -147,46 +147,92 @@ const routes = [
   },
 
   {
-    path: "/blog",
-    component: ContentLayout,
-
+    path: "/",
+    component: MainLayout,
     children: [
       {
         path: "",
-        name: "Blog",
-        component: Blog,
+        name: "HomePage",
+        component: Home,
+        meta: { breadcrumb: "Home" },
+      },
+      {
+        path: "categories",
+        name: "ListCategories",
+        component: Categories,
         meta: {
-          breadcrumb: "Videos",
+          breadcrumb: "Categories",
           heroTitles: {
-            website: ["Kiến thức Công Nghệ Thông Tin", "Dành cho Sinh viên"],
+            website: ["Kiến thức CNTT", "Dành cho Sinh viên"],
             mobile: ["Kiến thức CNTT", "Dành cho Sinh viên"],
           },
         },
       },
       {
-        path: "detail",
-        name: "Detail",
-        component: Detail,
+        path: "videos",
+        name: "ListVideos",
+        component: Videos,
         meta: {
           breadcrumb: "Videos",
           heroTitles: {
-            website: [],
-            mobile: [],
+            website: ["Video Clips Công Nghệ Thông Tin"],
+            mobile: ["Video Clips Công Nghệ Thông Tin"],
           },
         },
       },
       {
         path: "search",
-
-        name: "Search",
+        name: "ListResult",
         component: Search,
         meta: {
-          breadcrumb: "Videos",
+          breadcrumb: "Search",
           heroTitles: {
-            website: [],
-            mobile: [],
+              website: [],
+              mobile: ["Kết quả tìm kiếm"],
           },
         },
+      },
+      {
+        path: "blog",
+        component: ContentLayout,
+        children: [
+          {
+            path: "",
+            name: "Blog",
+            component: Blog,
+            meta: {
+              breadcrumb: "Videos",
+              heroTitles: {
+                website: ["Kiến thức Công Nghệ Thông Tin", "Dành cho Sinh viên"],
+                mobile: ["Kiến thức CNTT", "Dành cho Sinh viên"],
+              },
+            },
+          },
+          {
+            path: "detail",
+            name: "Detail",
+            component: Detail,
+            meta: {
+              breadcrumb: "Videos",
+              heroTitles: {
+                website: [],
+                mobile: [],
+              },
+            },
+          },
+          {
+            path: "search",
+            name: "Search",
+            component: Search,
+            meta: {
+              breadcrumb: "Videos",
+              heroTitles: {
+                website: [],
+                mobile: [],
+              },
+            },
+          },
+        ],
       },
     ],
   },
@@ -246,4 +292,3 @@ router.afterEach(() => {
 });
 
 export default router;
-  

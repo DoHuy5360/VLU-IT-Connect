@@ -8,91 +8,107 @@
     </template>
   </BasePageHeading>
 
-  <BaseBlock title="Blog Overview">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <input v-model="searchTerm" type="text" placeholder="Tìm kiếm bài viết..." class="form-control flex-grow-1 me-2" @input="onSearch" />
-      <select v-model="selectedStatus" class="form-control w-25" @change="onFilter">
-        <option value="">Tất cả trạng thái</option>
-        <option value="1">Public</option>
-        <option value="0">Unpublic</option>
-      </select>
+  <div class="content">
+    <!-- Filters and Search -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <input
+          type="text"
+          class="form-control"
+          v-model="searchTerm"
+          placeholder="Tìm kiếm bài viết..."
+          @input="onSearch"
+        />
+      </div>
+      <div class="col-md-4">
+        <select class="form-select" v-model="selectedStatus" @change="onFilter">
+          <option value="">Tất cả trạng thái</option>
+          <option value="1">Public</option>
+          <option value="0">Unpublic</option>
+        </select>
+      </div>
     </div>
 
-    <div class="d-flex justify-content-end mb-3">
-      <button
-        type="button"
-        class="btn btn-danger"
-        :disabled="selectedUsers.length === 0"
-        @click="deleteMultiple"
-      >
-        Xóa nhiều
-      </button>
+    <!-- Loading Spinner -->
+    <div v-if="loading" class="text-center">
+      <p>Đang tải dữ liệu...</p>
     </div>
 
-    <div v-if="filteredUsers.length === 0 && !loading" class="text-center p-5">
-      <p class="text-muted fs-lg">Không tìm thấy kết quả phù hợp.</p>
-    </div>
-
-    <div v-else class="table-responsive">
-      <table class="table table-bordered table-hover">
-        <thead class="bg-primary text-white">
-          
-          <tr>
-            <th class="text-center" style="width: 50px">
-              <input type="checkbox" :checked="isAllSelected" @click="selectAll($event)" />
-            </th>
-            <th class="text-center" style="width: 80px">#</th>
-            <th>Tác giả</th>
-            <th>Tiêu đề</th>
-            <th style="width: 15%">Trạng thái</th>
-            <th class="text-center" style="width: 120px">Sửa/Xóa</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(user, index) in paginatedUsers" :key="user.id" @click="viewBlog(user.id)" class="clickable-row">
-            <td class="text-center">
-              <input type="checkbox" :value="user.id" v-model="selectedUsers" @click.stop />
-            </td>
-            <td class="text-center fw-bold text-primary">
-              {{ (currentPage - 1) * itemsPerPage + index + 1 }}
-            </td>
-            <td class="fw-semibold fs-sm">{{ user.author }}</td>
-            <td class="fs-sm">{{ user.title }}</td>
-            <td>
-              <span :class="'fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill ' + getStatusClass(user.state)">
-                {{ user.state === 1 ? "Public" : "Unpublic" }}
-              </span>
-            </td>
-            <td class="text-center">
-              <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-warning" @click.stop="editBlog(user.id)">
-                  <i class="fa fa-edit me-1"></i>
+    <!-- Blog Table -->
+    <div v-else>
+      <BaseBlock title="Danh sách bài viết" class="shadow-sm rounded">
+        <p class="fs-sm text-muted mb-4">
+          Danh sách bài viết hiển thị theo thứ tự thời gian, bài viết mới nhất ở đầu danh sách.
+        </p>
+        <div v-if="paginatedUsers.length">
+          <table class="table table-bordered table-striped table-vcenter align-middle">
+            <thead class="bg-primary-light">
+              <tr>
+                <th class="text-center" style="width: 50px">
+                  <input type="checkbox" :checked="isAllSelected" @click="selectAll($event)" />
+                </th>
+                <th class="text-center">#</th>
+                <th>Tiêu đề</th>
+                <th>Tác giả</th>
+                <th>Trạng thái</th>
+                <th class="text-center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(user, index) in paginatedUsers" :key="user.id">
+                <td class="text-center">
+                  <input type="checkbox" :value="user.id" v-model="selectedUsers" @click.stop />
+                </td>
+                <td class="text-center">{{ currentPageIndex + index + 1 }}</td>
+                <td>{{ user.title }}</td>
+                <td>{{ user.author }}</td>
+                <td>
+                  <span :class="`badge bg-${user.state === 1 ? 'success' : 'warning'}`">
+                    {{ user.state === 1 ? 'Public' : 'Unpublic' }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <button
+                    class="btn btn-sm btn-alt-warning"
+                    @click.stop="editBlog(user.id)"
+                  >
+                    <i class="fa fa-fw fa-pencil-alt"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    title="Xóa bài viết"
+                    @click="swalConfirm(user.id)"
+                  >
+                    <i class="fa fa-fw fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- Pagination -->
+          <nav v-if="filteredUsers.length > itemsPerPage" class="mt-3">
+            <ul class="pagination justify-content-center">
+              <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                <button class="page-link" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Trước</button>
+              </li>
+              <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }">
+                <button class="page-link" @click="changePage(page)">
+                  {{ page }}
                 </button>
-                <button type="button" class="btn btn-sm btn-danger" @click.stop="swalConfirm(user.id)">
-                  <i class="fa fa-trash me-1"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <nav v-if="filteredUsers.length > itemsPerPage" class="mt-3">
-        <ul class="pagination justify-content-center">
-          <li class="page-item" :class="{ disabled: currentPage === 1 }">
-            <button class="page-link" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Trước</button>
-          </li>
-          <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }">
-            <button class="page-link" @click="changePage(page)">
-              {{ page }}
-            </button>
-          </li>
-          <li class="page-item" :class="{ disabled: currentPage === totalPages.value }">
-            <button class="page-link" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages.value">Tiếp</button>
-          </li>
-        </ul>
-      </nav>
+              </li>
+              <li class="page-item" :class="{ disabled: currentPage === totalPages.value }">
+                <button class="page-link" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages.value">Tiếp</button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div v-else class="text-center">
+          <p class="text-muted">Không tìm thấy kết quả phù hợp</p>
+        </div>
+      </BaseBlock>
     </div>
-  </BaseBlock>
+  </div>
 </template>
 
 <script>

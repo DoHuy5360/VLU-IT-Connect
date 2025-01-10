@@ -16,10 +16,7 @@
     <table class="table table-bordered table-striped table-hover table-vcenter">
       <thead class="bg-primary text-light">
         <tr>
-          
-            <th class="text-center" style="width: 50px">
-             
-            </th>
+          <th class="text-center" style="width: 50px"></th>
           <th class="text-left">Danh mục</th>
           <th class="text-center">Nội dung</th>
           <th class="text-center">Số lượng bài viết</th>
@@ -31,7 +28,7 @@
       </tbody>
       <tbody v-else>
         <tr>
-          <td colspan="4" class="text-center">Không có dữ liệu.</td>
+          <td colspan="5" class="text-center">Không có dữ liệu.</td>
         </tr>
       </tbody>
     </table>
@@ -129,7 +126,7 @@ export default {
       console.log("Toggling visibility:", category);
     },
     swalConfirm(category) {
-      if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.name}"?`)) {
+      if (confirm(`Bạn có chắc chắn muốn xóa danh mục \"${category.name}\"?`)) {
         alert("Danh mục đã được xóa!");
       }
     },

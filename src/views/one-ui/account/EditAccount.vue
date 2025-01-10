@@ -106,7 +106,7 @@ export default {
         const account = response.data.data;
 
         formData.value.id = account.Id;
-        formData.value.name = account.FullName;
+        formData.value.name = account.UserName;
         formData.value.email = account.Email;
         formData.value.phone = account.PhoneNumber || "";
         formData.value.role = account.Groups?.$values[0]?.GroupId || "";
@@ -122,39 +122,58 @@ export default {
     };
 
     const handleSubmit = async () => {
-      try {
-        const token = localStorage.getItem("authToken");
+  try {
+    const token = localStorage.getItem("authToken");
 
-        const payload = {
-          Id: formData.value.id || "00000000-0000-0000-0000-000000000000",
-          Email: formData.value.email,
-          FullName: formData.value.name,
-          PhoneNumber: formData.value.phone,
-          RoleId: formData.value.role,
-          UserName: formData.value.email,
-        };
-
-        if (isEditMode.value) {
-          await axios.put(`/api/UserManagement/users/${formData.value.id}`, payload, {
-            headers: { Authorization: token },
-          });
-          alert("Cập nhật tài khoản thành công!");
-        } else {
-          await axios.post("/api/UserManagement/users", payload, {
-            headers: { Authorization: token },
-          });
-          alert("Tạo tài khoản thành công!");
-        }
-
-        router.push("/administrator/account");
-      } catch (error) {
-        if (error.response?.data?.errors) {
-          formData.value.errors = error.response.data.errors;
-        } else {
-          alert(`Đã xảy ra lỗi: ${error.response?.data?.message || error.message}`);
-        }
-      }
+    // Prepare the payload
+    const payload = {
+      Id: formData.value.id || "00000000-0000-0000-0000-000000000000",
+      UserName: formData.value.name,
+      Email: formData.value.email,
+      FullName: formData.value.name,
+      PhoneNumber: formData.value.phone,
+      RoleId: formData.value.role,
+      EmailConfirmed: true, // Default values
+      PhoneNumberConfirmed: true,
+      TwoFactorEnabled: false,
+      LockoutEnd: null,
+      LockoutEnabled: false,
+      AccessFailedCount: 0,
     };
+
+    // Validate required fields
+    if (!payload.UserName || !payload.Email || !payload.FullName || !payload.RoleId) {
+      formData.value.errors = {
+        FullName: !payload.FullName ? ["Full name is required."] : null,
+        UserName: !payload.UserName ? ["User name is required."] : null,
+        Email: !payload.Email ? ["Email is required."] : null,
+        RoleId: !payload.RoleId ? ["Role is required."] : null,
+      };
+      return;
+    }
+
+    // Determine the request type (create or update)
+    const url = isEditMode.value
+      ? `/api/UserManagement/update-user/${formData.value.id}`
+      : "/api/UserManagement/create-user";
+    const method = isEditMode.value ? "put" : "post";
+
+    // Make API call
+    await axios[method](url, payload, {
+      headers: { Authorization: token },
+    });
+
+    // Redirect on success
+    router.push("/administrator/account");
+  } catch (error) {
+    // Handle server validation errors
+    if (error.response && error.response.data && error.response.data.errors) {
+      formData.value.errors = error.response.data.errors;
+    } else {
+      console.error("Error submitting form:", error);
+    }
+  }
+};
 
     onMounted(async () => {
       await fetchGroups();

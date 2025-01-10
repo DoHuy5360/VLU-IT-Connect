@@ -137,9 +137,9 @@ export default {
 
         // Prepare payload matching your JSON structure
         const payload = {
-          UserName: this.formData.email,
-          Email: this.formData.email,
+          UserName: this.formData.name,
           FullName: this.formData.name,
+          Email: this.formData.email,
           Password: this.formData.password,
           PhoneNumber: this.formData.phone,
           EmailConfirmed: true,

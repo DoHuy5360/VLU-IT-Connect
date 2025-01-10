@@ -6,9 +6,11 @@
                     {{ store.isVietNamese() ? "Trang Chủ" : "Home" }}
                 </div>
                 <div class="text-white">
-                    {{ 
-                        store.isVietNamese() ? "Dịch vụ CNTT dành cho: Khách | Sinh viên | Cán bộ - Giảng viên - Nhân viên": "Information Technology services for: Guest | Student | Staff - Lecture - Employee"
-                        }}
+                    {{
+                        store.isVietNamese()
+                            ? "Dịch vụ CNTT dành cho: Khách | Sinh viên | Cán bộ - Giảng viên - Nhân viên"
+                            : "Information Technology services for: Guest | Student | Staff - Lecture - Employee"
+                    }}
                 </div>
                 <div class="position-relative">
                     <div @click="toggleLanguageChoice" style="cursor: pointer">

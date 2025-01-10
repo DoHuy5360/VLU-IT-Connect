@@ -1,43 +1,14 @@
 <template>
     <div class="gap-3" style="display: grid" id="hero">
-        <div
-            class="w-100 bg-new-gray"
-            style="
-                display: flex;
-                flex-direction: column;
-                background-repeat: no-repeat;
-            "
-            id="heroLandscape"
-        >
-            <div
-                class="w-100 h-100"
-                id="heroOverlay"
-                style="
-                    display: grid;
-                    place-items: center;
-                "
-            >
+        <div class="w-100 bg-new-gray" style="display: flex; flex-direction: column; background-repeat: no-repeat" id="heroLandscape">
+            <div class="w-100 h-100" id="heroOverlay" style="display: grid; place-items: center">
                 <div class="d-none d-sm-flex flex-column align-items-center" id="search">
-                    <span
-                        class="text-white mb-3"
-                        style="font-weight: 600; font-size: xx-large"
-                        >
+                    <span class="text-white mb-3" style="font-weight: 600; font-size: xx-large">
                         {{ store.isVietNamese() ? "Bạn cần giúp đỡ vấn đề gì?" : "What can I assist you?" }}
-                        </span
-                    >
+                    </span>
                     <div class="bg-white rounded-pill px-2 py-1 d-flex align-items-center">
-                        <input
-                            type="text"
-                            style="outline: none; border: none; width: 400px"
-                            autofocus
-                        />
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
+                        <input type="text" style="outline: none; border: none; width: 400px" autofocus v-model="searchValue" @input="onInput" />
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
                                 stroke="#171717"
@@ -45,84 +16,46 @@
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                             />
-                            <path
-                                d="M22 22L20 20"
-                                stroke="#171717"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
+                            <path d="M22 22L20 20" stroke="#171717" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </div>
                 </div>
             </div>
-            <div
-                class="w-100 bg-new-gray position-relative"
-                style="bottom: 0"
-                id="wrapThreeRepresentItems"
-            >
-                <div class="position-absolute w-100" id="threeRepresentItems" style="opacity: .9;">
+            <div class="w-100 bg-new-gray position-relative" style="bottom: 0" id="wrapThreeRepresentItems">
+                <div class="position-absolute w-100" id="threeRepresentItems" style="opacity: 0.9">
                     <div class="container">
-                        <div
-                            class="row justify-content-center bg-white rounded"
-                        >
+                        <div class="row justify-content-center bg-white rounded">
                             <div class="col-sm-4 p-3">
                                 <img
                                     src="https://images.unsplash.com/photo-1580795479225-c50ab8c3348d?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    style="
-                                        object-fit: cover;
-                                        display: block;
-                                        width: 100%;
-                                        height: 120px;
-                                    "
+                                    style="object-fit: cover; display: block; width: 100%; height: 120px"
                                     alt=""
                                 />
                                 <div class="d-flex flex-column">
                                     <b>Yêu cầu hỗ trợ</b>
-                                    <span style=""
-                                        >Hỗ trợ nhanh theo các danh mục dịch vụ
-                                        Công nghệ thông tin sẵn có.</span
-                                    >
+                                    <span style="">Hỗ trợ nhanh theo các danh mục dịch vụ Công nghệ thông tin sẵn có.</span>
                                 </div>
                             </div>
                             <div class="col-sm-4 p-3">
                                 <img
                                     src="https://images.unsplash.com/photo-1495427513693-3f40da04b3fd?q=80&w=1471&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    style="
-                                        object-fit: cover;
-                                        display: block;
-                                        width: 100%;
-                                        height: 120px;
-                                    "
+                                    style="object-fit: cover; display: block; width: 100%; height: 120px"
                                     alt=""
                                 />
                                 <div class="d-flex flex-column">
                                     <b>Trợ giúp</b>
-                                    <span style=""
-                                        >Bạn không tìm thấy những thông tin cần
-                                        thiết trên đây? Hãy liên hệ với bộ phận
-                                        Hỗ trợ dịch vụ CNTT.</span
-                                    >
+                                    <span style="">Bạn không tìm thấy những thông tin cần thiết trên đây? Hãy liên hệ với bộ phận Hỗ trợ dịch vụ CNTT.</span>
                                 </div>
                             </div>
                             <div class="col-sm-4 p-3">
                                 <img
                                     src="https://images.unsplash.com/photo-1456406644174-8ddd4cd52a06?q=80&w=1468&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    style="
-                                        object-fit: cover;
-                                        display: block;
-                                        width: 100%;
-                                        height: 120px;
-                                    "
+                                    style="object-fit: cover; display: block; width: 100%; height: 120px"
                                     alt=""
                                 />
                                 <div class="d-flex flex-column">
                                     <b>Kiến thức Công nghệ thông tin</b>
-                                    <span style=""
-                                        >Tìm kiếm thông tin để khắc phục sự cố
-                                        hoặc tìm hiểu cách thực hiện những gì
-                                        bạn cần.</span
-                                    >
+                                    <span style="">Tìm kiếm thông tin để khắc phục sự cố hoặc tìm hiểu cách thực hiện những gì bạn cần.</span>
                                 </div>
                             </div>
                         </div>
@@ -134,25 +67,12 @@
             <div class="container py-2">
                 <div class="row gap-4" id="wrapQuestionAndNotification">
                     <div class="col col-sm-12 col-lg-7 rounded p-3 bg-white shadow-sm">
-                        <h4 class="mb-3" style="font-weight: bold">
-                            Các câu hỏi thường gặp
-                        </h4>
+                        <h4 class="mb-3" style="font-weight: bold">Các câu hỏi thường gặp</h4>
                         <div class="d-flex flex-column gap-3">
-                            <div
-                                v-for="(
-                                    question, index
-                                ) in frequentlyAskedQuestions"
-                                :key="index"
-                            >
+                            <div v-for="(question, index) in frequentlyAskedQuestions" :key="index">
                                 <div class="d-flex gap-2">
                                     <div style="width: 24px">
-                                        <svg
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path
                                                 d="M15 22.75H9C3.57 22.75 1.25 20.43 1.25 15V9C1.25 3.57 3.57 1.25 9 1.25H15C20.43 1.25 22.75 3.57 22.75 9V15C22.75 20.43 20.43 22.75 15 22.75ZM9 2.75C4.39 2.75 2.75 4.39 2.75 9V15C2.75 19.61 4.39 21.25 9 21.25H15C19.61 21.25 21.25 19.61 21.25 15V9C21.25 4.39 19.61 2.75 15 2.75H9Z"
                                                 fill="#171717"
@@ -163,34 +83,18 @@
                                             />
                                         </svg>
                                     </div>
-                                    <b
-                                        class="hover_underline"
-                                        style="cursor: pointer"
-                                        >{{ question }}</b
-                                    >
+                                    <b class="hover_underline" style="cursor: pointer">{{ question }}</b>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col col-sm-12 col-lg rounded p-3 bg-white shadow-sm">
-                        <h4 class="mb-3" style="font-weight: bold">
-                            Thông báo
-                        </h4>
+                        <h4 class="mb-3" style="font-weight: bold">Thông báo</h4>
                         <div class="d-flex flex-column gap-2">
-                            <div
-                                v-for="(notice, index) in notifications"
-                                :key="index"
-                                class="background_gradient p-2 rounded-pill"
-                            >
+                            <div v-for="(notice, index) in notifications" :key="index" class="background_gradient p-2 rounded-pill">
                                 <div class="d-flex gap-2 align-items-center">
                                     <div style="width: 24px">
-                                        <svg
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path
                                                 fill-rule="evenodd"
                                                 clip-rule="evenodd"
@@ -199,10 +103,7 @@
                                             />
                                         </svg>
                                     </div>
-                                    <b
-                                        class="hover_underline"
-                                        style="cursor: pointer"
-                                    >
+                                    <b class="hover_underline" style="cursor: pointer">
                                         {{ notice }}
                                     </b>
                                 </div>
@@ -213,68 +114,29 @@
             </div>
             <div class="container py-2 bg-white rounded mb-3 shadow-sm">
                 <div class="d-flex justify-content-between">
-                    <h4 class="mb-3" style="font-weight: bold">
-                        Clip hướng dẫn sử dụng
-                    </h4>
-                    <b
-                        class="text-primary hover_underline"
-                        style="cursor: pointer"
-                        >Xem tất cả</b
-                    >
+                    <h4 class="mb-3" style="font-weight: bold">Clip hướng dẫn sử dụng</h4>
+                    <b class="text-primary hover_underline" style="cursor: pointer">Xem tất cả</b>
                 </div>
                 <div class="row" id="wrapVideo">
                     <div class="col">
-                        <iframe
-                            width="100%"
-                            height="200px"
-                            src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6"
-                            frameborder="0"
-                            allowfullscreen
-                            class="rounded"
-                        ></iframe>
+                        <iframe width="100%" height="200px" src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6" frameborder="0" allowfullscreen class="rounded"></iframe>
                         <div>
                             <strong>Hướng dẫn</strong>
-                            <div>
-                                Lorem, ipsum dolor sit amet consectetur
-                                adipisicing elit. Maxime aliquid iusto tempore
-                                recusandae obcaecati
-                            </div>
+                            <div>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime aliquid iusto tempore recusandae obcaecati</div>
                         </div>
                     </div>
                     <div class="col">
-                        <iframe
-                            width="100%"
-                            height="200px"
-                            src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6"
-                            frameborder="0"
-                            allowfullscreen
-                            class="rounded"
-                        ></iframe>
+                        <iframe width="100%" height="200px" src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6" frameborder="0" allowfullscreen class="rounded"></iframe>
                         <div>
                             <strong>Hướng dẫn</strong>
-                            <div>
-                                Lorem, ipsum dolor sit amet consectetur
-                                adipisicing elit. Maxime aliquid iusto tempore
-                                recusandae obcaecati
-                            </div>
+                            <div>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime aliquid iusto tempore recusandae obcaecati</div>
                         </div>
                     </div>
                     <div class="col">
-                        <iframe
-                            width="100%"
-                            height="200px"
-                            src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6"
-                            frameborder="0"
-                            allowfullscreen
-                            class="rounded"
-                        ></iframe>
+                        <iframe width="100%" height="200px" src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6" frameborder="0" allowfullscreen class="rounded"></iframe>
                         <div>
                             <strong>Hướng dẫn</strong>
-                            <div>
-                                Lorem, ipsum dolor sit amet consectetur
-                                adipisicing elit. Maxime aliquid iusto tempore
-                                recusandae obcaecati
-                            </div>
+                            <div>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime aliquid iusto tempore recusandae obcaecati</div>
                         </div>
                     </div>
                 </div>
@@ -283,32 +145,9 @@
     </div>
 </template>
 
-<script setup>
-
-import { useTemplateStore } from '../../stores/template';
-const store = useTemplateStore()
-
-const frequentlyAskedQuestions = [
-    "Truy cập Wifi Văn Lang như thế nào?",
-    "Địa chỉ email của em là gì và sử dụng như thế nào?",
-    "Tài khoản các dịch vụ CNTT của sinh viên bao gồm những tài khoản nào?",
-    "Em muốn thay đổi mật khẩu các dịch vụ CNTT thì làm như thế nào?",
-    "Sử dụng Microsoft Teams như thế nào?",
-    "Đăng nhập vào trang Elearning như thế nào?",
-    "Làm thế nào để tìm được lớp học trên Elearning?",
-    "Em không ghi danh được vào lớp học trên trang E-learning thì phải làm sao?",
-];
-
-const notifications = [
-    "Nâng cấp hệ thống Wifi và dịch vụ CNTT",
-    "Lịch thi (lần 1) học kỳ 1 năm học 2024- 2025",
-    "Lịch thi xếp lớp tiếng Anh K28",
-];
-</script>
-
 <style lang="css" scoped>
 .background_gradient {
-    background: linear-gradient(to right, #FFEBE9, #FFFFFF);
+    background: linear-gradient(to right, #ffebe9, #ffffff);
 }
 /* màn hình nhỏ */
 @media (max-width: 576px) {
@@ -318,7 +157,7 @@ const notifications = [
     #wrapThreeRepresentItems {
         height: 100%;
     }
-    #heroOverlay{
+    #heroOverlay {
         background: none !important;
     }
     #threeRepresentItems {
@@ -327,7 +166,7 @@ const notifications = [
     #heroLandscape {
         background-size: contain;
         background-position: top;
-        background-image: url('../../../assets/media/brand/cropped_landscape.png');
+        background-image: url("../../../assets/media/brand/cropped_landscape.png");
     }
     #wrapQuestionAndNotification {
         display: flex !important;
@@ -353,9 +192,9 @@ const notifications = [
         background-size: cover;
         background-position: center;
         height: 100%;
-        background-image: url('../../../assets/media/brand/vlu_landscape-compressed.jpg');
+        background-image: url("../../../assets/media/brand/vlu_landscape-compressed.jpg");
     }
-    #search{
+    #search {
         transform: translateY(-50%);
     }
 }
@@ -367,3 +206,27 @@ const notifications = [
     }
 }
 </style>
+<script setup>
+import { ref, computed } from "vue";
+import { useTemplateStore } from "../../stores/template";
+const store = useTemplateStore();
+
+const searchValue = ref("");
+
+const onInput = computed(() => {
+    console.log(searchValue.value);
+});
+
+const frequentlyAskedQuestions = [
+    "Truy cập Wifi Văn Lang như thế nào?",
+    "Địa chỉ email của em là gì và sử dụng như thế nào?",
+    "Tài khoản các dịch vụ CNTT của sinh viên bao gồm những tài khoản nào?",
+    "Em muốn thay đổi mật khẩu các dịch vụ CNTT thì làm như thế nào?",
+    "Sử dụng Microsoft Teams như thế nào?",
+    "Đăng nhập vào trang Elearning như thế nào?",
+    "Làm thế nào để tìm được lớp học trên Elearning?",
+    "Em không ghi danh được vào lớp học trên trang E-learning thì phải làm sao?",
+];
+
+const notifications = ["Nâng cấp hệ thống Wifi và dịch vụ CNTT", "Lịch thi (lần 1) học kỳ 1 năm học 2024- 2025", "Lịch thi xếp lớp tiếng Anh K28"];
+</script>

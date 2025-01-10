@@ -4,7 +4,7 @@
       <button type="button" class="btn btn-success" @click="$router.push('/administrator/category/create')"><i class="fa fa-plus opacity-50 me-1"></i> Thêm danh mục</button>
     </template>
   </BasePageHeading>
-
+ 
   <BaseBlock>
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h5 class="mb-0">Bảng danh mục</h5>
@@ -12,11 +12,10 @@
         <input v-model="searchTerm" type="text" placeholder="Tìm kiếm (Tên danh mục)..." class="form-control" @input="onSearch" />
       </div>
     </div>
-
+ 
     <table class="table table-bordered table-striped table-hover table-vcenter">
       <thead class="bg-primary text-light">
         <tr>
-          <th class="text-center" style="width: 50px"></th>
           <th class="text-left">Danh mục</th>
           <th class="text-center">Nội dung</th>
           <th class="text-center">Số lượng bài viết</th>
@@ -28,7 +27,7 @@
       </tbody>
       <tbody v-else>
         <tr>
-          <td colspan="5" class="text-center">Không có dữ liệu.</td>
+          <td colspan="4" class="text-center">Không có dữ liệu.</td>
         </tr>
       </tbody>
     </table>
@@ -47,13 +46,13 @@
     </nav>
   </BaseBlock>
 </template>
-
+ 
 <script>
 import axios from "axios";
 import CategoryRow from "@/views/one-ui/category/compononts/CategoryRow.vue";
 import BasePageHeading from "@/components/BasePageHeading.vue";
 import BaseBlock from "@/components/BaseBlock.vue";
-
+ 
 export default {
   name: "SimpleCategoryTable",
   components: {
@@ -84,9 +83,9 @@ export default {
             limitRange: 10,
           },
         });
-
+ 
         console.log("API Response:", response.data);
-
+ 
         if (response.data?.data?.categories) {
           const mainCategory = response.data.data.categories;
           this.categories = [{
@@ -95,7 +94,7 @@ export default {
             description: mainCategory.Description,
             code: mainCategory.Code
           }];
-
+ 
           if (mainCategory.LeftChild) {
             this.categories.push({
               id: mainCategory.LeftChild.Id,
@@ -104,7 +103,7 @@ export default {
               code: mainCategory.LeftChild.Code
             });
           }
-
+ 
           console.log("Processed Categories:", this.categories);
           this.totalPages = response.data?.data?.totalPages || 1;
         }
@@ -126,7 +125,7 @@ export default {
       console.log("Toggling visibility:", category);
     },
     swalConfirm(category) {
-      if (confirm(`Bạn có chắc chắn muốn xóa danh mục \"${category.name}\"?`)) {
+      if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.name}"?`)) {
         alert("Danh mục đã được xóa!");
       }
     },

@@ -1,127 +1,65 @@
 <template>
-    <div class="container py-3">
-        <div class="rounded-3 p-3 border-new-gray border shadow-sm bg-white">
-            <div class="d-flex flex-column gap-2">
-                <div v-for="blog in blogs" :key="blog.id">
-                    <div><strong>{{ blog.title }}</strong></div>
-                    <span class="text-gray-700">{{ blog.content }}</span>
-                </div>
-            </div>
-            <hr style="border-top: dashed 2px black;">
-            <div class="py-2 mb-3">
-                <div class="d-flex justify-content-between">
-                    <h4 class="mb-3" style="font-weight: bold">
-                        Clip hướng dẫn sử dụng
-                    </h4>
-                    <b
-                        class="text-primary hover_underline"
-                        style="cursor: pointer"
-                        >Xem tất cả</b
-                    >
-                </div>
-                <div class="row" id="wrapVideo">
-                    <div class="col-auto col-sm">
-                        <iframe
-                            width="100%"
-                            height="200px"
-                            src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6"
-                            frameborder="0"
-                            allowfullscreen
-                            class="rounded"
-                        ></iframe>
-                        <div>
-                            <strong>Hướng dẫn</strong>
-                            <div>
-                                Lorem, ipsum dolor sit amet consectetur
-                                adipisicing elit. Maxime aliquid iusto tempore
-                                recusandae obcaecati
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-auto col-sm">
-                        <iframe
-                            width="100%"
-                            height="200px"
-                            src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6"
-                            frameborder="0"
-                            allowfullscreen
-                            class="rounded"
-                        ></iframe>
-                        <div>
-                            <strong>Hướng dẫn</strong>
-                            <div>
-                                Lorem, ipsum dolor sit amet consectetur
-                                adipisicing elit. Maxime aliquid iusto tempore
-                                recusandae obcaecati
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-auto col-sm">
-                        <iframe
-                            width="100%"
-                            height="200px"
-                            src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6"
-                            frameborder="0"
-                            allowfullscreen
-                            class="rounded"
-                        ></iframe>
-                        <div>
-                            <strong>Hướng dẫn</strong>
-                            <div>
-                                Lorem, ipsum dolor sit amet consectetur
-                                adipisicing elit. Maxime aliquid iusto tempore
-                                recusandae obcaecati
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <div class="container py-3">
+    <div class="rounded-3 p-3 border-new-gray border shadow-sm bg-white">
+      <h3>Search Results</h3>
+      <div v-if="getSearchBlogResult.length">
+        <div v-for="blog in getSearchBlogResult" :key="blog.id" class="mb-3">
+          <h4>{{ blog.title }}</h4>
+          <p>{{ blog.excerpt }}</p>
+          <p><strong>Category:</strong> {{ blog.categoryName }}</p>
+          <p><strong>Published At:</strong> {{ new Date(blog.publishedAt).toLocaleDateString() }}</p>
         </div>
+      </div>
+      <div v-else>
+        <p>No blog posts found.</p>
+      </div>
+      <hr style="border-top: dashed 2px black" />
+
+<!-- Videos Section -->
+<div class="py-2 mb-3">
+  <div class="d-flex justify-content-between">
+    <h4 class="mb-3 font-weight-bold">Clip hướng dẫn sử dụng</h4>
+    <b class="text-primary hover_underline" style="cursor: pointer">Xem tất cả</b>
+  </div>
+  <div class="row" id="wrapVideo">
+    <div class="col-auto col-sm" v-for="video in videos" :key="video.id">
+      <iframe :src="video.url" width="100%" height="200px" frameborder="0" allowfullscreen class="rounded"></iframe>
+      <div class="mt-2">
+        <strong>{{ video.title }}</strong>
+        <div>{{ video.description }}</div>
+      </div>
     </div>
+  </div>
+</div>
+</div>
+</div>
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useTemplateStore } from "@/stores/template";
 
 const store = useTemplateStore();
-store.setBreadcrumb([
-    {
-        name: "Kết quả tìm kiếm",
-        path: "/search",
-    },
-]);
-const blogs = [
-    {
-        id: "b",
-        title: "Sed blandit ante eu pulvinar semper",
-        content:
-            "Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse ac lorem magna. Donec venenatis, ipsum in porta pretium,o purus dictum dolor, at convallis mi nulla quis sem.",
-    },
-    {
-        id: "b",
-        title: "Quisque tincidunt commodo sapien, non viverra ante auctor ut",
-        content:
-            "Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse ac lorem magna. Donec venenatis, ipsum in porta pretium, o purus dictum dolor, at convallis mi nulla quis sem.",
-    },
-    {
-        id: "b",
-        title: "Fusce cursus, ipsum ac mollis fermentum, purus lorem maximus justo",
-        content:
-            "Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse ac lorem magna. Donec venenatis, ipsum in porta pretium, eo purus dictum dolor, at convallis mi nulla quis sem.",
-    },
-    {
-        id: "b",
-        title: "Ut id pretium tortor. Curabitur vel risus dolor",
-        content:
-            "Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse ac lorem magna. Donec venenatis, ipsum in porta pretium, le purus dictum dolor, at convallis mi nulla quis sem.",
-    },
-    {
-        id: "b",
-        title: "Aliquam placerat, metus ac efficitur tincidunt, mauris lorem vehicula arcu",
-        content:
-            "Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse ac lorem magna. Donec venenatis, ipsum in porta pretium, le purus dictum dolor, at convallis mi nulla quis sem.",
-    },
+
+const getSearchBlogResult = computed(() => store.searchBlogResult);
+const videos = [
+  {
+    id: "v1",
+    url: "https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6",
+    title: "Hướng dẫn 1",
+    description: "Clip hướng dẫn chi tiết về việc sử dụng nền tảng của bạn.",
+  },
+  {
+    id: "v2",
+    url: "https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6",
+    title: "Hướng dẫn 2",
+    description: "Giới thiệu các tính năng nâng cao và cách tận dụng.",
+  },
+  {
+    id: "v3",
+    url: "https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6",
+    title: "Hướng dẫn 3",
+    description: "Tips và tricks cho người dùng mới bắt đầu.",
+  },
 ];
 </script>
-
-<style lang="scss" scoped></style>

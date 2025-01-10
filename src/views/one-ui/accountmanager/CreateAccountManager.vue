@@ -10,30 +10,30 @@
 
   <div class="content">
     <BaseBlock class="text-center">
-      <p>Content always takes up all the available width of the main container. A maximum width is set for extra large screen widths.</p>
+   
       <div class="mb-4">
         <label class="form-label" for="categoryName">Tên Nhóm</label>
-        <input type="text" class="form-control" id="categoryName" placeholder="Enter New Category Name..." maxlength="50" required />
+        <input type="text" class="form-control" id="categoryName" placeholder="Tên Nhóm..." maxlength="50" required />
       </div>
-      <label class="form-label">Chọn quyền hạn</label>
+      <div class="mb-4">
+        <label class="form-label" for="categoryName">Mô Tả</label>
+        <input type="text" class="form-control" id="categoryName" placeholder="Mô Tả Nhóm..." maxlength="50" required />
+      </div>
+      <label class="form-label">Chọn Quyền người dùng:</label>
       <div class="table-responsive">
         <table class="table table-bordered table-striped table-vcenter">
           <thead>
             <tr>
-              <th class="text-center" style="width: 100px">
-                <i>#</i>
-              </th>
+             
               <th>Chức năng</th>
               <th style="width: 10%">Xem</th>
               <th style="width: 12%">Xem chi tiết</th>
-              <th style="width: 10%">Thêm</th>
-              <th style="width: 10%">Sửa</th>
-              <th style="width: 10%">Xóa</th>
+             
             </tr>
           </thead>
           <tbody>
             <tr v-for="(func, index) in functions" :key="func.id">
-              <td class="text-center">{{ index + 1 }}</td>
+             
               <td>{{ func.description }}</td>
               <td class="text-center">
                 <input type="checkbox" v-model="func.permissions.view" />
@@ -41,6 +41,29 @@
               <td class="text-center">
                 <input type="checkbox" v-model="func.permissions.viewDetails" />
               </td>
+          
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <label class="form-label">Chọn Quyền hành động:</label>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped table-vcenter">
+          <thead>
+            <tr>
+            
+              <th>Chức năng</th>
+           
+              <th style="width: 10%">Thêm</th>
+              <th style="width: 10%">Sửa</th>
+              <th style="width: 10%">Xóa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(func, index) in functions" :key="func.id">
+             
+              <td>{{ func.description }}</td>
+         
               <td class="text-center">
                 <input type="checkbox" v-model="func.permissions.add" />
               </td>
@@ -59,26 +82,35 @@
 </template>
 
 <script>
+
+
+
 export default {
   name: "FunctionTable",
   data() {
     return {
       functions: [
         {
-          id: 1,
+          
           description: "Quyền kiểm soát danh mục",
           permissions: { view: false, viewDetails: false, add: false, edit: false, delete: false },
         },
         {
-          id: 2,
+         
           description: "Quyền kiểm soát bải viết",
           permissions: { view: false, viewDetails: false, add: false, edit: false, delete: false },
         },
         {
-          id: 3,
+          
           description: "Quyền kiểm soát người dùng",
           permissions: { view: false, viewDetails: false, add: false, edit: false, delete: false },
         },
+        {
+          
+          description: "Quyền kiểm soát nhóm phân quyền",
+          permissions: { view: false, viewDetails: false, add: false, edit: false, delete: false },
+        },
+     
       ],
     };
   },

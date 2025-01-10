@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import axios from "axios";
 
 // Main Pinia Store
 export const useTemplateStore = defineStore({
@@ -12,9 +13,10 @@ export const useTemplateStore = defineStore({
       language: "VN",
     },
 
-    breadcrumb : {
-      path: []
+    breadcrumb: {
+      path: [],
     },
+    
 
     // Default layout options
     layout: {
@@ -47,12 +49,36 @@ export const useTemplateStore = defineStore({
       sideTransitions: true,
       mainContent: "", // 'boxed', ''narrow'
     },
+    searchBlogResult: [], // Corrected to ensure a single state definition
+    searchMetadata: {},
   }),
   actions: {
-    setLanguage(language){
-      this.app.language = language
+    async filterSearchResults(query) {
+      try {
+        if (!query.trim()) {
+          this.searchBlogResult = [];
+          this.searchMetadata = {};
+          return;
+        }
+
+        // Call the API with the search term
+        const response = await axios.get(`https://localhost:7017/api/posts/search`, {
+          params: { searchTerm: query.trim() },
+        });
+
+        // Update state with response data
+        this.searchBlogResult = response.data.data.$values || []; // Extract posts data
+        this.searchMetadata = response.data.metadata || {}; // Extract pagination metadata
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        this.searchBlogResult = [];
+        this.searchMetadata = {};
+      }
     },
-    setBreadcrumb(path){
+    setLanguage(language) {
+      this.app.language = language;
+    },
+    setBreadcrumb(path) {
       this.breadcrumb.path = path;
     },
     // Sets the layout, useful for setting different layouts (under layouts/variations/)
@@ -70,8 +96,7 @@ export const useTemplateStore = defineStore({
         } else if (payload.mode === "close") {
           this.settings.sidebarVisibleDesktop = false;
         } else if (payload.mode === "toggle") {
-          this.settings.sidebarVisibleDesktop =
-            !this.settings.sidebarVisibleDesktop;
+          this.settings.sidebarVisibleDesktop = !this.settings.sidebarVisibleDesktop;
         }
       } else {
         if (payload.mode === "open") {
@@ -79,8 +104,7 @@ export const useTemplateStore = defineStore({
         } else if (payload.mode === "close") {
           this.settings.sidebarVisibleMobile = false;
         } else if (payload.mode === "toggle") {
-          this.settings.sidebarVisibleMobile =
-            !this.settings.sidebarVisibleMobile;
+          this.settings.sidebarVisibleMobile = !this.settings.sidebarVisibleMobile;
         }
       }
     },
@@ -133,8 +157,7 @@ export const useTemplateStore = defineStore({
       } else if (payload.mode === "off") {
         this.settings.sideOverlayHoverable = false;
       } else if (payload.mode === "toggle") {
-        this.settings.sideOverlayHoverable =
-          !this.settings.sideOverlayHoverable;
+        this.settings.sideOverlayHoverable = !this.settings.sideOverlayHoverable;
       }
     },
     // Sets page overlay visibility (on, off, toggle)
@@ -223,10 +246,7 @@ export const useTemplateStore = defineStore({
         this.settings.darkModeSystem = true;
 
         // Check system preference
-        if (
-          window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches
-        ) {
+        if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
           this.settings.darkMode = true;
         } else {
           this.settings.darkMode = false;

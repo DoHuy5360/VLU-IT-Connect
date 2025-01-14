@@ -57,22 +57,23 @@ onUnmounted(() => {
       <!-- Side Header -->
       <div class="content-header border-bottom">
         <slot name="header">
+      
           <!-- User Avatar -->
-          <a class="img-link me-1" href="javascript:void(0)">
+          <!-- <a class="img-link me-1" href="javascript:void(0)">
             <img
               class="img-avatar img-avatar32"
               src="/assets/media/avatars/avatar10.jpg"
               alt="Avatar"
             />
-          </a>
+          </a> -->
           <!-- END User Avatar -->
 
           <!-- User Info -->
-          <div class="ms-2">
+          <!-- <div class="ms-2">
             <a class="text-dark fw-semibold fs-sm" href="javascript:void(0)"
               >John Smith</a
             >
-          </div>
+          </div> -->
           <!-- END User Info -->
         </slot>
 
@@ -406,3 +407,7 @@ onUnmounted(() => {
   </aside>
   <!-- END Side Overlay -->
 </template>
+<script>
+
+
+</script>

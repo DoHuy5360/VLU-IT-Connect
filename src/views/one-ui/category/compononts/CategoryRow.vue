@@ -12,8 +12,10 @@
     <td class="text-center">{{ category.description }}</td>
     <td class="text-center">{{ postCount }}</td>
     <td class="text-center">
-      <button class="btn btn-sm btn-alt-info" @click="$emit('edit', category)">Sửa</button>
-      <button class="btn btn-sm btn-alt-danger" @click="$emit('delete', category)">Xóa</button>
+      <div class="d-flex gap-2 justify-content-center">
+        <button class="btn btn-sm btn-alt-info" @click="$emit('edit', category)">Sửa</button>
+        <button class="btn btn-sm btn-alt-danger" @click="$emit('delete', category)">Xóa</button>
+      </div>
     </td>
   </tr>
 </template>

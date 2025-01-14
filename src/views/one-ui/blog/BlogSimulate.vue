@@ -13,16 +13,16 @@
   </BasePageHeading>
 
   <div class="content">
-    <div class="container py-3">
+    <div class="py-3">
       <div class="row gx-2 gy-2">
         <!-- Left Column: Blog Details -->
-        <div class="col-lg-8">
+        <div class="">
           <div class="rounded p-4 bg-white">
             <h4 class="mb-3 fw-bold">Nội Dung Bài Viết</h4>
-            <div class="blog-detail-box">
+            <div class="bg-new-pale-gray p-3 rounded">
               <div class="text-muted mb-3">
                 <strong>{{ blogData.date }}</strong> |
-                <span class="text-primary clickable-text">{{ blogData.category }}</span>
+                <span class="text-primary">{{ blogData.category }}</span>
               </div>
               <!-- Hình ảnh hoặc video -->
               <div class="media-content mb-3">
@@ -90,24 +90,3 @@ onMounted(() => {
   };
 });
 </script>
-
-<style scoped>
-.clickable-text {
-  cursor: pointer;
-}
-
-.blog-detail-box {
-  background-color: #f8f9fa;
-  padding: 20px;
-  border-radius: 5px;
-}
-
-.content {
-  padding: 20px;
-}
-
-.container {
-  max-width: 1200px;
-  margin: auto;
-}
-</style>

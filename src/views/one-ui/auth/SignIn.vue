@@ -140,7 +140,6 @@ export default {
           twoFactorCode: "string",
           twoFactorRecoveryCode: "string",
         });
-
         console.log("Login success:", response.data);
 
         // Save token to a shared state/store or localStorage

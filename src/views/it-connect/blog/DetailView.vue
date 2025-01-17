@@ -62,48 +62,45 @@ export default {
   components: {
     CategoryItem,
   },
+  props: ["id"], // Nhận ID bài viết từ route params
   data() {
     return {
       featuredArticle: null, // Store the main article data
       categories: {}, // Holds the raw categories data
       relatedArticles: [], // Store related articles
+      baseURL: "https://localhost:7017/",
     };
   },
   computed: {
     formattedCategories() {
       if (!this.categories || !this.categories.leftChild) return [];
-      // Format and include only the children of the root category
-      return [...(this.categories.leftChild ? [this.formatCategory(this.categories.leftChild)] : []), ...(this.categories.rightChild ? [this.formatCategory(this.categories.rightChild)] : [])];
+      return [
+        ...(this.categories.leftChild ? [this.formatCategory(this.categories.leftChild)] : []),
+        ...(this.categories.rightChild ? [this.formatCategory(this.categories.rightChild)] : [])
+      ];
     },
   },
   methods: {
     async fetchFeaturedArticle() {
       try {
-        const response = await axios.get("/api/posts", {
-          params: { PageNumber: 1, PageSize: 10 },
-        });
-        const posts = response.data.data?.$values || [];
-        if (posts.length > 0) {
-          this.featuredArticle = {
-            id: posts[0].id,
-            title: posts[0].title || "No Title Available",
-            details: posts[0].content || "No details available.",
-            date: new Date(posts[0].publishedAt).toLocaleDateString(),
-            author: posts[0].userId || "Unknown author",
-            image: posts[0].metadata || "https://via.placeholder.com/600x400",
-          };
+        const response = await axios.get(`/api/posts/${this.id}`); // ✅ Lấy bài viết theo ID
+        const post = response.data.data;
 
-          this.relatedArticles = posts.slice(1).map((post) => ({
+        if (post) {
+          this.featuredArticle = {
             id: post.id,
             title: post.title || "No Title Available",
-            details: post.excerpt || "No excerpt available.",
+            category: post.category || "No Category",
+            details: post.content || "No details available.",
             date: new Date(post.publishedAt).toLocaleDateString(),
-            author: post.userId || "Unknown author",
-            image: post.metadata || "https://via.placeholder.com/100x100",
-          }));
+            author: post.userName || "Unknown author",
+            image: this.parseMetadata(post.metadata), // ✅ Fix lỗi lấy hình ảnh từ metadata
+          };
+        } else {
+          this.featuredArticle = null;
         }
       } catch (error) {
-        console.error("Error fetching posts:", error.message);
+        console.error("Error fetching article:", error.message);
       }
     },
     async getCategories() {
@@ -116,10 +113,22 @@ export default {
           },
         });
         this.categories = response.data?.data?.categories || null;
-        console.log("Categories Fetched:", this.categories);
       } catch (error) {
         console.error("Error fetching categories:", error.response?.data || error.message);
         this.categories = null;
+      }
+    },
+    parseMetadata(metadata) {
+      try {
+        const metaObj = JSON.parse(metadata);
+        if (metaObj.Files?.length) {
+          let imagePath = metaObj.Files[0].replace(/\\/g, "/");
+          return this.baseURL + imagePath;
+        }
+        return "https://via.placeholder.com/600x300";
+      } catch (error) {
+        console.error("Error parsing metadata:", error);
+        return "https://via.placeholder.com/600x300";
       }
     },
     formatCategory(category) {
@@ -129,7 +138,10 @@ export default {
         name: category.name,
         postCount: category.code || "0",
         isExpanded: false,
-        children: [...(category.leftChild ? [this.formatCategory(category.leftChild)] : []), ...(category.rightChild ? [this.formatCategory(category.rightChild)] : [])],
+        children: [
+          ...(category.leftChild ? [this.formatCategory(category.leftChild)] : []),
+          ...(category.rightChild ? [this.formatCategory(category.rightChild)] : [])
+        ],
       };
     },
     truncateText(text, maxLength) {
@@ -138,6 +150,9 @@ export default {
     navigateToArticle(id) {
       this.$router.push(`/blog/detail/${id}`);
     },
+  },
+  watch: {
+    id: "fetchFeaturedArticle", // ✅ Theo dõi ID, tự động tải lại bài viết khi ID thay đổi
   },
   async created() {
     await this.fetchFeaturedArticle();

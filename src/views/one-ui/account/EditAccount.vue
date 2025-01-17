@@ -44,10 +44,10 @@
         </div>
 
         <!-- Role Name -->
-        <div class="mb-4">
+        <!-- <div class="mb-4">
           <label class="form-label" for="roleName">Selected Role</label>
           <input type="text" class="form-control" id="roleName" v-model="formData.roleName" placeholder="Role Name" readonly />
-        </div>
+        </div> -->
 
         <!-- Submit Button -->
         <button type="submit" class="btn btn-alt-primary bg-success">

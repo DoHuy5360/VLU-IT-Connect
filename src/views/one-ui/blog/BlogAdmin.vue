@@ -51,7 +51,7 @@
                                 <td class="text-center">
                                     <input type="checkbox" :value="user.id" v-model="selectedUsers" @click.stop />
                                 </td>
-                                <td class="text-center">{{ currentPageIndex + index + 1 }}</td>
+                                <td class="text-center">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
                                 <td>{{ user.title }}</td>
                                 <td>{{ user.author }}</td>
                                 <td>
@@ -247,6 +247,7 @@ export default {
             router.push({ name: "AdminBlogViewDetail", params: { id: String(id) } });
         };
         const editBlog = (id) => router.push({ name: "AdminBlogEdit", params: { id: String(id) } });
+        const detailBlog = (id) => router.push({ name: "AdminBlogDetail", params: { id: String(id) } });        
 
         const changePage = (page) => {
             if (page >= 1 && page <= totalPages.value) {

@@ -24,6 +24,8 @@ const AuthSignIn = () => import("@/views/one-ui/auth/SignIn.vue");
 const AccountAdminManager = () => import("@/views/one-ui/accountmanager/AccountManager.vue");
 const AccountManagerCreate = () => import("@/views/one-ui/accountmanager/CreateAccountManager.vue");
 const AccountManagerEdit = () => import("@/views/one-ui/accountmanager/EditAccountManager.vue");
+const AddAccountManager = () => import("@/views/one-ui/accountmanager/AssignUserToGroup.vue");
+
 
 // Layouts
 const MainLayout = () => import("@/layouts/variations/it-connect/MainLayout.vue");
@@ -120,6 +122,12 @@ const routes = [
             component: AccountManagerEdit,
             props: true,
           },
+          {
+            path: "addaccount",
+            name: "AdminAccountManagerAddAccount",
+            component: AddAccountManager,
+            props: true
+          }
         ],
       },
       {
@@ -156,6 +164,12 @@ const routes = [
         component: Home,
         meta: { breadcrumb: "Home" },
       },
+    ],
+  },
+  {
+    path: "/",
+    component: ContentLayout,
+    children: [
       {
         path: "categories",
         name: "ListCategories",
@@ -187,21 +201,20 @@ const routes = [
         meta: {
           breadcrumb: "Search",
           heroTitles: {
-              website: [],
-              mobile: ["Kết quả tìm kiếm"],
+            website: [],
+            mobile: ["Kết quả tìm kiếm"],
           },
         },
       },
       {
         path: "blog",
-        component: ContentLayout,
         children: [
           {
             path: "",
             name: "Blog",
             component: Blog,
             meta: {
-              breadcrumb: "Videos",
+              breadcrumb: "Blog",
               heroTitles: {
                 website: ["Kiến thức Công Nghệ Thông Tin", "Dành cho Sinh viên"],
                 mobile: ["Kiến thức CNTT", "Dành cho Sinh viên"],
@@ -209,11 +222,12 @@ const routes = [
             },
           },
           {
-            path: "detail",
+            path: "detail/:id",
             name: "Detail",
             component: Detail,
+            props: true,
             meta: {
-              breadcrumb: "Videos",
+              breadcrumb: "Blog Detail",
               heroTitles: {
                 website: [],
                 mobile: [],
@@ -222,10 +236,10 @@ const routes = [
           },
           {
             path: "search",
-            name: "Search",
+            name: "BlogSearch",
             component: Search,
             meta: {
-              breadcrumb: "Videos",
+              breadcrumb: "Blog Search",
               heroTitles: {
                 website: [],
                 mobile: [],

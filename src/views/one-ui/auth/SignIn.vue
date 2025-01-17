@@ -76,6 +76,9 @@
                       Log In
                     </button>
                   </div>
+                  <div v-if="state.loginError" class="text-danger mt-2">
+                    Login failed. Please check your email and password.
+                  </div>
                   <div class="text-center my-3">
                     <hr class="my-4" />
                     <span class="bg-white px-3">OR</span>
@@ -100,7 +103,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import axios from "axios";
 import { reactive } from "vue";
@@ -112,6 +114,7 @@ export default {
     const state = reactive({
       email: "",
       password: "",
+      loginError: false, // Control for showing error message
     });
 
     const rules = {
@@ -128,6 +131,8 @@ export default {
 
     const onSubmit = async () => {
       isLoading.login = true;
+      state.loginError = false; // Reset error state before login attempt
+
       try {
         const response = await axios.post("https://localhost:7017/login", {
           email: state.email,
@@ -135,7 +140,6 @@ export default {
           twoFactorCode: "string",
           twoFactorRecoveryCode: "string",
         });
-        alert("Login successful!");
         console.log("Login success:", response.data);
 
         // Save token to a shared state/store or localStorage
@@ -145,8 +149,8 @@ export default {
         // Redirect after login success
         window.location.href = "http://localhost:5173/administrator";
       } catch (error) {
-        alert("Login failed. Please check your email and password.");
         console.error("Login failed:", error.response?.data || error.message);
+        state.loginError = true; // Show error message
       } finally {
         isLoading.login = false;
       }
@@ -154,7 +158,6 @@ export default {
 
     const signInWithMicrosoft = async () => {
       try {
-        // Implement Microsoft login logic here
         console.log("Microsoft login clicked");
       } catch (error) {
         alert("Microsoft login failed.");

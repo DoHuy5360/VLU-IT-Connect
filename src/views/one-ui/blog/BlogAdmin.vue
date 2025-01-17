@@ -51,11 +51,7 @@
                                 <td class="text-center">
                                     <input type="checkbox" :value="user.id" v-model="selectedUsers" @click.stop />
                                 </td>
-<<<<<<< HEAD
                                 <td class="text-center">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
-=======
-                                <td class="text-center">{{ currentPageIndex + index + 1 }}</td>
->>>>>>> 1f590253f086ba9281edf89118cd3d0046151773
                                 <td>{{ user.title }}</td>
                                 <td>{{ user.author }}</td>
                                 <td>

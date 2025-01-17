@@ -65,17 +65,16 @@ const router = useRouter();
 const searchQuery = ref("");
 
 function onSearch() {
+  console.log("Search function triggered");
   const trimmedQuery = searchQuery.value.trim();
   if (trimmedQuery) {
-    // Trigger store action for filtering
     store.filterSearchResults(trimmedQuery);
-    // Navigate to the search results page with the query parameter
-    router.push({ name: "Search", query: { q: trimmedQuery } });
+    router.push({ name: "ListResult", query: { q: trimmedQuery } });
   } else {
-    // Reset the search results if the input is empty
     store.searchBlogResult = [];
   }
 }
+
 </script>
 
 <style scoped>

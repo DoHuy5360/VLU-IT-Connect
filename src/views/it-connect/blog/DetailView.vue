@@ -68,6 +68,7 @@ export default {
       featuredArticle: null, // Store the main article data
       categories: {}, // Holds the raw categories data
       relatedArticles: [], // Store related articles
+      baseURL: "https://localhost:7017/",
     };
   },
   computed: {
@@ -121,12 +122,13 @@ export default {
       try {
         const metaObj = JSON.parse(metadata);
         if (metaObj.Files?.length) {
-          return `/` + metaObj.Files[0].replace(/\\/g, "/");
+          let imagePath = metaObj.Files[0].replace(/\\/g, "/");
+          return this.baseURL + imagePath;
         }
-        return "https://via.placeholder.com/600x400"; // Ảnh mặc định nếu không có
+        return "https://via.placeholder.com/600x300";
       } catch (error) {
         console.error("Error parsing metadata:", error);
-        return "https://via.placeholder.com/600x400"; // Ảnh mặc định nếu lỗi
+        return "https://via.placeholder.com/600x300";
       }
     },
     formatCategory(category) {

@@ -76,7 +76,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      baseURL: "https://your-api.com/", // Cập nhật đường dẫn domain của API
+      baseURL: "https://localhost:7017/", // Cập nhật đường dẫn domain của API
       featuredArticle: null,
       oldArticles: [],
     };
@@ -129,7 +129,7 @@ export default {
           details: post.excerpt || "No excerpt available.",
           date: new Date(post.publishedAt).toLocaleDateString(),
           author: post.userName || "Unknown author",
-          image: this.parseMetadata(post.metadata),
+       
         }));
       }
     } catch (error) {

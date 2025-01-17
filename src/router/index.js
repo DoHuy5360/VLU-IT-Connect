@@ -24,6 +24,8 @@ const AuthSignIn = () => import("@/views/one-ui/auth/SignIn.vue");
 const AccountAdminManager = () => import("@/views/one-ui/accountmanager/AccountManager.vue");
 const AccountManagerCreate = () => import("@/views/one-ui/accountmanager/CreateAccountManager.vue");
 const AccountManagerEdit = () => import("@/views/one-ui/accountmanager/EditAccountManager.vue");
+const AddAccountManager = () => import("@/views/one-ui/accountmanager/AssignUserToGroup.vue");
+
 
 // Layouts
 const MainLayout = () => import("@/layouts/variations/it-connect/MainLayout.vue");
@@ -120,6 +122,12 @@ const routes = [
             component: AccountManagerEdit,
             props: true,
           },
+          {
+            path: "addaccount",
+            name: "AdminAccountManagerAddAccount",
+            component: AddAccountManager,
+            props: true
+          }
         ],
       },
       {

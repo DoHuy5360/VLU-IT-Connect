@@ -1,198 +1,214 @@
 <template>
-  <BasePageHeading title="Category" subtitle="Welcome Admin!">
+  <BasePageHeading title="Sửa thể loại" subtitle="">
     <template #extra>
       <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/category')">
-        <i class="fa fa-arrow-left opacity-50 me-1"></i>
-        Back
+        <i class="fa fa-arrow-left opacity-50 me-1"></i> Quay về
       </button>
     </template>
   </BasePageHeading>
 
-  <BaseBlock title="Create New Category">
-    <div class="col-lg-8 space-y-5">
-      <form @submit.prevent="handleSubmit">
-        <!-- Parent Category -->
-        <div class="mb-4">
-          <label class="form-label" for="parentCategory">Parent Category</label>
-          <select class="form-select" id="parentCategory" v-model="formData.parentCategory" @change="checkParentCategory" required>
-            <option value="">Select Parent Category</option>
-            <option v-for="category in parentCategories" :key="category.id" :value="category.id">
-              {{ category.name }}
-            </option>
-          </select>
-          <small v-if="errors.parentCategory" class="text-danger">{{ errors.parentCategory }}</small>
-        </div>
+  <div class="content">
+    <BaseBlock title="Chỉnh sửa thể loại">
+      <div class="col-lg-8 space-y-5">
+        <form @submit.prevent="updateCategory">
+          <!-- Parent Category Dropdown -->
+          <div class="mb-4">
+            <label class="form-label" for="parentCategory">Thể loại cha</label>
+            <select class="form-select" id="parentCategory" v-model="formData.parentCategory">
+              <option value="">-- Không có thể loại cha --</option>
+              <option v-for="category in allCategories" :key="category.id" :value="category.id">
+                {{ category.name }}
+              </option>
+            </select>
+            <small v-if="errors.parentCategory" class="text-danger">{{ errors.parentCategory }}</small>
+          </div>
 
-        <!-- Child Category -->
-        <div v-if="showChildCategory" class="mb-4">
-          <label class="form-label" for="childCategory">Child Category</label>
-          <select class="form-select" id="childCategory" v-model="formData.childCategory" @change="checkChildCategory">
-            <option value="">Select Child Category</option>
-            <option v-for="category in childCategories" :key="category.id" :value="category.id">
-              {{ category.name }}
-            </option>
-          </select>
-          <small v-if="errors.childCategory" class="text-danger">{{ errors.childCategory }}</small>
-        </div>
+          <!-- Category Name -->
+          <div class="mb-4">
+            <label class="form-label" for="categoryName">Tên thể loại</label>
+            <input
+              type="text"
+              class="form-control"
+              id="categoryName"
+              v-model="formData.categoryName"
+              placeholder="Nhập tên thể loại"
+              required
+            />
+            <small v-if="errors.categoryName" class="text-danger">{{ errors.categoryName }}</small>
+          </div>
 
-        <!-- Grandchild Category -->
-        <div v-if="showGrandchildCategory" class="mb-4">
-          <label class="form-label" for="grandchildCategory">Grandchild Category</label>
-          <select class="form-select" id="grandchildCategory" v-model="formData.grandchildCategory">
-            <option value="">Select Grandchild Category</option>
-            <option v-for="category in grandchildCategories" :key="category.id" :value="category.id">
-              {{ category.name }}
-            </option>
-          </select>
-          <small v-if="errors.grandchildCategory" class="text-danger">{{ errors.grandchildCategory }}</small>
-        </div>
+          <!-- Detail -->
+          <div class="mb-4">
+            <label class="form-label" for="categoryDetail">Mô tả</label>
+            <input
+              type="text"
+              class="form-control"
+              id="categoryDetail"
+              v-model="formData.categoryDetail"
+              placeholder="Nhập mô tả"
+              required
+            />
+            <small v-if="errors.categoryDetail" class="text-danger">{{ errors.categoryDetail }}</small>
+          </div>
 
-        <!-- Category Name -->
-        <div class="mb-4">
-          <label class="form-label" for="categoryName">Category Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="categoryName"
-            v-model="formData.categoryName"
-            placeholder="Enter New Category Name..."
-            maxlength="50"
-            @input="checkCharacterLimit('categoryName', 50)"
-            required
-          />
-          <small v-if="errors.categoryName" class="text-danger">{{ errors.categoryName }}</small>
-          <small v-if="warnings.categoryName" class="text-warning">{{ warnings.categoryName }}</small>
-        </div>
-
-        <!-- Detail -->
-        <div class="mb-4">
-          <label class="form-label" for="categoryDetail">Detail</label>
-          <input type="text" class="form-control" id="categoryDetail" v-model="formData.categoryDetail" placeholder="Enter Category Detail..." required />
-          <small v-if="errors.categoryDetail" class="text-danger">{{ errors.categoryDetail }}</small>
-        </div>
-
-        <div class="mb-4">
-          <button type="submit" class="btn btn-alt-primary bg-success">Done</button>
-        </div>
-      </form>
-    </div>
-  </BaseBlock>
+          <div class="mb-4">
+            <button type="submit" class="btn btn-success">Cập nhật</button>
+          </div>
+        </form>
+      </div>
+    </BaseBlock>
+  </div>
 </template>
 
 <script>
+import axios from "axios";
 import { useToast } from "vue-toastification";
 
 export default {
+  props: ["code"], // Nhận `cateCode` từ route params
   data() {
     return {
       formData: {
+        id: "",
         parentCategory: "",
-        childCategory: "",
-        newChildCategory: "",
-        grandchildCategory: "",
-        newGrandchildCategory: "",
         categoryName: "",
         categoryDetail: "",
+        code: "",
       },
       errors: {},
-      warnings: {},
-      categories: [
-        { id: "1", name: "Công nghệ", parentID: null },
-        { id: "1.1", name: "Công nghệ thông tin", parentID: "1" },
-        { id: "1.1.1", name: "Công nghệ thông tin cơ bản", parentID: "1.1" },
-        { id: "1.1.2", name: "Thực hành công nghệ thông tin", parentID: "1.1" },
-        { id: "1.2", name: "Thiết bị điện tử", parentID: "1" },
-        { id: "2", name: "Xã hội", parentID: null },
-        { id: "2.1", name: "Chủ nghĩa", parentID: "2" },
-        { id: "2.1.1", name: "Mac Lenin", parentID: "2.1" },
-        { id: "3", name: "Kinh tế", parentID: null },
-        { id: "3.1", name: "Quản trị kinh doanh", parentID: "3" },
-        { id: "3.1.1", name: "Ngân Hàng", parentID: "3.1" },
-        { id: "4", name: "Y tế", parentID: null },
-        { id: "4.1", name: "Dược phẩm", parentID: "4" },
-        { id: "4.2", name: "Thiết bị y tế", parentID: "4" },
-        { id: "5", name: "Giáo dục", parentID: null },
-        { id: "5.1", name: "Đại học", parentID: "5" },
-        { id: "5.2", name: "Trung học", parentID: "5" },
-        // Additional categories
-        { id: "6", name: "Thể thao", parentID: null },
-        { id: "6.1", name: "Bóng đá", parentID: "6" },
-        { id: "6.2", name: "Bóng rổ", parentID: "6" },
-        { id: "7", name: "Văn hóa", parentID: null },
-        { id: "7.1", name: "Âm nhạc", parentID: "7" },
-        { id: "7.2", name: "Điện ảnh", parentID: "7" },
-        { id: "8", name: "Khoa học", parentID: null },
-        { id: "8.1", name: "Vật lý", parentID: "8" },
-        { id: "8.2", name: "Hóa học", parentID: "8" },
-      ],
-      showChildCategory: false,
-      showNewChildCategory: false,
-      showGrandchildCategory: false,
-      showNewGrandchildCategory: false,
-      parentCategories: [],
-      childCategories: [],
-      grandchildCategories: [],
+      allCategories: [],
     };
   },
+  async mounted() {
+    await this.getAllCategories(); // Lấy danh sách tất cả thể loại trước
+    if (this.code) {
+      await this.getCategoryByCode(this.code);
+    }
+  },
   methods: {
-    checkParentCategory() {
-      const parentCategory = this.categories.find((category) => category.id === this.formData.parentCategory);
-      if (parentCategory) {
-        this.childCategories = this.categories.filter((category) => category.parentID === parentCategory.id);
-        this.showChildCategory = this.childCategories.length > 0;
-        this.showNewChildCategory = !this.showChildCategory;
-      } else {
-        this.showChildCategory = false;
-        this.showNewChildCategory = false;
+    // 🔍 Lấy danh sách tất cả thể loại (duyệt cây)
+    async getAllCategories() {
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await axios.get("https://localhost:7017/api/Categories/getallcategories?indexPage=1&limitRange=20", {
+          headers: { Authorization: token },
+        });
+
+        if (response.data?.data?.categories) {
+          // Chuyển đổi dữ liệu cây thành danh sách phẳng
+          this.allCategories = this.flattenCategories(response.data.data.categories);
+          console.log("✅ All Categories Loaded:", this.allCategories);
+        }
+      } catch (error) {
+        console.error("❌ Lỗi lấy danh sách thể loại:", error.response?.data || error.message);
       }
     },
-    checkChildCategory() {
-      const childCategory = this.categories.find((category) => category.id === this.formData.childCategory);
-      if (childCategory) {
-        this.grandchildCategories = this.categories.filter((category) => category.parentID === childCategory.id);
-        this.showGrandchildCategory = this.grandchildCategories.length > 0;
-        this.showNewGrandchildCategory = !this.showGrandchildCategory;
-      } else {
-        this.showGrandchildCategory = false;
-        this.showNewGrandchildCategory = false;
+
+    // 🔄 Chuyển đổi danh mục cây thành danh sách phẳng
+    flattenCategories(category, depth = 0) {
+      let flatList = [];
+      if (!category) return flatList;
+
+      // Thêm danh mục hiện tại
+      flatList.push({
+        id: category.Id,
+        name: `${"— ".repeat(depth)}${category.Name}`, // Hiển thị cấp bậc bằng dấu gạch
+      });
+
+      // Duyệt cây con (nếu có)
+      if (category.LeftChild) {
+        flatList = flatList.concat(this.flattenCategories(category.LeftChild, depth + 1));
+      }
+      if (category.RightChild) {
+        flatList = flatList.concat(this.flattenCategories(category.RightChild, depth + 1));
+      }
+
+      return flatList;
+    },
+
+    // 🔍 Lấy danh mục theo `cateCode`
+    async getCategoryByCode(cateCode) {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          console.error("❌ Không tìm thấy token, hãy đăng nhập lại!");
+          return;
+        }
+
+        console.log("🔍 Fetching category with cateCode:", cateCode);
+
+        const response = await axios.get("https://localhost:7017/api/Categories/getcategorybycode", {
+          headers: { Authorization: token },
+          params: { cateCode: cateCode }, // Dùng `params`
+        });
+
+        console.log("✅ API Response:", response.data);
+
+        if (response.data?.data?.category) {
+          this.populateForm(response.data.data.category);
+        } else {
+          console.error("❌ Không tìm thấy danh mục.");
+        }
+      } catch (error) {
+        console.error("❌ API Error:", error.response?.data || error.message);
       }
     },
-    checkCharacterLimit(field, maxLength) {
-      if (this.formData[field].length > maxLength) {
-        this.warnings[field] = `Maximum ${maxLength} characters allowed.`;
-      } else {
-        this.warnings[field] = null;
-      }
+
+    // Điền dữ liệu vào form
+    populateForm(category) {
+      this.formData.id = category.Id;
+      this.formData.parentCategory = category.ParentId ? category.ParentId.toString() : "";
+      this.formData.categoryName = category.Name;
+      this.formData.categoryDetail = category.Description;
+      this.formData.code = category.Code;
+
+      console.log("✅ Populated Form Data:", this.formData);
     },
-    handleSubmit() {
+
+    // 🚀 Gửi API cập nhật danh mục
+    async updateCategory() {
       const toast = useToast();
       this.errors = {};
 
-      // Validation
-
       if (!this.formData.categoryName) {
-        this.errors.categoryName = "Category name is required.";
+        this.errors.categoryName = "Tên thể loại không được để trống.";
       }
       if (!this.formData.categoryDetail) {
-        this.errors.categoryDetail = "Category detail is required.";
+        this.errors.categoryDetail = "Mô tả thể loại không được để trống.";
       }
 
-      // If no errors, submit the form
       if (Object.keys(this.errors).length === 0) {
-        console.log("Form submitted:", this.formData);
-        toast.success("Category created successfully!");
-        this.$router.push("/administrator/category"); // Redirect
+        try {
+          const token = localStorage.getItem("authToken");
+          if (!token) {
+            console.error("❌ Không tìm thấy token, hãy đăng nhập lại!");
+            return;
+          }
+
+          const payload = {
+            Id: this.formData.id,
+            ParentId: this.formData.parentCategory || null,
+            Name: this.formData.categoryName,
+            Description: this.formData.categoryDetail,
+            Code: this.formData.code,
+          };
+
+          console.log("🚀 Updating category:", payload);
+
+          const response = await axios.put("https://localhost:7017/api/Categories/updatecategory", payload, {
+            headers: { Authorization: token },
+          });
+
+          if (response.status === 200) {
+            toast.success("Cập nhật danh mục thành công!");
+            this.$router.push("/administrator/category");
+          }
+        } catch (error) {
+          console.error("❌ Lỗi cập nhật danh mục:", error.response?.data || error.message);
+          toast.error("Cập nhật danh mục thất bại!");
+        }
       }
     },
   },
-  mounted() {
-    this.parentCategories = this.categories.filter((category) => category.parentID === null);
-  },
 };
 </script>
-
-<style scoped>
-.text-danger {
-  font-size: 0.875rem;
-}
-</style>

@@ -97,9 +97,10 @@ const routes = [
             component: CategoryCreate,
           },
           {
-            path: "edit",
+            path: "edit/:code",
             name: "AdminCategoryEdit",
             component: CategoryEdit,
+            props: true,
           },
         ],
       },

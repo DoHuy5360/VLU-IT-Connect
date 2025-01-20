@@ -127,9 +127,9 @@
                     </span>
                 </div>
                 <div class="col d-none d-sm-flex gap-4 justify-content-end align-items-center text-end menu" style="font-weight: bold">
-                    <div style="cursor: pointer">
+                    <a href="#frequentlyQuestions" style="cursor: pointer; color: black;">
                         {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
-                    </div>
+                    </a>
                     <div style="cursor: pointer">
                         {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
                     </div>
@@ -230,10 +230,18 @@
                 <li class="p-2" style="font-weight: 600">Sinh viên</li>
                 <li class="p-2" style="font-weight: 600">Cán bộ - Giảng viên - Nhân viên</li>
             </ul>
-            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">Các câu hỏi thường gặp</div>
-            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">Yêu cầu hỗ trợ</div>
-            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">Quy định - Chính sách</div>
-            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">Liên hệ</div>
+            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
+                {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
+            </div>
+            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
+                {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
+            </div>
+            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
+                {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
+            </div>
+            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
+                {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
+            </div>
         </div>
     </div>
 </template>

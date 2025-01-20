@@ -101,7 +101,7 @@
     <div class="bg-white py-2">
         <div class="container">
             <div class="row justify-content-between">
-                <img src="../../../../../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
+                <img src="@/../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
                 <div class="col d-flex gap-2 align-items-center justify-content-end d-sm-none">
                     <!-- Search icon -->
                     <span @click="toggleSearchBar">
@@ -161,7 +161,7 @@
     <div class="d-sm-none position-absolute bg-white w-100 z-2 h-100" style="top: 0; left: 100%; transition: 300ms linear" ref="headerAsSidebar">
         <div class="d-flex justify-content-between p-3">
             <div>
-                <img src="../../../../../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
+                <img src="@/../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
             </div>
             <div @click="toggleHeaderInMobileView" style="width: 24px">
                 <!-- Close header sidebar icon -->

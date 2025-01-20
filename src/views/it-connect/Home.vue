@@ -166,7 +166,7 @@
     #heroLandscape {
         background-size: contain;
         background-position: top;
-        background-image: url("../../../assets/media/brand/cropped_landscape.png");
+        background-image: url("@/../assets/media/brand/cropped_landscape.png");
     }
     #wrapQuestionAndNotification {
         display: flex !important;
@@ -192,7 +192,7 @@
         background-size: cover;
         background-position: center;
         height: 100%;
-        background-image: url("../../../assets/media/brand/vlu_landscape-compressed.jpg");
+        background-image: url("@/../assets/media/brand/vlu_landscape-compressed.jpg");
     }
     #search {
         transform: translateY(-50%);

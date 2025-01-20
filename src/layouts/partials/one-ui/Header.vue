@@ -114,12 +114,12 @@ onUnmounted(() => {
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  <img
+                  <!-- <img
                     class="rounded-circle"
-                    src="/assets/media/avatars/avatar10.jpg"
+                    src="@/../assets/media/avatars/avatar10.jpg"
                     alt="Header Avatar"
                     style="width: 21px"
-                  />
+                  /> -->
                   <span class="d-none d-sm-inline-block ms-2">John</span>
                   <i
                     class="fa fa-fw fa-angle-down d-none d-sm-inline-block opacity-50 ms-1 mt-1"
@@ -132,11 +132,11 @@ onUnmounted(() => {
                   <div
                     class="p-3 text-center bg-body-light border-bottom rounded-top"
                   >
-                    <img
+                    <!-- <img
                       class="img-avatar img-avatar48 img-avatar-thumb"
-                      src="/assets/media/avatars/avatar10.jpg"
+                      src="@/../assets/media/avatars/avatar10.jpg"
                       alt="Header Avatar"
-                    />
+                    /> -->
                     <p class="mt-2 mb-0 fw-medium">John Smith</p>
                     <p class="mb-0 text-muted fs-sm fw-medium">Web Developer</p>
                   </div>

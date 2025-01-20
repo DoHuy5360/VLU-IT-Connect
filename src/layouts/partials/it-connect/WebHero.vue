@@ -1,14 +1,14 @@
 <template>
   <div class="position-relative w-100">
     <div class="position-relative overflow-hidden">
-      <img src="../../../../../assets/media/brand/hero.png" class="hero-image" alt="Hero Image" />
+      <img src="@/../assets/media/brand/hero.png" class="hero-image" alt="Hero Image" />
       <img
-        src="../../../../../assets/media/brand/hero-partial-right.png"
+        src="@/../assets/media/brand/hero-partial-right.png"
         class="hero-decoration-right"
         alt="Hero Decoration Right"
       />
       <img
-        src="../../../../../assets/media/brand/hero-partial-left.png"
+        src="@/../assets/media/brand/hero-partial-left.png"
         class="hero-decoration-left"
         alt="Hero Decoration Left"
       />

@@ -12,7 +12,7 @@
             </div>
             <img :src="featuredArticle?.image" alt="Blog Article Image" class="rounded mb-3" style="width: 100%; height: 400px; object-fit: cover" />
             <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
-            <p class="text-muted mb-3">{{ featuredArticle?.details }}</p>
+            <div class="text-muted mb-3" v-html="featuredArticle?.details "></div>
             <div class="text-muted"><strong>Tác giả:</strong> {{ featuredArticle?.author }}</div>
           </div>
         </div>
@@ -91,7 +91,7 @@ export default {
             id: post.id,
             title: post.title || "No Title Available",
             category: post.category || "No Category",
-            details: post.content || "No details available.",
+            details: post.contentHtml || "No details available.",
             date: new Date(post.publishedAt).toLocaleDateString(),
             author: post.userName || "Unknown author",
             image: this.parseMetadata(post.metadata), // ✅ Fix lỗi lấy hình ảnh từ metadata

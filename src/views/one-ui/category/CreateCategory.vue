@@ -3,49 +3,25 @@
         <template #extra>
             <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/category')">
                 <i class="fa fa-arrow-left opacity-50 me-1"></i>
-                Quay về
+                Quay về
             </button>
         </template>
     </BasePageHeading>
 
     <div class="content">
-        <BaseBlock title="Create New Category">
+        <BaseBlock title="Tạo thể loại mới">
             <div class="col-lg-8 space-y-5">
                 <form @submit.prevent="handleSubmit">
-                    <!-- Parent Category -->
+                    <!-- Parent Category Dropdown -->
                     <div class="mb-4">
-                        <label class="form-label" for="parentCategory">Thể loại cha</label>
+                        <label class="form-label" for="parentCategory">Chọn thể loại cha</label>
                         <select class="form-select" id="parentCategory" v-model="formData.parentCategory" @change="checkParentCategory">
-                            <option value="">--Chọn--</option>
-                            <option v-for="category in parentCategories" :key="category.id" :value="category.id">
+                            <option value="">-- Không có thể loại cha --</option>
+                            <option v-for="category in allCategories" :key="category.id" :value="category.id">
                                 {{ category.name }}
                             </option>
                         </select>
                         <small v-if="errors.parentCategory" class="text-danger">{{ errors.parentCategory }}</small>
-                    </div>
-
-                    <!-- Child Category -->
-                    <div v-if="showChildCategory" class="mb-4">
-                        <label class="form-label" for="childCategory">Thể loại con</label>
-                        <select class="form-select" id="childCategory" v-model="formData.childCategory" @change="checkChildCategory">
-                            <option value="">--Chọn--</option>
-                            <option v-for="category in childCategories" :key="category.id" :value="category.id">
-                                {{ category.name }}
-                            </option>
-                        </select>
-                        <small v-if="errors.childCategory" class="text-danger">{{ errors.childCategory }}</small>
-                    </div>
-
-                    <!-- Grandchild Category -->
-                    <div v-if="showGrandchildCategory" class="mb-4">
-                        <label class="form-label" for="grandchildCategory">Thể loại cháu</label>
-                        <select class="form-select" id="grandchildCategory" v-model="formData.grandchildCategory">
-                            <option value="">--Chọn--</option>
-                            <option v-for="category in grandchildCategories" :key="category.id" :value="category.id">
-                                {{ category.name }}
-                            </option>
-                        </select>
-                        <small v-if="errors.grandchildCategory" class="text-danger">{{ errors.grandchildCategory }}</small>
                     </div>
 
                     <!-- Category Name -->
@@ -56,19 +32,17 @@
                             class="form-control"
                             id="categoryName"
                             v-model="formData.categoryName"
-                            placeholder=""
+                            placeholder="Nhập tên thể loại"
                             maxlength="50"
-                            @input="checkCharacterLimit('categoryName', 50)"
                             required
                         />
                         <small v-if="errors.categoryName" class="text-danger">{{ errors.categoryName }}</small>
-                        <small v-if="warnings.categoryName" class="text-warning">{{ warnings.categoryName }}</small>
                     </div>
 
                     <!-- Detail -->
                     <div class="mb-4">
                         <label class="form-label" for="categoryDetail">Mô tả</label>
-                        <input type="text" class="form-control" id="categoryDetail" v-model="formData.categoryDetail" placeholder="" required />
+                        <input type="text" class="form-control" id="categoryDetail" v-model="formData.categoryDetail" placeholder="Nhập mô tả" required />
                         <small v-if="errors.categoryDetail" class="text-danger">{{ errors.categoryDetail }}</small>
                     </div>
 
@@ -90,109 +64,129 @@ export default {
         return {
             formData: {
                 parentCategory: "",
-                childCategory: "",
-                grandchildCategory: "",
                 categoryName: "",
                 categoryDetail: "",
             },
             errors: {},
-            warnings: {},
-            categories: [],
-            showChildCategory: false,
-            showGrandchildCategory: false,
-            parentCategories: [],
-            childCategories: [],
-            grandchildCategories: [],
+            allCategories: [], // Danh sách tất cả danh mục lấy từ API
         };
     },
     methods: {
-        async fetchCategories() {
+        async getCategories() {
             try {
-                const response = await axios.get("/api/Categories/getallcategories");
-                this.categories = response.data;
-                this.parentCategories = this.categories.filter((category) => !category.parentID);
+                const token = localStorage.getItem("authToken");
+                const params = {
+                    indexPage: 1,
+                    limitRange: 20,
+                };
+
+                console.log("🔍 Request API:", params);
+
+                const response = await axios.get("https://localhost:7017/api/Categories/getallcategories", {
+                    headers: { Authorization: `Bearer ${token}` },
+                    params: params,
+                });
+
+                console.log("✅ API Response Raw:", response.data);
+
+                if (response.data?.data?.categories) {
+                    let rootCategory = response.data.data.categories; // Dữ liệu là object, không phải array
+
+                    // ✅ Chuyển từ object cây sang danh sách mảng
+                    this.allCategories = this.convertTreeToArray(rootCategory);
+
+                    console.log("📂 Processed Categories:", this.allCategories);
+                } else {
+                    console.warn("⚠ Không tìm thấy danh mục trong API response!");
+                }
             } catch (error) {
-                console.error("Failed to fetch categories:", error);
+                console.error("❌ API Error:", error.response?.data || error.message);
             }
         },
-        checkParentCategory() {
-            const parentCategory = this.categories.find((category) => category.id === this.formData.parentCategory);
-            if (parentCategory) {
-                this.childCategories = this.categories.filter((category) => category.parentID === parentCategory.id);
-                this.showChildCategory = this.childCategories.length > 0;
-            } else {
-                this.showChildCategory = false;
-            }
-        },
-        checkChildCategory() {
-            const childCategory = this.categories.find((category) => category.id === this.formData.childCategory);
-            if (childCategory) {
-                this.grandchildCategories = this.categories.filter((category) => category.parentID === childCategory.id);
-                this.showGrandchildCategory = this.grandchildCategories.length > 0;
-            } else {
-                this.showGrandchildCategory = false;
-            }
-        },
-        checkCharacterLimit(field, maxLength) {
-            if (this.formData[field].length > maxLength) {
-                this.errors[field] = `Maximum ${maxLength} characters allowed.`;
-            } else {
-                delete this.errors[field];
-            }
-        },
-        clearForm() {
-            this.formData = {
-                parentCategory: "",
-                childCategory: "",
-                grandchildCategory: "",
-                categoryName: "",
-                categoryDetail: "",
+
+        // 🛠 Chuyển từ cây danh mục sang mảng
+        convertTreeToArray(node, parentId = null, result = []) {
+            if (!node) return result;
+
+            // ✅ Định dạng lại object danh mục
+            let formattedNode = {
+                id: node.Id,
+                name: node.Name,
+                parentId: parentId, // Lưu ID danh mục cha
+                description: node.Description
             };
-            this.errors = {};
-            this.warnings = {};
-            this.showChildCategory = false;
-            this.showGrandchildCategory = false;
+
+            result.push(formattedNode);
+
+            // ✅ Đệ quy xử lý LeftChild và RightChild
+            if (node.LeftChild) {
+                this.convertTreeToArray(node.LeftChild, node.Id, result);
+            }
+            if (node.RightChild) {
+                this.convertTreeToArray(node.RightChild, node.Id, result);
+            }
+
+            return result;
         },
+
+        checkParentCategory() {
+            console.log("🛠 Danh mục cha được chọn:", this.formData.parentCategory);
+        },
+
         async handleSubmit() {
             const toast = useToast();
             this.errors = {};
 
-            // Validation
             if (!this.formData.categoryName) {
-                this.errors.categoryName = "Category name is required.";
+                this.errors.categoryName = "Tên thể loại là bắt buộc.";
             }
             if (!this.formData.categoryDetail) {
-                this.errors.categoryDetail = "Category detail is required.";
+                this.errors.categoryDetail = "Mô tả là bắt buộc.";
             }
 
-            // If no errors, submit the form
-            if (Object.keys(this.errors).length === 0) {
-                const payload = {
-                    name: this.formData.categoryName,
-                    slug: this.formData.categoryName.toLowerCase().replace(/\s+/g, "-"),
-                    description: this.formData.categoryDetail,
-                    parentId: this.formData.parentCategory || null,
-                    nestLeft: 0, // Adjust based on your requirements
-                    nestRight: 0, // Adjust based on your requirements
-                    nestDepth: this.formData.grandchildCategory ? 2 : this.formData.childCategory ? 1 : 0,
-                };
+            if (Object.keys(this.errors).length > 0) return;
 
-                try {
-                    const response = await axios.post("/api/Categories/createcategory", payload);
-                    console.log("Form submitted:", response.data);
-                    toast.success("Category created successfully!");
-                    this.clearForm();
-                    this.$router.push("/administrator/category");
-                } catch (error) {
-                    toast.error("Failed to create category. Please try again.");
-                    console.error(error);
-                }
+            const payload = {
+                name: this.formData.categoryName,
+                slug: this.formData.categoryName.toLowerCase().replace(/\s+/g, "-"),
+                code: this.formData.categoryName.toLowerCase().replace(/\s+/g, "-"),
+                description: this.formData.categoryDetail,
+                parentId: this.formData.parentCategory || null, // Lấy `id` của danh mục cha từ dropdown
+                nestLeft: 0, 
+                nestRight: 0, 
+                nestDepth: 0,
+            };
+
+            try {
+                const token = localStorage.getItem("authToken");
+                await axios.post("https://localhost:7017/api/Categories/createcategory", payload, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                toast.success("Tạo thể loại thành công!");
+
+                // 🔄 Cập nhật danh sách danh mục ngay sau khi tạo mới
+                this.getCategories();
+                this.$router.push('/administrator/category');
+                
+                this.clearForm();
+            } catch (error) {
+                toast.error("Tạo thể loại thất bại. Vui lòng thử lại.");
+                console.error("❌ API Error:", error.response?.data || error.message);
             }
+        },
+
+        clearForm() {
+            this.formData = {
+                parentCategory: "",
+                categoryName: "",
+                categoryDetail: "",
+            };
         },
     },
     mounted() {
-        this.fetchCategories();
-    },
+        this.getCategories();
+    }
 };
 </script>
 

@@ -17,4 +17,8 @@
 .hover_underline:hover {
     text-decoration: underline;
 }
+*{
+  scroll-behavior: smooth;
+  scroll-padding-top: 3rem;
+}
 </style>

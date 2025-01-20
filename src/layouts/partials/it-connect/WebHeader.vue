@@ -101,7 +101,7 @@
     <div class="bg-white py-2">
         <div class="container">
             <div class="row justify-content-between">
-                <img src="../../../../../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
+                <img src="@/../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
                 <div class="col d-flex gap-2 align-items-center justify-content-end d-sm-none">
                     <!-- Search icon -->
                     <span @click="toggleSearchBar">
@@ -127,9 +127,9 @@
                     </span>
                 </div>
                 <div class="col d-none d-sm-flex gap-4 justify-content-end align-items-center text-end menu" style="font-weight: bold">
-                    <div style="cursor: pointer">
+                    <a href="#frequentlyQuestions" style="cursor: pointer; color: black;">
                         {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
-                    </div>
+                    </a>
                     <div style="cursor: pointer">
                         {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
                     </div>
@@ -161,7 +161,7 @@
     <div class="d-sm-none position-absolute bg-white w-100 z-2 h-100" style="top: 0; left: 100%; transition: 300ms linear" ref="headerAsSidebar">
         <div class="d-flex justify-content-between p-3">
             <div>
-                <img src="../../../../../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
+                <img src="@/../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
             </div>
             <div @click="toggleHeaderInMobileView" style="width: 24px">
                 <!-- Close header sidebar icon -->
@@ -230,10 +230,18 @@
                 <li class="p-2" style="font-weight: 600">Sinh viên</li>
                 <li class="p-2" style="font-weight: 600">Cán bộ - Giảng viên - Nhân viên</li>
             </ul>
-            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">Các câu hỏi thường gặp</div>
-            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">Yêu cầu hỗ trợ</div>
-            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">Quy định - Chính sách</div>
-            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">Liên hệ</div>
+            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
+                {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
+            </div>
+            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
+                {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
+            </div>
+            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
+                {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
+            </div>
+            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
+                {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
+            </div>
         </div>
     </div>
 </template>

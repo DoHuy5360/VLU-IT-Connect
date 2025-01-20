@@ -47,7 +47,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(user, index) in paginatedUsers" :key="user.id">
+                            <tr v-for="(user, index) in paginatedUsers" :key="user.id" @click="viewBlog(user.id)" class="clickable-row">
                                 <td class="text-center">
                                     <input type="checkbox" :value="user.id" v-model="selectedUsers" @click.stop />
                                 </td>

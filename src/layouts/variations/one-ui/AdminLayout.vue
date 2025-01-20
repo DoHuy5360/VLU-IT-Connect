@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useTemplateStore } from "@/stores/template";
 
@@ -23,17 +23,25 @@ store.setLayout({
 store.headerStyle({ mode: "light" });
 store.mainContent({ mode: "narrow" });
 
+// 🔍 Kiểm tra nếu không có token thì chuyển hướng sang Sign In
+onMounted(() => {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    console.warn("🚫 Không tìm thấy token! Chuyển hướng đến trang đăng nhập.");
+    router.push("/auth/signin");
+  }
+});
+
 function handleLogout() {
   isLoading.value = true;
 
   // Perform logout
-  localStorage.removeItem("authToken"); // Remove token from localStorage
-  router.push("/auth/signin"); // Redirect to signin page
+  localStorage.removeItem("authToken"); // Xóa token khỏi localStorage
+  router.push("/auth/signin"); // Chuyển hướng về trang đăng nhập
 
   isLoading.value = false; // Reset loading state
 }
 </script>
-
 <template>
   <BaseLayout>
     <!-- Side Overlay Content -->

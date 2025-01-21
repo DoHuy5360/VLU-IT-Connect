@@ -1,5 +1,5 @@
 <template>
-    <BasePageHeading title="Bài viết" subtitle="">
+    <BasePageHeading title="Quản Lý Bài Viết" subtitle="">
         <template #extra>
             <button type="button" class="btn btn-success d-flex align-items-center" @click="$router.push('/administrator/blog/create')">
                 <i class="fa fa-plus opacity-50 me-2"></i>
@@ -31,7 +31,6 @@
         <!-- Blog Table -->
         <div v-else>
             <BaseBlock title="Danh sách bài viết" class="shadow-sm rounded">
-                <p class="fs-sm text-muted mb-4">Danh sách bài viết hiển thị theo thứ tự thời gian, bài viết mới nhất ở đầu danh sách.</p>
                 <div v-if="paginatedUsers.length">
                     <table class="table table-bordered table-striped table-vcenter align-middle">
                         <thead class="bg-primary-light">

@@ -1,5 +1,5 @@
 <template>
-  <BasePageHeading title="Chi tiết bài viết" subtitle="">
+  <BasePageHeading title="Chi Tiết Bài Viết" subtitle="">
     <template #extra>
       <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/blog')">
         <i class="fa fa-arrow-left opacity-50 me-1"></i>
@@ -12,20 +12,23 @@
     <p>Đang tải...</p>
   </div>
   <div v-else class="content">
-    <table class="table table-bordered">
-      <tbody>
-        <tr v-for="(value, key) in post" :key="key">
-          <td>{{ key }}</td>
-          <td>
-            <!-- Xử lý nội dung phức tạp -->
-            <div v-if="key === 'contentHtml'" v-html="value"></div>
-            <div v-else-if="key === 'metadata'">{{ parseMetadata(value) }}</div>
-            <div v-else-if="value === null">Not Available</div>
-            <div v-else>{{ value }}</div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="rounded overflow-hidden">
+
+      <table class="table table-bordered">
+        <tbody>
+          <tr v-for="(value, key) in post" :key="key">
+            <td>{{ key }}</td>
+            <td>
+              <!-- Xử lý nội dung phức tạp -->
+              <div v-if="key === 'contentHtml'" v-html="value"></div>
+              <div v-else-if="key === 'metadata'">{{ parseMetadata(value) }}</div>
+              <div v-else-if="value === null">Not Available</div>
+              <div v-else>{{ value }}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 <script>

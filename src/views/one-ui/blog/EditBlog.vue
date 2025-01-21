@@ -1,5 +1,5 @@
 <template>
-    <BasePageHeading title="Chỉnh sửa bài viết" subtitle="">
+    <BasePageHeading title="Chỉnh Sửa Bài Viết" subtitle="">
         <template #extra>
             <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/blog')">
                 <i class="fa fa-arrow-left opacity-50 me-1"></i>

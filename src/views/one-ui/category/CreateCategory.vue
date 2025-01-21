@@ -1,5 +1,5 @@
 <template>
-    <BasePageHeading title="Thể loại" subtitle="">
+    <BasePageHeading title="Tạo Thể Loại" subtitle="">
         <template #extra>
             <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/category')">
                 <i class="fa fa-arrow-left opacity-50 me-1"></i>
@@ -9,8 +9,8 @@
     </BasePageHeading>
 
     <div class="content">
-        <BaseBlock title="Tạo thể loại mới">
-            <div class="col-lg-8 space-y-5">
+        <BaseBlock title="">
+            <div class="space-y-5">
                 <form @submit.prevent="handleSubmit">
                     <!-- Parent Category Dropdown -->
                     <div class="mb-4">

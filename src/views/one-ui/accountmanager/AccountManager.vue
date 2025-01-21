@@ -1,5 +1,5 @@
 <template>
-  <BasePageHeading title="Quản lý nhóm phân quyền">
+  <BasePageHeading title="Quản Lý Nhóm Phân Quyền">
     <template #extra>
       <div class="d-flex gap-2 align-items-center">
         <!-- Thanh tìm kiếm -->
@@ -34,7 +34,7 @@
   </BasePageHeading>
 
   <div class="content">
-      <BaseBlock title="Phân Quyền Nhóm" class="shadow-sm">
+      <BaseBlock title="" class="shadow-sm">
         <template #options>
           <div class="d-flex align-items-center">
             <button

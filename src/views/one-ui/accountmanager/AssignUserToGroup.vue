@@ -1,5 +1,5 @@
 <template>
-  <BasePageHeading title="Thêm người dùng vào nhóm phân quyền">
+  <BasePageHeading title="Thêm Người Dùng Vào Nhóm Phân Quyền">
     <template #extra>
       <button class="btn btn-primary" @click="$router.push('/administrator/accountmanager')"><i class="fa fa-arrow-left opacity-50 me-1"></i> Quay lại</button>
     </template>
@@ -57,7 +57,7 @@
     
             <div class="row">
               <div class="col-12">
-                <button type="submit" class="btn btn-success" :disabled="!selectedGroup || selectedUsers.length === 0"><i class="fa fa-save opacity-50 me-1"></i> Lưu thay đổi</button>
+                <button type="submit" class="btn btn-success" :disabled="!selectedGroup || selectedUsers.length === 0"><i class="fa fa-save me-1"></i> Lưu thay đổi</button>
               </div>
             </div>
           </form>

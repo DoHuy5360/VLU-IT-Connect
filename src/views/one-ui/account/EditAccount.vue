@@ -1,5 +1,5 @@
 <template>
-  <BasePageHeading :title="isEditMode ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản'" subtitle="">
+  <BasePageHeading :title="isEditMode ? 'Chỉnh Sửa Tài Khoản' : 'Thêm Tài Khoản'" subtitle="">
     <template #extra>
       <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/account')">
         <i class="fa fa-arrow-left opacity-50 me-1"></i>
@@ -34,9 +34,9 @@
     
             <!-- Role -->
             <div class="mb-4">
-              <label class="form-label" for="role">Role*</label>
+              <label class="form-label" for="role">Nhóm vai trò*</label>
               <select class="form-select" v-model="formData.role" @change="handleRoleChange" required>
-                <option value="" disabled>Chọn Role</option>
+                <option value="" disabled>-- Chọn --</option>
                 <option v-for="group in groups" :key="group.value" :value="group.value">
                   {{ group.label }}
                 </option>

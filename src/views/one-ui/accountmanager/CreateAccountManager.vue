@@ -1,5 +1,5 @@
 <template>
-  <BasePageHeading title="Tạo nhóm phân quyền">
+  <BasePageHeading title="Tạo Nhóm Phân Quyền">
     <template #extra>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb breadcrumb-alt">

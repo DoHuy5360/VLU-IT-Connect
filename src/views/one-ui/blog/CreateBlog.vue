@@ -1,16 +1,16 @@
 <template>
-  <BasePageHeading title="Bài viết" subtitle="">
+  <BasePageHeading title="Tạo Bài Viết" subtitle="">
     <template #extra>
       <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/blog')">
         <i class="fa fa-arrow-left opacity-50 me-1"></i>
-        Back
+        Quay lại
       </button>
     </template>
   </BasePageHeading>
 
   <div class="content">
-    <BaseBlock title="THÊM BÀI VIẾT">
-      <div class="col-lg-8 space-y-5 pb-4">
+    <BaseBlock title="">
+      <div class="space-y-5 pb-4">
         <form @submit.prevent="submitForm" class="space-y-4">
           <!-- Tiêu đề -->
           <div>

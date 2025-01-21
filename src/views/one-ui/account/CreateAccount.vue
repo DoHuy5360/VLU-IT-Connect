@@ -1,16 +1,16 @@
 <template>
-    <BasePageHeading title="Tài khoản" subtitle="">
+    <BasePageHeading title="Tạo Tài Khoản" subtitle="">
         <template #extra>
             <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/account')">
                 <i class="fa fa-arrow-left opacity-50 me-1"></i>
-                Về danh sách
+                Quay lại
             </button>
         </template>
     </BasePageHeading>
 
     <div class="content">
-        <BaseBlock title="Tạo tài khoản">
-            <div class="col-lg-8 space-y-5 pb-4">
+        <BaseBlock title="">
+            <div class="space-y-5 pb-4">
                 <form @submit.prevent="handleSubmit">
                     <!-- Full Name -->
                     <div class="mb-4">
@@ -42,9 +42,9 @@
 
                     <!-- Role -->
                     <div class="mb-4">
-                        <label class="form-label" for="accountType">Account Type*</label>
+                        <label class="form-label" for="accountType">Nhóm vai trò*</label>
                         <select class="form-select" id="accountType" v-model="formData.role" @change="handleRoleChange" required>
-                            <option value="">Select Account Type</option>
+                            <option value="">-- Chọn --</option>
                             <option v-for="group in groups" :key="group.value" :value="group.value">
                                 {{ group.label }}
                             </option>

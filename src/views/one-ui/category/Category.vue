@@ -1,5 +1,5 @@
 <template>
-    <BasePageHeading title="Thể loại" subtitle="">
+    <BasePageHeading title="Quản Lý Thể Loại" subtitle="">
         <template #extra>
             <button type="button" class="btn btn-success" @click="$router.push('/administrator/category/create')">
                 <i class="fa fa-plus opacity-50 me-1"></i> Thêm thể loại

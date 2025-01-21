@@ -27,33 +27,33 @@
                         <div class="row justify-content-center bg-white rounded">
                             <div class="col-sm-4 p-3">
                                 <img
-                                    src="https://images.unsplash.com/photo-1580795479225-c50ab8c3348d?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                    src="@/../assets/media/other/browse knowledge.png"
                                     style="object-fit: cover; display: block; width: 100%; height: 120px"
                                     alt=""
                                 />
-                                <div class="d-flex flex-column">
+                                <div class="d-flex flex-column mt-2">
                                     <b>{{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}</b>
                                     <span style="">{{ store.isVietNamese() ? "Hỗ trợ nhanh theo các danh mục dịch vụ Công nghệ thông tin sẵn có." : "Quick support according to available Information Technology service categories." }}</span>
                                 </div>
                             </div>
                             <div class="col-sm-4 p-3">
                                 <img
-                                    src="https://images.unsplash.com/photo-1495427513693-3f40da04b3fd?q=80&w=1471&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                    src="@/../assets/media/other/submit a ticket.png"
                                     style="object-fit: cover; display: block; width: 100%; height: 120px"
                                     alt=""
                                 />
-                                <div class="d-flex flex-column">
+                                <div class="d-flex flex-column mt-2">
                                     <b>{{ store.isVietNamese() ? "Trợ giúp" : "Help" }}</b>
                                     <span style="">{{store.isVietNamese() ? "Bạn không tìm thấy những thông tin cần thiết trên đây? Hãy liên hệ với bộ phận Hỗ trợ dịch vụ CNTT." :"Didn't find the necessary information above? Contact IT Service Support."}}</span>
                                 </div>
                             </div>
                             <div class="col-sm-4 p-3">
                                 <img
-                                    src="https://images.unsplash.com/photo-1456406644174-8ddd4cd52a06?q=80&w=1468&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                    src="@/../assets/media/other/request something.png"
                                     style="object-fit: cover; display: block; width: 100%; height: 120px"
                                     alt=""
                                 />
-                                <div class="d-flex flex-column">
+                                <div class="d-flex flex-column mt-2">
                                     <b>{{ store.isVietNamese() ? "Kiến thức Công nghệ thông tin" : "Information Technology knowledge" }}</b>
                                     <span style="">{{store.isVietNamese() ? "Tìm kiếm thông tin để khắc phục sự cố hoặc tìm hiểu cách thực hiện những gì bạn cần." : "Find information to troubleshoot problems or learn how to do what you need."}}</span>
                                 </div>

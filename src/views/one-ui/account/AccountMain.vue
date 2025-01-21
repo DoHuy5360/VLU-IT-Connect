@@ -1,9 +1,9 @@
 <template>
-    <BasePageHeading title="Tài khoản" subtitle="">
+    <BasePageHeading title="Quản Lý Tài Khoản" subtitle="">
         <template #extra>
             <button type="button" class="btn btn-success" v-click-ripple @click="$router.push('/administrator/account/create')">
                 <i class="fa fa-plus opacity-50 me-1"></i>
-                Thêm tài khoản
+                Tạo tài khoản
             </button>
         </template>
     </BasePageHeading>
@@ -32,7 +32,6 @@
         <!-- User Table -->
         <div v-else>
             <BaseBlock title="Danh sách tài khoản" class="shadow-sm rounded">
-                <p class="fs-sm text-muted mb-4">Danh sách tài khoản hiển thị theo thứ tự thời gian, tài khoản mới nhất ở đầu danh sách.</p>
                 <div v-if="paginatedAccounts.length">
                     <table class="table table-bordered table-striped table-vcenter align-middle">
                         <thead class="bg-primary-light">
@@ -91,7 +90,7 @@
                     </nav>
                 </div>
                 <div v-else class="text-center">
-                    <p class="text-muted">Không tìm thấy kết quả phù hợp</p>
+                    <p class="text-muted">Không có dữ liệu</p>
                 </div>
             </BaseBlock>
         </div>
@@ -127,7 +126,6 @@ const fetchGroups = async () => {
             label: group.GroupName,
         }));
     } catch (error) {
-        Swal.fire("Error", "Không thể tải danh sách nhóm tài khoản.", "error");
         console.error("Error fetching groups:", error);
     }
 };
@@ -147,7 +145,6 @@ const fetchUsers = async () => {
             status: user.state ? "Active" : "Inactive",
         }));
     } catch (error) {
-        Swal.fire("Error", "Không thể tải dữ liệu tài khoản.", "error");
         console.error("Error fetching users:", error);
     } finally {
         loading.value = false;
@@ -186,17 +183,34 @@ const onSearch = () => (currentPage.value = 1);
 const onFilterGroup = () => (currentPage.value = 1);
 
 const deleteUser = async (id) => {
-    try {
+    Swal.fire({
+        title: "Bạn có chắc chắn?",
+        text: "Hành động này không thể hoàn tác.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Đồng ý xóa!",
+        cancelButtonText: "Hủy",
+        customClass: {
+            confirmButton: "btn btn-danger m-1",
+            cancelButton: "btn btn-secondary m-1",
+        },
+        buttonsStyling: false,
+    }).then(async (result) => {
         const token = localStorage.getItem("authToken");
-        await axios.delete(`/api/UserManagement/users/${id}`, {
-            headers: { Authorization: token },
-        });
-        users.value = users.value.filter((user) => user.id !== id);
-        Swal.fire("Deleted!", "Tài khoản đã được xóa.", "success");
-    } catch (error) {
-        Swal.fire("Error", "Không thể xóa tài khoản.", "error");
-        console.error("Error deleting user:", error);
-    }
+        if (result.isConfirmed) {
+            try {
+                const token = localStorage.getItem("authToken");
+                await axios.delete(`/api/UserManagement/users/${id}`, {
+                    headers: { Authorization: token },
+                });
+                users.value = users.value.filter((user) => user.id !== id);
+                Swal.fire("Deleted!", "Tài khoản đã được xóa.", "success");
+            } catch (error) {
+                Swal.fire("Error", "Không thể xóa tài khoản.", "error");
+                console.error("Error deleting user:", error);
+            }
+        }
+    });
 };
 
 const deleteMultiple = async () => {

@@ -1,5 +1,5 @@
 <template>
-    <BasePageHeading title="Thể loại" subtitle="">
+    <BasePageHeading title="Quản Lý Thể Loại" subtitle="">
         <template #extra>
             <button type="button" class="btn btn-success" @click="$router.push('/administrator/category/create')">
                 <i class="fa fa-plus opacity-50 me-1"></i> Thêm thể loại
@@ -10,7 +10,7 @@
     <div class="content">
         <BaseBlock title="Danh sách thể loại" class="shadow-sm rounded">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="mb-0">Bảng thể loại</h5>
+                <div></div>
                 <div class="col-md-4">
                     <input v-model="searchTerm" type="text" placeholder="Tìm kiếm ..." class="form-control" @input="onSearch" />
                 </div>

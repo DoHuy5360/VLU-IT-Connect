@@ -13,16 +13,16 @@
       <div class="row justify-content-center push">
         <div class="col-md-8 col-lg-6 col-xl-4">
           <!-- Sign In Block -->
-          <BaseBlock title="Sign In" class="mb-0">
+          <BaseBlock title="" class="mb-0">
             <div class="p-sm-3 px-lg-4 px-xxl-5 py-lg-5">
               <div class="text-center mb-4">
                 <img
                   src="/assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png"
                   alt="VLU Logo"
-                  style="max-width: 40%; height: auto"
+                  style="max-width: 60%; height: auto"
                 />
               </div>
-              <p class="fw-medium text-muted">Welcome, please login.</p>
+              <p class="fw-medium text-muted text-center">Vui lòng đăng nhập</p>
               <form @submit.prevent="onSubmit">
                 <div class="py-3">
                   <div class="mb-4">
@@ -36,10 +36,10 @@
                     />
                     <div v-if="v$.email.$errors.length" class="invalid-feedback">
                       <span v-if="v$.email.$errors[0].$validator === 'required'">
-                        Email is required.
+                        Hãy nhập Email
                       </span>
                       <span v-if="v$.email.$errors[0].$validator === 'email'">
-                        Enter a valid email address.
+                        Email không hợp lệ
                       </span>
                     </div>
                   </div>
@@ -48,13 +48,13 @@
                       type="password"
                       class="form-control form-control-alt form-control-lg"
                       v-model="state.password"
-                      placeholder="Password"
+                      placeholder="Mật khẩu"
                       :class="{ 'is-invalid': v$.password.$errors.length }"
                       @blur="v$.password.$touch"
                     />
                     <div v-if="v$.password.$errors.length" class="invalid-feedback">
                       <span v-if="v$.password.$errors[0].$validator === 'required'">
-                        Password is required.
+                       Hãy nhập mật khẩu
                       </span>
                       <span
                         v-if="v$.password.$errors[0].$validator === 'minLength'"
@@ -63,25 +63,25 @@
                       </span>
                     </div>
                   </div>
+                  <div v-if="state.loginError" class="text-danger mt-2 text-center mb-3">
+                    Đăng nhập thất bại, vui lòng kiểm tra lại Email và Mật khẩu
+                  </div>
                   <div class="mb-4 d-flex justify-content-between align-items-center">
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" />
-                      <label class="form-check-label">Remember Me</label>
+                      <!-- <input class="form-check-input" type="checkbox" />
+                      <label class="form-check-label">Nhớ tôi</label> -->
                     </div>
                     <button
                       type="submit"
                       class="btn btn-alt-success"
                       :disabled="isLoading.login"
                     >
-                      Log In
+                      Đăng nhập
                     </button>
-                  </div>
-                  <div v-if="state.loginError" class="text-danger mt-2">
-                    Login failed. Please check your email and password.
                   </div>
                   <div class="text-center my-3">
                     <hr class="my-4" />
-                    <span class="bg-white px-3">OR</span>
+                    <span class="bg-white px-3">Hoặc</span>
                   </div>
                   <div class="text-center">
                     <button
@@ -91,7 +91,7 @@
                       @click="signInWithMicrosoft"
                     >
                       <i class="fab fa-microsoft me-3"></i>
-                      Log In with Microsoft
+                      Đăng nhập bằng Microsoft
                     </button>
                   </div>
                 </div>
@@ -107,7 +107,7 @@
 import axios from "axios";
 import { reactive } from "vue";
 import useVuelidate from "@vuelidate/core";
-import { required, minLength, email } from "@vuelidate/validators";
+import { required, email } from "@vuelidate/validators";
 
 export default {
   setup() {
@@ -119,7 +119,7 @@ export default {
 
     const rules = {
       email: { required, email },
-      password: { required, minLength: minLength(5) },
+      password: { required },
     };
 
     const v$ = useVuelidate(rules, state);
@@ -130,6 +130,10 @@ export default {
     });
 
     const onSubmit = async () => {
+      v$.value.$touch(); // Đánh dấu tất cả các trường
+      if (v$.value.$invalid) {
+        return;
+      }
       isLoading.login = true;
       state.loginError = false; // Reset error state before login attempt
 
@@ -140,7 +144,6 @@ export default {
           twoFactorCode: "string",
           twoFactorRecoveryCode: "string",
         });
-        console.log("Login success:", response.data);
 
         // Save token to a shared state/store or localStorage
         const { tokenType, accessToken } = response.data;

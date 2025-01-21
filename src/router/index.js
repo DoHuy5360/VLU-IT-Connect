@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import NProgress from "nprogress/nprogress.js";
 
 // Import components
+const WelcomeAdmin = () => import("@/views/one-ui/WelcomeAdmin.vue");
 const Home = () => import("@/views/it-connect/Home.vue");
 const Categories = () => import("@/views/it-connect/Categories.vue");
 const Videos = () => import("@/views/it-connect/Videos.vue");
@@ -51,6 +52,11 @@ const routes = [
     name: "AdminPage",
     component: AdminLayout,
     children: [
+      {
+        path: "",
+        name: "index",
+        component: WelcomeAdmin
+      },
       {
         path: "blog",
         children: [

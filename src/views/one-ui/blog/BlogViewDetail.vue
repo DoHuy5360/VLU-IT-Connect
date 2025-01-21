@@ -1,37 +1,34 @@
 <template>
-  <BasePageHeading title="Blog Detail" subtitle="Details of the selected blog">
+  <BasePageHeading title="Chi Tiết Bài Viết" subtitle="">
     <template #extra>
       <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/blog')">
         <i class="fa fa-arrow-left opacity-50 me-1"></i>
-        Back
+        Quay lại
       </button>
     </template>
   </BasePageHeading>
   
   <div v-if="loading" class="text-center py-5">
-    <p>Loading...</p>
+    <p>Đang tải...</p>
   </div>
-  <div v-else>
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>Field</th>
-          <th>Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(value, key) in post" :key="key">
-          <td>{{ key }}</td>
-          <td>
-            <!-- Xử lý nội dung phức tạp -->
-            <div v-if="key === 'contentHtml'" v-html="value"></div>
-            <div v-else-if="key === 'metadata'">{{ parseMetadata(value) }}</div>
-            <div v-else-if="value === null">Not Available</div>
-            <div v-else>{{ value }}</div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div v-else class="content">
+    <div class="rounded overflow-hidden">
+
+      <table class="table table-bordered">
+        <tbody>
+          <tr v-for="(value, key) in post" :key="key">
+            <td>{{ key }}</td>
+            <td>
+              <!-- Xử lý nội dung phức tạp -->
+              <div v-if="key === 'contentHtml'" v-html="value"></div>
+              <div v-else-if="key === 'metadata'">{{ parseMetadata(value) }}</div>
+              <div v-else-if="value === null">Not Available</div>
+              <div v-else>{{ value }}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 <script>

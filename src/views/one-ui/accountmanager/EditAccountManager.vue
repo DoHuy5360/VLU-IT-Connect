@@ -3,14 +3,14 @@
     <template #extra>
       <button
         type="button"
-        class="btn btn-secondary me-1"
+        class="btn btn-primary me-1"
         @click="$router.back()"
       >
         <i class="fa fa-arrow-left opacity-50 me-1"></i> Quay lại
       </button>
       <button
         type="button"
-        class="btn btn-primary"
+        class="btn btn-success"
         @click="handleSave"
         :disabled="loading"
       >
@@ -35,10 +35,10 @@
 
           <!-- Group Name -->
           <div class="mb-4 row">
-            <label class="col-sm-3 col-form-label" for="groupName">
+            <label class="col-sm-2 col-form-label" for="groupName">
               Tên Nhóm <span class="text-danger">*</span>
             </label>
-            <div class="col-sm-9">
+            <div class="col-sm-10">
               <input
                 type="text"
                 class="form-control"
@@ -58,10 +58,10 @@
 
           <!-- Description -->
           <div class="mb-4 row">
-            <label class="col-sm-3 col-form-label" for="description">
+            <label class="col-sm-2 col-form-label" for="description">
               Mô Tả <span class="text-danger">*</span>
             </label>
-            <div class="col-sm-9">
+            <div class="col-sm-10">
               <textarea
                 class="form-control"
                 id="description"
@@ -74,8 +74,8 @@
 
           <!-- Permissions -->
           <div class="mb-4 row">
-            <label class="col-sm-3 col-form-label">Phân Quyền</label>
-            <div class="col-sm-9">
+            <label class="col-sm-2 col-form-label">Phân Quyền</label>
+            <div class="col-sm-10">
               <!-- Search box -->
               <div class="mb-4">
                 <div class="input-group">
@@ -162,7 +162,7 @@
 
           <!-- Submit button -->
           <div class="row">
-            <div class="col-sm-9 ms-auto">
+            <div class="col-sm-10 ms-auto">
               <!-- <button type="submit" class="btn btn-primary" :disabled="loading">
                 <i class="fa fa-check me-1"></i> Lưu thay đổi
               </button> -->

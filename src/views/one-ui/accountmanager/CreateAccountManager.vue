@@ -1,13 +1,11 @@
 <template>
-  <BasePageHeading title="Tạo Nhóm Phân Quyền Mới">
+  <BasePageHeading title="Tạo Nhóm Phân Quyền">
     <template #extra>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb breadcrumb-alt">
-          <li class="breadcrumb-item">
-            <router-link to="/administrator/accountmanager">
-              <i class="fa fa-arrow-left me-1"></i> Quay lại
-            </router-link>
-          </li>
+          <button class="btn btn-primary" @click="$router.push('/administrator/accountmanager')">
+            <i class="fa fa-arrow-left me-1"></i> Quay lại
+          </button>
         </ol>
       </nav>
     </template>
@@ -29,10 +27,10 @@
 
           <!-- Group Name -->
           <div class="mb-4 row">
-            <label class="col-sm-3 col-form-label" for="groupName">
+            <label class="col-sm-2 col-form-label" for="groupName">
               Tên Nhóm <span class="text-danger">*</span>
             </label>
-            <div class="col-sm-9">
+            <div class="col-sm-10">
               <input
                 type="text"
                 class="form-control"
@@ -49,10 +47,10 @@
 
           <!-- Description -->
           <div class="mb-4 row">
-            <label class="col-sm-3 col-form-label" for="description">
+            <label class="col-sm-2 col-form-label" for="description">
               Mô Tả <span class="text-danger">*</span>
             </label>
-            <div class="col-sm-9">
+            <div class="col-sm-10">
               <textarea
                 class="form-control"
                 id="description"
@@ -69,8 +67,8 @@
 
           <!-- Permissions -->
           <div class="mb-4 row">
-            <label class="col-sm-3 col-form-label"> Phân Quyền </label>
-            <div class="col-sm-9">
+            <label class="col-sm-2 col-form-label"> Phân Quyền </label>
+            <div class="col-sm-10">
               <div v-if="loadingPermissions" class="text-center py-3">
                 <div class="spinner-border text-primary" role="status">
                   <span class="visually-hidden">Loading permissions...</span>
@@ -127,19 +125,19 @@
           <!-- Submit Buttons -->
           <div class="row mb-4">
             <div
-              class="col-sm-9 offset-sm-3"
+              class=""
               style="display: flex; justify-content: end"
             >
               <button
                 type="submit"
-                class="btn btn-primary me-2"
+                class="btn btn-success me-2"
                 :disabled="loading"
               >
                 {{ loading ? "Đang xử lý..." : "Tạo Nhóm" }}
               </button>
               <router-link
                 to="/administrator/accountmanager"
-                class="btn btn-secondary"
+                class="btn btn-danger"
               >
                 Hủy
               </router-link>

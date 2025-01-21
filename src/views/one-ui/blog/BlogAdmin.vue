@@ -1,5 +1,5 @@
 <template>
-    <BasePageHeading title="Bài viết" subtitle="">
+    <BasePageHeading title="Quản Lý Bài Viết" subtitle="">
         <template #extra>
             <button type="button" class="btn btn-success d-flex align-items-center" @click="$router.push('/administrator/blog/create')">
                 <i class="fa fa-plus opacity-50 me-2"></i>
@@ -31,7 +31,6 @@
         <!-- Blog Table -->
         <div v-else>
             <BaseBlock title="Danh sách bài viết" class="shadow-sm rounded">
-                <p class="fs-sm text-muted mb-4">Danh sách bài viết hiển thị theo thứ tự thời gian, bài viết mới nhất ở đầu danh sách.</p>
                 <div v-if="paginatedUsers.length">
                     <table class="table table-bordered table-striped table-vcenter align-middle">
                         <thead class="bg-primary-light">
@@ -47,12 +46,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(user, index) in paginatedUsers" :key="user.id" @click="viewBlog(user.id)" class="clickable-row">
+                            <tr v-for="(user, index) in paginatedUsers" :key="user.id">
                                 <td class="text-center">
                                     <input type="checkbox" :value="user.id" v-model="selectedUsers" @click.stop />
                                 </td>
                                 <td class="text-center">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
-                                <td>{{ user.title }}</td>
+                                <td class="clickable-row" style="cursor: pointer;" @click="viewBlog(user.id)">{{ user.title }}</td>
                                 <td>{{ user.author }}</td>
                                 <td>
                                     <span :class="`badge bg-${user.state === 1 ? 'success' : 'warning'}`">
@@ -60,12 +59,14 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-alt-warning" @click.stop="editBlog(user.id)">
-                                        <i class="fa fa-fw fa-pencil-alt"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger" title="Xóa bài viết" @click="swalConfirm(user.id)">
-                                        <i class="fa fa-fw fa-trash"></i>
-                                    </button>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <button class="btn btn-sm btn-alt-warning" @click.stop="editBlog(user.id)">
+                                            <i class="fa fa-fw fa-pencil-alt"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger" title="Xóa bài viết" @click="swalConfirm(user.id)">
+                                            <i class="fa fa-fw fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -323,12 +324,9 @@ export default {
     background-color: #f8f9fa;
 }
 
-.clickable-row {
-    cursor: pointer;
-}
 
 .clickable-row:hover {
-    background-color: #f8f9fa;
+    text-decoration: underline;
 }
 
 .btn-group .btn {

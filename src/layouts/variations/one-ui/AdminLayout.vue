@@ -54,7 +54,7 @@ function handleLogout() {
           :disabled="isLoading"
         >
           <i class="si si-logout"></i>
-          <span v-if="!isLoading">Logout</span>
+          <span v-if="!isLoading">Đăng xuất</span>
           <span v-else>Logging out...</span>
         </button>
       </div>

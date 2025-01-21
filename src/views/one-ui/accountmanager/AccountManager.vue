@@ -1,9 +1,9 @@
 <template>
-  <BasePageHeading title="Quản Lý Nhóm Phân Quyền">
+  <BasePageHeading title="Quản lý nhóm phân quyền">
     <template #extra>
-      <div class="d-flex align-items-center">
+      <div class="d-flex gap-2 align-items-center">
         <!-- Thanh tìm kiếm -->
-        <div class="me-3">
+        <div class="">
           <input
             type="text"
             class="form-control"
@@ -23,7 +23,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-success-user"
+          class="btn btn-alt-success"
           @click="$router.push('/administrator/accountmanager/addaccount')"
         >
           <i class="fa fa-plus opacity-50 me-1"></i>
@@ -33,124 +33,126 @@
     </template>
   </BasePageHeading>
 
-  <BaseBlock title="Phân Quyền Nhóm" class="shadow-sm">
-    <template #options>
-      <div class="d-flex align-items-center">
-        <button
-          v-if="selectedGroups.length > 0"
-          type="button"
-          class="btn btn-danger me-2"
-          @click="deleteSelected"
-        >
-          <i class="fa fa-trash opacity-50 me-1"></i>
-          Xóa đã chọn ({{ selectedGroups.length }})
-        </button>
-      </div>
-    </template>
-
-    <div v-if="loading" class="text-center my-4">
-      <i class="fa fa-spinner fa-spin"></i> Đang tải dữ liệu...
-    </div>
-
-    <div v-else-if="error" class="text-center my-4">
-      {{ error }}
-    </div>
-
-    <div v-else>
-      <table class="table table-bordered table-striped table-vcenter">
-        <thead>
-          <tr>
-            <th class="text-center" style="width: 50px">
-              <div class="form-check">
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  :checked="isAllSelected"
-                  @change="toggleSelectAll"
-                />
-              </div>
-            </th>
-            <th>Tên Nhóm</th>
-            <th class="d-none d-md-table-cell">Mô Tả</th>
-            <th class="text-center">Quyền Hạn</th>
-            <th class="text-center">Số Lượng</th>
-            <th class="d-none d-md-table-cell">Ngày Tạo</th>
-            <th class="text-center">Thao Tác</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="group in groups" :key="group.id">
-            <td class="text-center">
-              <div class="form-check">
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  :checked="selectedGroups.includes(group.id)"
-                  @change="toggleGroupSelection(group.id)"
-                />
-              </div>
-            </td>
-            <td>{{ group.name }}</td>
-            <td class="d-none d-md-table-cell">
-              {{ group.description || "-" }}
-            </td>
-            <td class="text-center">{{ group.permissionCount }}</td>
-            <td class="text-center">{{ group.accountCount }}</td>
-            <td class="d-none d-md-table-cell">
-              {{ formatDate(group.createdDate) }}
-            </td>
-            <td class="text-center">
-              <button
-                class="btn btn-sm btn-primary me-2"
-                @click="
-                  $router.push(`/administrator/accountmanager/edit/${group.id}`)
-                "
-              >
-                <i class="fa fa-pencil"></i>
-              </button>
-              <button
-                class="btn btn-sm btn-danger"
-                @click="confirmDelete(group.id)"
-              >
-                <i class="fa fa-trash"></i>
-              </button>
-            </td>
-          </tr>
-          <tr v-if="groups.length === 0">
-            <td colspan="7" class="text-center">Không có dữ liệu</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- Phân trang -->
-      <div class="d-flex justify-content-between align-items-center">
-        <div>Hiển thị {{ groups.length }} / {{ totalItems }} kết quả</div>
-        <nav aria-label="Page navigation">
-          <ul class="pagination">
-            <li class="page-item" :class="{ disabled: currentPage === 1 }">
-              <a class="page-link" @click="changePage(currentPage - 1)"
-                >Trước</a
-              >
-            </li>
-            <li
-              v-for="page in totalPages"
-              :key="page"
-              class="page-item"
-              :class="{ active: currentPage === page }"
+  <div class="content">
+      <BaseBlock title="Phân Quyền Nhóm" class="shadow-sm">
+        <template #options>
+          <div class="d-flex align-items-center">
+            <button
+              v-if="selectedGroups.length > 0"
+              type="button"
+              class="btn btn-danger me-2"
+              @click="deleteSelected"
             >
-              <a class="page-link" @click="changePage(page)">{{ page }}</a>
-            </li>
-            <li
-              class="page-item"
-              :class="{ disabled: currentPage === totalPages }"
-            >
-              <a class="page-link" @click="changePage(currentPage + 1)">Sau</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </div>
-  </BaseBlock>
+              <i class="fa fa-trash opacity-50 me-1"></i>
+              Xóa đã chọn ({{ selectedGroups.length }})
+            </button>
+          </div>
+        </template>
+    
+        <div v-if="loading" class="text-center my-4">
+          <i class="fa fa-spinner fa-spin"></i> Đang tải dữ liệu...
+        </div>
+    
+        <div v-else-if="error" class="text-center my-4">
+          {{ error }}
+        </div>
+    
+        <div v-else>
+          <table class="table table-bordered table-striped table-vcenter">
+            <thead>
+              <tr>
+                <th class="text-center" style="width: 50px">
+                  <div class="form-check">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      :checked="isAllSelected"
+                      @change="toggleSelectAll"
+                    />
+                  </div>
+                </th>
+                <th>Tên Nhóm</th>
+                <th class="d-none d-md-table-cell">Mô Tả</th>
+                <th class="text-center">Quyền Hạn</th>
+                <th class="text-center">Số Lượng</th>
+                <th class="d-none d-md-table-cell">Ngày Tạo</th>
+                <th class="text-center">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="group in groups" :key="group.id">
+                <td class="text-center">
+                  <div class="form-check">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      :checked="selectedGroups.includes(group.id)"
+                      @change="toggleGroupSelection(group.id)"
+                    />
+                  </div>
+                </td>
+                <td>{{ group.name }}</td>
+                <td class="d-none d-md-table-cell">
+                  {{ group.description || "-" }}
+                </td>
+                <td class="text-center">{{ group.permissionCount }}</td>
+                <td class="text-center">{{ group.accountCount }}</td>
+                <td class="d-none d-md-table-cell">
+                  {{ formatDate(group.createdDate) }}
+                </td>
+                <td class="text-center">
+                  <button
+                    class="btn btn-sm btn-alt-danger me-2"
+                    @click="
+                      $router.push(`/administrator/accountmanager/edit/${group.id}`)
+                    "
+                  >
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                  <button
+                    class="btn btn-sm btn-danger"
+                    @click="confirmDelete(group.id)"
+                  >
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr v-if="groups.length === 0">
+                <td colspan="7" class="text-center">Không có dữ liệu</td>
+              </tr>
+            </tbody>
+          </table>
+    
+          <!-- Phân trang -->
+          <div class="d-flex justify-content-between align-items-center">
+            <div>Hiển thị {{ groups.length }} / {{ totalItems }} kết quả</div>
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                  <a class="page-link" @click="changePage(currentPage - 1)"
+                    >Trước</a
+                  >
+                </li>
+                <li
+                  v-for="page in totalPages"
+                  :key="page"
+                  class="page-item"
+                  :class="{ active: currentPage === page }"
+                >
+                  <a class="page-link" @click="changePage(page)">{{ page }}</a>
+                </li>
+                <li
+                  class="page-item"
+                  :class="{ disabled: currentPage === totalPages }"
+                >
+                  <a class="page-link" @click="changePage(currentPage + 1)">Sau</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </BaseBlock>
+  </div>
 </template>
 
 <script setup>
@@ -454,16 +456,6 @@ onMounted(() => {
 
 .table th {
   white-space: nowrap;
-}
-button.btn.btn-success-user {
-  margin-right: 13px;
-  background-color: darkcyan;
-  color: white;
-  margin-left: 14px;
-}
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
 }
 
 .shadow-sm {

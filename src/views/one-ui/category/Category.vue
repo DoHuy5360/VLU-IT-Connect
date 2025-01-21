@@ -10,7 +10,7 @@
     <div class="content">
         <BaseBlock title="Danh sách thể loại" class="shadow-sm rounded">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="mb-0">Bảng thể loại</h5>
+                <div></div>
                 <div class="col-md-4">
                     <input v-model="searchTerm" type="text" placeholder="Tìm kiếm ..." class="form-control" @input="onSearch" />
                 </div>

@@ -14,7 +14,7 @@
               :src="featuredArticle?.image"
               alt="Blog Article Image"
               class="rounded mb-3"
-              style="width: 100%; height: 400px; object-fit: cover"
+              style="width: 100%; height: 400px; object-fit: contain"
             />
             <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
             <div class="text-muted mb-3" v-html="featuredArticle?.details"></div>
@@ -24,7 +24,8 @@
       </div>
 
       <!-- Right Column: Category List -->
-      <div class="col-lg-4">
+      <div class="position-relative col-lg-4">
+        <div style="position: sticky; top: 1rem;">
         <div class="rounded p-3 bg-white border shadow-sm mb-3">
           <h4 class="mb-3 fw-bold">Danh Mục</h4>
           <ul v-if="formattedCategories.length" class="list-unstyled">
@@ -37,15 +38,15 @@
         <div class="rounded p-3 bg-white border shadow-sm">
           <h4 class="mb-3 fw-bold">Bài Viết Liên Quan</h4>
           <ul v-if="relatedArticles.length" class="list-unstyled">
-            <li v-for="(article, index) in relatedArticles" :key="index" class="row  align-items-start mb-3">
+            <li v-for="(article, index) in relatedArticles" :key="index" @click="navigateToArticle(article.id)" class="relative-posts row p-2 align-items-start" style="cursor: pointer;">
               <img
                 :src="article.image"
                 alt="Related Post Image"
-                class="rounded border col-3"
-                style="width: 100px; height: 100px; object-fit: cover"
+                class="rounded border col-3 bg-white"
+                style="width: 100px; height: 100px; object-fit: contain"
               />
               <div class="col-9">
-                <h6 class="mb-1 clickable-text text-truncate " @click="navigateToArticle(article.id)" :title="article.title" style="cursor: pointer;">
+                <h6 class="mb-1 clickable-text text-truncate " :title="article.title">
                   {{ truncateText(article.title, 30) }}
                 </h6>
                 <p class="text-muted small mb-1">
@@ -60,6 +61,7 @@
           <p v-else class="text-muted">Không có bài viết liên quan nào.</p>
         </div>
       </div>
+      </div>
     </div>
   </div>
 </template>
@@ -67,6 +69,9 @@
 <script>
 import axios from "axios";
 import CategoryItem from "./CategoryItem.vue";
+import { useTemplateStore } from "@/stores/template";
+
+const store = useTemplateStore();
 
 export default {
   components: {
@@ -106,6 +111,16 @@ export default {
             author: post.userName || "Unknown author",
             image: this.parseMetadata(post.metadata),
           };
+          store.setBreadcrumb([
+          {
+              name: "Kiến thức CNTT - Sinh viên",
+              path: "/blog",
+          },
+          {
+              name: this.featuredArticle?.title,
+              path: `/blog/detail/${this.featuredArticle?.id}`,
+          },
+      ]);
         } else {
           this.featuredArticle = null;
         }
@@ -172,6 +187,8 @@ export default {
   watch: {
     id: "fetchFeaturedArticle",
   },
+
+  
   async created() {
     await this.fetchFeaturedArticle();
     await this.getCategories();
@@ -179,3 +196,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.relative-posts:hover{
+  background-color: #EFF6FF;
+}
+</style>

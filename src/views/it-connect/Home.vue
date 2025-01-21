@@ -7,8 +7,8 @@
                         {{ store.isVietNamese() ? "Bạn cần giúp đỡ vấn đề gì?" : "What can I assist you?" }}
                     </span>
                     <div class="bg-white rounded-pill px-2 py-1 d-flex align-items-center">
-                        <input type="text" style="outline: none; border: none; width: 400px" autofocus v-model="searchValue" @input="onInput" />
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <input type="text" style="outline: none; border: none; width: 400px" autofocus  @keypress.enter="onSearch" v-model="searchQuery" ref="searchInput"/>
+                        <svg style="cursor: pointer; user-select: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" @click="onSearch">
                             <path
                                 d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
                                 stroke="#171717"
@@ -27,33 +27,33 @@
                         <div class="row justify-content-center bg-white rounded">
                             <div class="col-sm-4 p-3">
                                 <img
-                                    src="https://images.unsplash.com/photo-1580795479225-c50ab8c3348d?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                    src="@/../assets/media/other/browse knowledge.png"
                                     style="object-fit: cover; display: block; width: 100%; height: 120px"
                                     alt=""
                                 />
-                                <div class="d-flex flex-column">
+                                <div class="d-flex flex-column mt-2">
                                     <b>{{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}</b>
                                     <span style="">{{ store.isVietNamese() ? "Hỗ trợ nhanh theo các danh mục dịch vụ Công nghệ thông tin sẵn có." : "Quick support according to available Information Technology service categories." }}</span>
                                 </div>
                             </div>
                             <div class="col-sm-4 p-3">
                                 <img
-                                    src="https://images.unsplash.com/photo-1495427513693-3f40da04b3fd?q=80&w=1471&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                    src="@/../assets/media/other/submit a ticket.png"
                                     style="object-fit: cover; display: block; width: 100%; height: 120px"
                                     alt=""
                                 />
-                                <div class="d-flex flex-column">
+                                <div class="d-flex flex-column mt-2">
                                     <b>{{ store.isVietNamese() ? "Trợ giúp" : "Help" }}</b>
                                     <span style="">{{store.isVietNamese() ? "Bạn không tìm thấy những thông tin cần thiết trên đây? Hãy liên hệ với bộ phận Hỗ trợ dịch vụ CNTT." :"Didn't find the necessary information above? Contact IT Service Support."}}</span>
                                 </div>
                             </div>
                             <div class="col-sm-4 p-3">
                                 <img
-                                    src="https://images.unsplash.com/photo-1456406644174-8ddd4cd52a06?q=80&w=1468&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                    src="@/../assets/media/other/request something.png"
                                     style="object-fit: cover; display: block; width: 100%; height: 120px"
                                     alt=""
                                 />
-                                <div class="d-flex flex-column">
+                                <div class="d-flex flex-column mt-2">
                                     <b>{{ store.isVietNamese() ? "Kiến thức Công nghệ thông tin" : "Information Technology knowledge" }}</b>
                                     <span style="">{{store.isVietNamese() ? "Tìm kiếm thông tin để khắc phục sự cố hoặc tìm hiểu cách thực hiện những gì bạn cần." : "Find information to troubleshoot problems or learn how to do what you need."}}</span>
                                 </div>
@@ -276,6 +276,28 @@
     </div>
 </template>
 
+<script setup>
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import { useTemplateStore } from "../../stores/template";
+const store = useTemplateStore();
+const router = useRouter();
+const searchQuery = ref("");
+const searchInput = ref(null)
+
+function onSearch() {
+  const trimmedQuery = searchQuery.value.trim();
+  if (trimmedQuery) {
+    store.filterSearchResults(trimmedQuery);
+    router.push({ name: "ListResult", query: { q: trimmedQuery } });
+  } else {
+    searchInput.value.focus()
+    // store.searchBlogResult = [];
+  }
+}
+
+</script>
+
 <style lang="css" scoped>
 .background_gradient {
     background: linear-gradient(to right, #ffebe9, #ffffff);
@@ -337,14 +359,3 @@
     }
 }
 </style>
-<script setup>
-import { ref, computed } from "vue";
-import { useTemplateStore } from "../../stores/template";
-const store = useTemplateStore();
-
-const searchValue = ref("");
-
-const onInput = computed(() => {
-    console.log(searchValue.value);
-});
-</script>

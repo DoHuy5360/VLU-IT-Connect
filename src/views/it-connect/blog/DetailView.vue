@@ -45,7 +45,7 @@
                 style="width: 100px; height: 100px; object-fit: cover"
               />
               <div class="col-9">
-                <h6 class="mb-1 clickable-text text-truncate" @click="navigateToArticle(article.id)" :title="article.title">
+                <h6 class="mb-1 clickable-text text-truncate " @click="navigateToArticle(article.id)" :title="article.title" style="cursor: pointer;">
                   {{ truncateText(article.title, 30) }}
                 </h6>
                 <p class="text-muted small mb-1">

@@ -37,7 +37,7 @@
           </div>
           <div>
             <label for="pic-file">File Hình Ảnh</label>
-            <input type="file" id="image-file" accept="image/*" class="form-control" @change="handleFileChange" />
+            <input type="file" id="image-file" accept="image/*" class="form-control" ref="selectedImageFile" />
           </div>
 
           <!-- Editor -->
@@ -59,7 +59,7 @@
 
           <div>
             <label>File Video</label>
-            <input type="file" id="video-file" accept="video/*" class="form-control" />
+            <input type="file" id="video-file" accept="video/*" class="form-control" ref="selectedVideoFile"/>
           </div>
 
           <!-- Checkboxes -->
@@ -95,6 +95,10 @@ export default {
     SlugInput,
   },
   setup() {
+
+    const selectedImageFile = ref(null);
+    const selectedVideoFile = ref(null);
+
     const router = useRouter();
     const route = useRoute();
 
@@ -218,22 +222,21 @@ export default {
         formDataToSend.append("ContentHtml", formData.value.contentHtml.trim());
 
         // Optional fields
-        formDataToSend.append("Files", formData.value.image?.trim() || "");
+        formDataToSend.append("Files", selectedImageFile.value?.files[0]);
         formDataToSend.append("Excerpt", formData.value.excerpt?.trim() || "");
         formDataToSend.append("Published", formData.value.published.toString());
         formDataToSend.append("EnableComments", formData.value.enableComments.toString());
         formDataToSend.append("VideoType", formData.value.videoType?.trim() || "");
         formDataToSend.append("VideoUrl", formData.value.videoUrl?.trim() || "");
 
-        const videoFileInput = document.getElementById("video-file");
-        if (videoFileInput?.files[0]) {
-          const fileSize = videoFileInput.files[0].size;
+        if (selectedVideoFile.value?.files[0]) {
+          const fileSize = selectedVideoFile.value.files[0].size;
           const maxSize = 5 * 1024 * 1024; // 5MB
           if (fileSize > maxSize) {
             alert("File video không được vượt quá 5MB");
             return;
           }
-          formDataToSend.append("VideoFile", videoFileInput.files[0]);
+          formDataToSend.append("VideoFile", selectedVideoFile.value.files[0]);
         }
 
         // Log request data
@@ -245,15 +248,16 @@ export default {
         // Token đã có prefix từ localStorage
         const response = await axios.post("/api/admin/posts", formDataToSend, {
           headers: {
+            'Content-Type': 'multipart/form-data',
             Authorization: token, // Không thêm 'Bearer' vì token đã có prefix
           },
-          timeout: 10000,
+          // timeout: 10000,
         });
 
         console.log("Response:", response.data);
 
         if (response.data) {
-          router.push("/administrator/blog");
+          // router.push("/administrator/blog");
         }
       } catch (error) {
         console.error("Error creating post:", error);
@@ -298,6 +302,8 @@ export default {
       categories,
       submitForm,
       navigateToSimulation,
+      selectedImageFile,
+      selectedVideoFile
     };
   },
 };

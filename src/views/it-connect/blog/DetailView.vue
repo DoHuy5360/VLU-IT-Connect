@@ -3,16 +3,21 @@
     <div class="row gx-2 gy-2">
       <!-- Left Column: Blog Details -->
       <div class="col-lg-8">
-        <div class="rounded p-4 bg-white">
+        <div class="rounded p-4 bg-white border shadow-sm">
           <h4 class="mb-3 fw-bold">Nội Dung Bài Viết</h4>
           <div class="blog-detail-box">
             <div class="text-muted mb-3">
               <strong>{{ featuredArticle?.date }}</strong> |
               <span class="text-primary clickable-text">{{ featuredArticle?.category }}</span>
             </div>
-            <img :src="featuredArticle?.image" alt="Blog Article Image" class="rounded mb-3" style="width: 100%; height: 400px; object-fit: cover" />
+            <img
+              :src="featuredArticle?.image"
+              alt="Blog Article Image"
+              class="rounded mb-3"
+              style="width: 100%; height: 400px; object-fit: cover"
+            />
             <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
-            <div class="text-muted mb-3" v-html="featuredArticle?.details "></div>
+            <div class="text-muted mb-3" v-html="featuredArticle?.details"></div>
             <div class="text-muted"><strong>Tác giả:</strong> {{ featuredArticle?.author }}</div>
           </div>
         </div>
@@ -20,7 +25,7 @@
 
       <!-- Right Column: Category List -->
       <div class="col-lg-4">
-        <div class="rounded p-3 bg-white mb-3">
+        <div class="rounded p-3 bg-white border shadow-sm mb-3">
           <h4 class="mb-3 fw-bold">Danh Mục</h4>
           <ul v-if="formattedCategories.length" class="list-unstyled">
             <CategoryItem v-for="(category, index) in formattedCategories" :key="index" :category="category" />
@@ -29,21 +34,25 @@
         </div>
 
         <!-- Related Posts -->
-        <div class="rounded p-3 bg-white">
+        <div class="rounded p-3 bg-white border shadow-sm">
           <h4 class="mb-3 fw-bold">Bài Viết Liên Quan</h4>
           <ul v-if="relatedArticles.length" class="list-unstyled">
-            <li v-for="(article, index) in relatedArticles" :key="index" class="d-flex gap-2 align-items-start mb-3">
-              <img :src="article.image" alt="Related Post Image" class="rounded" style="width: 100px; height: 100px; object-fit: cover" />
-              <div>
+            <li v-for="(article, index) in relatedArticles" :key="index" class="row  align-items-start mb-3">
+              <img
+                :src="article.image"
+                alt="Related Post Image"
+                class="rounded border col-3"
+                style="width: 100px; height: 100px; object-fit: cover"
+              />
+              <div class="col-9">
                 <h6 class="mb-1 clickable-text text-truncate" @click="navigateToArticle(article.id)" :title="article.title">
                   {{ truncateText(article.title, 30) }}
                 </h6>
                 <p class="text-muted small mb-1">
-                  {{ truncateText(article.details, 60) }}
+                  {{ truncateText(article.excerpt, 60) }}
                 </p>
                 <div class="text-muted small">
-                  <strong>{{ article.author }}</strong
-                  >, {{ article.date }}
+                  <strong>{{ article.author }}</strong>, {{ article.date }}
                 </div>
               </div>
             </li>
@@ -54,6 +63,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import axios from "axios";
 import CategoryItem from "./CategoryItem.vue";
@@ -62,12 +72,12 @@ export default {
   components: {
     CategoryItem,
   },
-  props: ["id"], // Nhận ID bài viết từ route params
+  props: ["id"],
   data() {
     return {
-      featuredArticle: null, // Store the main article data
-      categories: {}, // Holds the raw categories data
-      relatedArticles: [], // Store related articles
+      featuredArticle: null,
+      categories: {},
+      relatedArticles: [],
       baseURL: "https://localhost:7017/",
     };
   },
@@ -76,14 +86,14 @@ export default {
       if (!this.categories || !this.categories.leftChild) return [];
       return [
         ...(this.categories.leftChild ? [this.formatCategory(this.categories.leftChild)] : []),
-        ...(this.categories.rightChild ? [this.formatCategory(this.categories.rightChild)] : [])
+        ...(this.categories.rightChild ? [this.formatCategory(this.categories.rightChild)] : []),
       ];
     },
   },
   methods: {
     async fetchFeaturedArticle() {
       try {
-        const response = await axios.get(`/api/posts/${this.id}`); // ✅ Lấy bài viết theo ID
+        const response = await axios.get(`/api/posts/${this.id}`);
         const post = response.data.data;
 
         if (post) {
@@ -94,7 +104,7 @@ export default {
             details: post.contentHtml || "No details available.",
             date: new Date(post.publishedAt).toLocaleDateString(),
             author: post.userName || "Unknown author",
-            image: this.parseMetadata(post.metadata), // ✅ Fix lỗi lấy hình ảnh từ metadata
+            image: this.parseMetadata(post.metadata),
           };
         } else {
           this.featuredArticle = null;
@@ -118,6 +128,27 @@ export default {
         this.categories = null;
       }
     },
+    async getRelatedArticles() {
+      try {
+        const response = await axios.get("/api/posts");
+        let posts = response.data?.data?.$values || [];
+
+        posts = posts
+          .filter((post) => post.publishedAt)
+          .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+
+        this.relatedArticles = posts.slice(1, 4).map((post) => ({
+          id: post.id,
+          title: post.title,
+          excerpt: post.excerpt || "No excerpt available.",
+          date: new Date(post.publishedAt).toLocaleDateString(),
+          author: post.userName || "Unknown author",
+          image: this.parseMetadata(post.metadata),
+        }));
+      } catch (error) {
+        console.error("Error fetching related articles:", error);
+      }
+    },
     parseMetadata(metadata) {
       try {
         const metaObj = JSON.parse(metadata);
@@ -131,19 +162,6 @@ export default {
         return "https://via.placeholder.com/600x300";
       }
     },
-    formatCategory(category) {
-      if (!category) return { children: [] };
-      return {
-        id: category.id,
-        name: category.name,
-        postCount: category.code || "0",
-        isExpanded: false,
-        children: [
-          ...(category.leftChild ? [this.formatCategory(category.leftChild)] : []),
-          ...(category.rightChild ? [this.formatCategory(category.rightChild)] : [])
-        ],
-      };
-    },
     truncateText(text, maxLength) {
       return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
     },
@@ -152,11 +170,12 @@ export default {
     },
   },
   watch: {
-    id: "fetchFeaturedArticle", // ✅ Theo dõi ID, tự động tải lại bài viết khi ID thay đổi
+    id: "fetchFeaturedArticle",
   },
   async created() {
     await this.fetchFeaturedArticle();
     await this.getCategories();
+    await this.getRelatedArticles();
   },
 };
 </script>

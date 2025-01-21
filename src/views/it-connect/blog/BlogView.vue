@@ -6,11 +6,11 @@
       <div class="col-lg-6 h-120 d-flex flex-column" v-if="featuredArticle"> <!-- ✅ Thêm h-100 và d-flex -->
         <div class="rounded p-4 bg-white border shadow-sm flex-grow-1"> <!-- ✅ Thêm flex-grow-1 -->
           <h4 class="mb-3 fw-bold">Bài viết mới</h4>
-          <div class="featured-article-box d-flex flex-column gap-3">
+          <div class="featured-article-box d-flex flex-column gap-3" style="cursor: pointer;" @click="viewBlog(featuredArticle.id, featuredArticle.title)">
             <img :src="featuredArticle.image" alt="Featured Article Image" class="rounded mb-3"
-                 style="width: 100%; height: 300px; object-fit: cover" />
+                 style="width: 100%; height: 300px; object-fit: contain" />
             <div>
-              <h4 class="mb-3 clickable-text" @click="viewBlog(featuredArticle.id)">
+              <h4 class="mb-3 clickable-text">
                 {{ featuredArticle.title }}
               </h4>
               <p class="text-muted mb-3">{{ truncateText(featuredArticle.details, 150) }}</p>
@@ -23,14 +23,13 @@
       </div>
 
       <!-- Old Articles with Pagination -->
-      <div class="col-lg-6 d-flex flex-column" v-if="oldArticles.length"> <!-- ✅ Thêm h-100 và d-flex -->
-        <div class="rounded d-flex flex-column p-4 bg-white border shadow-sm flex-grow-1"> <!-- ✅ Thêm flex-grow-1 -->
+      <div class="col-lg-6 d-flex flex-column" v-if="oldArticles.length">
+        <div class="rounded d-flex flex-column p-4 bg-white border shadow-sm flex-grow-1">
           <h4 class="mb-3 fw-bold">Bài viết cũ</h4>
      
           <ul class="list-unstyled flex-grow-1">
-            <li v-for="(article, index) in paginatedArticles" :key="index" class="mb-3">
-              <hr>
-              <h6 class="mb-2 clickable-text" @click="viewBlog(article.id)">
+            <li v-for="(article, index) in paginatedArticles" :key="index" class="old-posts p-2 border border-gray mb-2 rounded" style="cursor: pointer;">
+              <h6 class="mb-2 clickable-text" @click="viewBlog(article.id, article.title)">
                 {{ article.title }}
               </h6>
               <p class="text-muted small mb-1">{{ truncateText(article.details, 80) }}</p>
@@ -71,6 +70,16 @@
 <script>
 import axios from "axios";
 import { ref } from 'vue';
+
+import { useTemplateStore } from "@/stores/template";
+
+const store = useTemplateStore();
+store.setBreadcrumb([
+    {
+        name: "Kiến thức CNTT - Sinh viên",
+        path: "/blog",
+    },
+]);
 
 export default {
   data() {
@@ -130,7 +139,17 @@ export default {
       }
     },
 
-    viewBlog(id) {
+    viewBlog(id, title) {
+      store.setBreadcrumb([
+        {
+            name: "Kiến thức CNTT - Sinh viên",
+            path: "/blog",
+        },
+        {
+            name: title,
+            path: `/blog/detail/${id}`,
+        },
+    ]);
       this.$router.push({ name: "Detail", params: { id: id.toString() } });
     },
 
@@ -181,3 +200,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+.old-posts:hover{
+  background-color: #EFF6FF;
+}
+
+</style>

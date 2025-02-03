@@ -21,7 +21,9 @@
               />
             </svg>
           </span>
-          <div v-if="blog" style="word-break: break-all">{{ blog.title }}</div>
+          <div v-if="blog" style="word-break: break-all">
+            <a :href="/blog/detail/blog.id">{{ blog.postTitle }}</a>
+          </div>
           <div v-else style="word-break: break-all; color: #999;">No content</div>
         </div>
       </div>
@@ -34,6 +36,7 @@
   </template>
   
   <script>
+  
   export default {
     props: {
       name: {

@@ -1,5 +1,5 @@
 <template>
-    <div class="category-box rounded-2 shadow-sm border border-new-gray py-2 px-4">
+    <div class="rounded-2 shadow-sm border border-new-gray py-2 px-4 h-100">
       <div class="category-name py-3" style="font-weight: bold" @click="onClick">{{ name }}</div>
       <div class="d-flex flex-column gap-2">
         <div
@@ -64,8 +64,6 @@
   </script>
   
   <style scoped>
-  .category-box {
-    /* Add custom styles here if needed */
-  }
+
   </style>
   

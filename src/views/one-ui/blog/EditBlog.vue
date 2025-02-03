@@ -258,7 +258,6 @@ export default {
                     headers: { Authorization: token },
                 });
 
-                alert("Bài viết đã được cập nhật thành công.");
                 router.push("/administrator/blog");
             } catch (error) {
                 console.error("Lỗi khi cập nhật bài viết:", error);

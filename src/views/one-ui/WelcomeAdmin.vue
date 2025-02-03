@@ -12,7 +12,7 @@
 
   <div class="content">
     <div class="row">
-        <RouterLink to="blog" class="col-3" style="cursor: pointer;">
+        <RouterLink to="/administrator/blog" class="col-3" style="cursor: pointer;">
             <div class="navigate-items p-4 bg-white rounded border border-gray">
                 <div class="d-flex justify-content-between">
                     <span>Danh sách bài viết</span>
@@ -20,7 +20,7 @@
                 </div>
             </div>
         </RouterLink>
-        <RouterLink to="category" class="col-3" style="cursor: pointer;">
+        <RouterLink to="/administrator/category" class="col-3" style="cursor: pointer;">
             <div class="navigate-items p-4 bg-white rounded border border-gray">
                 <div class="d-flex justify-content-between">
                     <span>Danh sách thể loại</span>
@@ -28,7 +28,7 @@
                 </div>
             </div>
         </RouterLink>
-        <RouterLink to="account" class="col-3" style="cursor: pointer;">
+        <RouterLink to="/administrator/account" class="col-3" style="cursor: pointer;">
             <div class="navigate-items p-4 bg-white rounded border border-gray">
                 <div class="d-flex justify-content-between">
                     <span>Danh sách tài khoản</span>
@@ -36,7 +36,7 @@
                 </div>
             </div>
         </RouterLink>
-        <RouterLink to="accountmanager" class="col-3" style="cursor: pointer;">
+        <RouterLink to="/administrator/accountmanager" class="col-3" style="cursor: pointer;">
             <div class="navigate-items p-4 bg-white rounded border border-gray">
                 <div class="d-flex justify-content-between">
                     <span>Danh sách quyền hạn</span>

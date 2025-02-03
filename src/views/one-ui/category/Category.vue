@@ -50,6 +50,7 @@ import axios from "axios";
 import CategoryRow from "@/views/one-ui/category/compononts/CategoryRow.vue";
 import BasePageHeading from "@/components/BasePageHeading.vue";
 import BaseBlock from "@/components/BaseBlock.vue";
+import Swal from "sweetalert2";
 
 export default {
     name: "SimpleCategoryTable",
@@ -148,10 +149,12 @@ export default {
         editCategory(category) {
             console.log("📝 Edit category:", category);
         },
-        confirmDelete(category) {
-            if (confirm(`❌ Bạn có chắc chắn muốn xóa danh mục "${category.name}"?`)) {
-                alert("Danh mục đã được xóa!");
-            }
+        async confirmDelete(category) {
+            this.getCategories()
+            const result = await Swal.fire({
+                title: "Xóa thành công",
+                icon: "success",
+            });
         },
     },
 };

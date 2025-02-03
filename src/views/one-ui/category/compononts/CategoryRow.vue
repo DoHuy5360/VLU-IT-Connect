@@ -94,7 +94,6 @@ export default {
                     });
 
                     if (response.status === 200) {
-                        toast.success("Danh mục đã được xóa thành công!");
                         this.$emit("delete", this.category); // Emit event để cập nhật danh sách
                     }
                 } catch (error) {

@@ -229,7 +229,7 @@ const routes = [
             },
           },
           {
-            path: "detail/:id",
+            path: "detail/:categorySlug/:postSlug",
             name: "Detail",
             component: Detail,
             props: true,

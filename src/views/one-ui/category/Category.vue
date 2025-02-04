@@ -1,9 +1,7 @@
 <template>
     <BasePageHeading title="Quản Lý Thể Loại" subtitle="">
         <template #extra>
-            <button type="button" class="btn btn-success" @click="$router.push('/administrator/category/create')">
-                <i class="fa fa-plus opacity-50 me-1"></i> Thêm thể loại
-            </button>
+            <button type="button" class="btn btn-success" @click="$router.push('/administrator/category/create')"><i class="fa fa-plus opacity-50 me-1"></i> Thêm thể loại</button>
         </template>
     </BasePageHeading>
 
@@ -26,12 +24,12 @@
                     </tr>
                 </thead>
                 <tbody v-if="categories.length">
-                    <CategoryRow 
-                        v-for="category in categories" 
-                        :key="category.id" 
-                        :category="category" 
+                    <CategoryRow
+                        v-for="category in categories"
+                        :key="category.id"
+                        :category="category"
                         :expandedCategories="expandedCategories"
-                        @edit="editCategory" 
+                        @edit="editCategory"
                         @delete="confirmDelete"
                         @toggle="toggleCategory"
                     />
@@ -81,7 +79,7 @@ export default {
 
                 console.log("🔍 Request API:", params);
 
-                const response = await axios.get("https://localhost:7017/api/Categories/getallcategories", {
+                const response = await axios.get("/api/Categories/getallcategories", {
                     headers: { Authorization: token },
                     params: params,
                 });
@@ -97,28 +95,28 @@ export default {
             }
         },
         processCategories(category, parentId = null) {
-        if (!category) return [];
+            if (!category) return [];
 
-        let newCategory = {
-            id: category.Id,
-            name: category.Name,
-            description: category.Description,
-            code: category.Code,
-            parentId: parentId,
-            nestDepth: category.NestDepth,
-            children: [],
-        };
+            let newCategory = {
+                id: category.Id,
+                name: category.Name,
+                description: category.Description,
+                code: category.Code,
+                parentId: parentId,
+                nestDepth: category.NestDepth,
+                children: [],
+            };
 
-        // Xử lý tất cả danh mục con (LeftChild + RightChild) để hiển thị đúng
-        if (category.LeftChild) {
-            newCategory.children.push(...this.processCategories(category.LeftChild, newCategory.id));
-        }
-        if (category.RightChild) {
-            newCategory.children.push(...this.processCategories(category.RightChild, newCategory.id));
-        }
+            // Xử lý tất cả danh mục con (LeftChild + RightChild) để hiển thị đúng
+            if (category.LeftChild) {
+                newCategory.children.push(...this.processCategories(category.LeftChild, newCategory.id));
+            }
+            if (category.RightChild) {
+                newCategory.children.push(...this.processCategories(category.RightChild, newCategory.id));
+            }
 
-        return [newCategory]; 
-    },
+            return [newCategory];
+        },
         toggleCategory(categoryId) {
             // Nếu danh mục đã mở, đóng tất cả danh mục con
             if (this.expandedCategories[categoryId]) {
@@ -135,7 +133,7 @@ export default {
             let updatedCategories = { ...this.expandedCategories };
             delete updatedCategories[categoryId];
 
-            Object.keys(updatedCategories).forEach(id => {
+            Object.keys(updatedCategories).forEach((id) => {
                 if (id.startsWith(categoryId + "-")) {
                     delete updatedCategories[id];
                 }
@@ -150,7 +148,7 @@ export default {
             console.log("📝 Edit category:", category);
         },
         async confirmDelete(category) {
-            this.getCategories()
+            this.getCategories();
             const result = await Swal.fire({
                 title: "Xóa thành công",
                 icon: "success",

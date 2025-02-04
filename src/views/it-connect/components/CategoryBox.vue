@@ -12,37 +12,26 @@
                             />
                         </svg>
                     </span>
-                    <a class="hover_underline text-black" style="font-size: 1rem" :href="`/blog/detail/${props.dataProps.slug}/${blog.slugPost}`">{{ blog.postTitle }}</a>
+                    <a class="hover_underline text-black" style="font-size: 1rem" :href="`/blog/detail/${blog.slugPost}`">{{ blog.postTitle }}</a>
                 </div>
             </div>
         </div>
         <div v-else style="word-break: break-all; color: #999">Không có bài viết</div>
         <div class="d-flex justify-content-end">
-            <button v-if="props.dataProps.posts.length > 0" class="btn btn-link p-0" @click="() => openRelativeBlog(props.dataProps.slug)">Show More</button>
+            <a v-if="props.dataProps.posts.length > 0" :href="`/blog?category=${props.dataProps.slug}`" >Xem thêm</a>
         </div>
     </div>
 </template>
 
 <script setup>
 import { useRouter } from "vue-router";
+import { useTemplateStore } from "@/stores/template";
 
 const props = defineProps({
     dataProps: Object,
 });
+const store = useTemplateStore();
 
 const router = useRouter();
 
-function openRelativeBlog(name) {
-    store.setBreadcrumb([
-        {
-            name: "Kiến thức CNTT - Sinh viên",
-            path: "/categories",
-        },
-        {
-            name: `${name}`,
-            path: `/categories/${name}`,
-        },
-    ]);
-    router.push({ name: "Blog", query: { category: props.dataProps.slug } });
-}
 </script>

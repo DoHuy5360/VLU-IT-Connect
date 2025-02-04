@@ -26,7 +26,6 @@ store.setBreadcrumb([
 const categories = ref([]);
 async function getCategoryAndPosts() {
     const res = await axios.get("/api/posts/categories-with-posts?limit=4")
-    console.log(res);
     
     categories.value = res.data
 }

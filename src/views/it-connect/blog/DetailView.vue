@@ -1,69 +1,67 @@
 <template>
-    <div class="container py-3">
-        <div class="row gx-2 gy-2">
+    <div class="container my-3">
+        <div class="row gx-2 gy-2 bg-white rounded rounded-lg">
             <!-- Left Column: Blog Details -->
             <div class="col-lg-8">
-                <div class="rounded p-4 bg-white border shadow-sm">
-                    <h4 class="mb-3 fw-bold">Nội Dung Bài Viết</h4>
+                <div class="rounded p-4">
                     <div class="blog-detail-box">
                         <div class="text-muted mb-3">
                             <strong>{{ featuredArticle?.date }}</strong> |
-                            <span class="text-primary clickable-text">{{ featuredArticle?.category }}</span>
+                            <span class="text-primary clickable-text">{{ featuredArticle?.category.name }}</span>
                         </div>
-                        <img :src="featuredArticle?.image" alt="Blog Article Image" class="rounded mb-3" style="width: 100%; height: 400px; object-fit: contain" />
+                        <div class="d-flex justify-content-start">
+                            <img :src="featuredArticle?.image" alt="Blog Article Image" class="w-100 border border-new-pale-gray rounded mb-3" style="object-fit: contain" />
+                        </div>
                         <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
                         <div class="text-muted mb-3" v-html="featuredArticle?.details"></div>
                         <div class="text-muted"><strong>Tác giả:</strong> {{ featuredArticle?.author }}</div>
                     </div>
                 </div>
             </div>
-
             <!-- Right Column: Category List -->
             <div class="position-relative col-lg-4">
-                <div style="position: sticky; top: 1rem">
-                    <div class="rounded p-3 bg-white border shadow-sm mb-3">
+                <div class="d-flex flex-column gap-3 p-4" style="position: sticky; top: 1rem;">
+                    <div class="">
                         <h4 class="mb-3 fw-bold">Danh Mục</h4>
                         <ul v-if="categories.length" class="list-unstyled">
-                            <li v-for="(category, index) in categories" :key="index" class="hover_underline" style="cursor: pointer;">
-                                <div class="d-flex justify-content-between">
+                            <li v-for="(category, index) in categories" :key="index" class="hover_underline mb-1" style="cursor: pointer">
+                                <a :href="`/blog?category=${category.slug}`" class="text-black d-flex justify-content-between">
                                     <span>
                                         {{ category.categoryName }}
                                     </span>
                                     <strong>
                                         {{ category.posts.length }}
                                     </strong>
-                                </div>
+                                </a>
                             </li>
                         </ul>
                         <p v-else class="text-muted">Không có danh mục nào để hiển thị.</p>
                     </div>
 
                     <!-- Related Posts -->
-                    <div class="rounded p-3 bg-white border shadow-sm">
-                        <h4 class="mb-3 fw-bold">Bài Viết Liên Quan</h4>
-                        <ul v-if="relatedArticles.length" class="list-unstyled">
-                            <li
-                                v-for="(article, index) in relatedArticles"
-                                :key="index"
-                                @click="navigateToArticle(article.id)"
-                                class="relative-posts row p-2 align-items-start"
-                                style="cursor: pointer"
-                            >
-                                <img :src="article.image" alt="Related Post Image" class="rounded border col-3 bg-white" style="width: 100px; height: 100px; object-fit: contain" />
-                                <div class="col-9">
-                                    <h6 class="mb-1 clickable-text text-truncate" :title="article.title">
-                                        <!-- {{ truncateText(article.title, 30) }} -->
-                                    </h6>
-                                    <p class="text-muted small mb-1">
-                                        <!-- {{ truncateText(article.excerpt, 60) }} -->
-                                    </p>
-                                    <div class="text-muted small">
-                                        <strong>{{ article.author }}</strong
-                                        >, {{ article.date }}
+                    <div class="">
+                        <h4 class="mb-3 fw-bold">Các bài Viết Liên Quan</h4>
+                        <div v-if="relatedArticles.length" class="d-flex flex-column gap-2">
+                            <div v-for="(article, index) in relatedArticles" :key="index">
+                                <a :href="`/blog/detail/${article.slug}`" class="relative-posts row py-2 text-black" style="cursor: pointer">
+                                    <div class="col-4 d-flex">
+                                        <img :src="article.image" alt="Related Post Image" class="rounded border w-100 h-100" style="object-fit: contain" />
                                     </div>
-                                </div>
-                            </li>
-                        </ul>
+                                    <div class="col-8">
+                                        <h6 class="mb-1 clickable-text text-truncate" :title="article.title">
+                                            {{ truncateText(article.title, 30) }}
+                                        </h6>
+                                        <p class="text-muted small mb-1">
+                                            {{ truncateText(article.excerpt, 60) }}
+                                        </p>
+                                        <div class="text-muted small">
+                                            <strong>{{ article.author }}</strong>
+                                            <span>{{ article.date }}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                         <p v-else class="text-muted">Không có bài viết liên quan nào.</p>
                     </div>
                 </div>
@@ -75,23 +73,26 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
 import axios from "axios";
-import CategoryItem from "./CategoryItem.vue";
 import { useTemplateStore } from "@/stores/template";
 
-const props = defineProps(["postSlug", "categorySlug"]);
+const props = defineProps(["postSlug", "category"]);
 const store = useTemplateStore();
 
 const featuredArticle = ref(null);
 const categories = ref({});
 const relatedArticles = ref([]);
-const baseURL = ref("/");
-let currentPostId
+const baseURL = ref("https://localhost:7017/");
+let currentPostId;
+let categoryOfThisPost;
 
 const fetchFeaturedArticle = async () => {
     try {
         const response = await axios.get(`/api/posts/by-slug/${props.postSlug}`);
-        const post = response.data.data;
-        currentPostId = post.id
+        const post = response.data.data[0];
+        categoryOfThisPost = post.category;
+        console.log(categoryOfThisPost);
+
+        currentPostId = post.id;
 
         if (post) {
             featuredArticle.value = {
@@ -103,9 +104,9 @@ const fetchFeaturedArticle = async () => {
                 author: post.userName || "Unknown author",
                 image: parseMetadata(post.metadata),
             };
-
             store.setBreadcrumb([
                 { name: "Kiến thức CNTT - Sinh viên", path: "/blog" },
+                { name: categoryOfThisPost.name, path: `/blog?category=${categoryOfThisPost.slug}` },
                 { name: featuredArticle.value?.title, path: `/blog/detail/${featuredArticle.value?.id}` },
             ]);
         } else {
@@ -113,6 +114,7 @@ const fetchFeaturedArticle = async () => {
         }
     } catch (error) {
         console.error("Error fetching article:", error.message);
+    } finally {
     }
 };
 
@@ -120,7 +122,6 @@ const getCategories = async () => {
     try {
         const response = await axios.get("/api/posts/categories-with-posts");
         categories.value = response.data;
-
     } catch (error) {
         console.error("Error fetching categories:", error.response?.data || error.message);
         categories.value = null;
@@ -129,16 +130,18 @@ const getCategories = async () => {
 
 const getRelatedArticles = async () => {
     try {
-        const response = await axios.get(`/api/posts/categories-with-posts?categorySlug=${props.categorySlug}&limit=4`);
-        let categoryAndPosts = response.data[0]
-        
+        const response = await axios.get(`/api/posts/categories-with-posts?categorySlug=${categoryOfThisPost.slug}&limit=5`);
+        let categoryAndPosts = response.data[0];
+        console.log(categoryAndPosts);
+
         const posts = categoryAndPosts.posts.filter((post) => post.id !== currentPostId);
 
         relatedArticles.value = posts.map((post) => ({
             id: post.id,
-            // title: post.title,
-            // excerpt: post.excerpt || "No excerpt available.",
-            // image: parseMetadata(post.metadata),
+            title: post.title,
+            excerpt: post.excerpt,
+            image: parseMetadata(post.image),
+            slug: post.slugPost
         }));
     } catch (error) {
         console.error("Error fetching related articles:", error);
@@ -161,12 +164,6 @@ const parseMetadata = (metadata) => {
 
 const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-};
-
-const navigateToArticle = (id) => {
-    // Sử dụng router để điều hướng
-    const router = useRouter();
-    router.push(`/blog/detail/${id}`);
 };
 
 // Watcher để theo dõi slug

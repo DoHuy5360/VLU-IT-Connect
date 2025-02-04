@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row my-4 gy-4">
             <div v-for="category in categories" :key="category.id" class="col-sm-4 col">
-                <CategoryBox :name="category.categoryName" :blogs="category.posts" @click="() => openRelativeBlog(category.categoryName)" />
+                <CategoryBox :dataProps="category" />
             </div>
         </div>
     </div>
@@ -21,25 +21,12 @@ store.setBreadcrumb([
         path: "/categories",
     },
 ]);
-function openRelativeBlog(name) {
-    store.setBreadcrumb([
-        {
-            name: "Kiến thức CNTT - Sinh viên",
-            path: "/categories",
-        },
-        {
-            name: `${name}`,
-            path: `/categories/${name}`,
-        },
-    ]);
-}
+
 
 const categories = ref([]);
 async function getCategoryAndPosts() {
-    const res = await axios.get("/api/posts/categories-with-posts")
+    const res = await axios.get("/api/posts/categories-with-posts?limit=4")
     console.log(res);
-    
-    console.log(res.data);
     
     categories.value = res.data
 }

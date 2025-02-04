@@ -106,7 +106,7 @@ export default {
             state.loginError = false; // Reset error state before login attempt
 
             try {
-                const response = await axios.post("https://localhost:7017/login", {
+                const response = await axios.post("/login", {
                     email: state.email,
                     password: state.password,
                     twoFactorCode: "string",
@@ -118,7 +118,7 @@ export default {
                 localStorage.setItem("authToken", `${tokenType} ${accessToken}`);
 
                 // Redirect after login success
-                window.location.href = "http://localhost:5173/administrator";
+                window.location.href = "/administrator";
             } catch (error) {
                 console.error("Login failed:", error.response?.data || error.message);
                 state.loginError = true; // Show error message

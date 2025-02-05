@@ -90,7 +90,6 @@ const fetchFeaturedArticle = async () => {
         const response = await axios.get(`/api/posts/by-slug/${props.postSlug}`);
         const post = response.data.data[0];
         categoryOfThisPost = post.category;
-        console.log(categoryOfThisPost);
 
         currentPostId = post.id;
 
@@ -132,19 +131,22 @@ const getRelatedArticles = async () => {
     try {
         const response = await axios.get(`/api/posts/categories-with-posts?categorySlug=${categoryOfThisPost.slug}&limit=5`);
         let categoryAndPosts = response.data;
-        console.log(categoryAndPosts);
 
-        categoryAndPosts.foreach((category) => {
-            category.posts.foreach((post) => {
-                relatedArticles.value.push({
-                    id: post.id,
-                    title: post.title,
-                    excerpt: post.excerpt,
-                    image: parseMetadata(post.image),
-                    slug: post.slugPost,
-                });
-            });
-        });
+        for (let categoryIndex = 0; categoryIndex < categoryAndPosts.length; categoryIndex++) {
+            const category = categoryAndPosts[categoryIndex];
+            for (let postIndex = 0; postIndex < category.posts.length; postIndex++) {
+                const post = category.posts[postIndex];
+                if(post.id !== currentPostId){
+                    relatedArticles.value.push({
+                        id: post.id,
+                        title: post.title,
+                        excerpt: post.excerpt,
+                        image: parseMetadata(post.image),
+                        slug: post.slugPost,
+                    });
+                }
+            }
+        }
     } catch (error) {
         console.error("Error fetching related articles:", error);
     }
@@ -157,10 +159,10 @@ const parseMetadata = (metadata) => {
             let imagePath = metaObj.Files[0].replace(/\\/g, "/");
             return baseURL.value + imagePath;
         }
-        return "https://via.placeholder.com/600x300";
+        return "";
     } catch (error) {
         console.error("Error parsing metadata:", error);
-        return "https://via.placeholder.com/600x300";
+        return "";
     }
 };
 

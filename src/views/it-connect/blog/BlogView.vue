@@ -129,13 +129,12 @@ const parseMetadata = (metadata) => {
             let imagePath = metaObj.Files[0].replace(/\\/g, "/");
             return baseURL + imagePath;
         }
-        return "https://via.placeholder.com/600x300";
+        return "";
     } catch (error) {
         console.error("Error parsing metadata:", error);
-        return "https://via.placeholder.com/600x300";
+        return "";
     }
 };
-
 
 const nextPage = () => {
     if (currentPage.value < totalPages.value) {
@@ -189,7 +188,7 @@ onMounted(async () => {
     } catch (error) {
         console.error("Error fetching posts:", error);
     } finally {
-        if(category === undefined){
+        if (category === undefined) {
             store.setBreadcrumb([
                 {
                     name: "Kiến thức CNTT - Sinh viên",
@@ -197,10 +196,10 @@ onMounted(async () => {
                 },
                 {
                     name: "Bài viết",
-                    path: '/blog',
+                    path: "/blog",
                 },
             ]);
-        }else{
+        } else {
             store.setBreadcrumb([
                 {
                     name: "Kiến thức CNTT - Sinh viên",

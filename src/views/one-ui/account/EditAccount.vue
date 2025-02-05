@@ -156,13 +156,15 @@ export default {
 
     // Determine the request type (create or update)
     const url = isEditMode.value
-      ? `/api/UserManagement/update-user/${formData.value.id}`
+      ? `/api/UserManagement/users/${formData.value.id}`
       : "/api/UserManagement/create-user";
     const method = isEditMode.value ? "put" : "post";
 
     // Make API call
     await axios[method](url, payload, {
-      headers: { Authorization: token },
+      headers: { 
+        "Content-Type": "multipart/form-data",
+        Authorization: token },
     });
 
     // Redirect on success

@@ -14,13 +14,13 @@
                         </div>
                         <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
                         <div class="text-muted mb-3" v-html="featuredArticle?.details"></div>
-                        <div class="text-muted"><strong>Tác giả:</strong> {{ featuredArticle?.author }}</div>
+                        <strong>{{ featuredArticle?.author }}</strong>
                     </div>
                 </div>
             </div>
             <!-- Right Column: Category List -->
             <div class="position-relative col-lg-4">
-                <div class="d-flex flex-column gap-3 p-4" style="position: sticky; top: 1rem;">
+                <div class="d-flex flex-column gap-3 p-4" style="position: sticky; top: 1rem">
                     <div class="">
                         <h4 class="mb-3 fw-bold">Danh Mục</h4>
                         <ul v-if="categories.length" class="list-unstyled">
@@ -90,7 +90,6 @@ const fetchFeaturedArticle = async () => {
         const response = await axios.get(`/api/posts/by-slug/${props.postSlug}`);
         const post = response.data.data[0];
         categoryOfThisPost = post.category;
-        console.log(categoryOfThisPost);
 
         currentPostId = post.id;
 
@@ -131,18 +130,23 @@ const getCategories = async () => {
 const getRelatedArticles = async () => {
     try {
         const response = await axios.get(`/api/posts/categories-with-posts?categorySlug=${categoryOfThisPost.slug}&limit=5`);
-        let categoryAndPosts = response.data[0];
-        console.log(categoryAndPosts);
+        let categoryAndPosts = response.data;
 
-        const posts = categoryAndPosts.posts.filter((post) => post.id !== currentPostId);
-
-        relatedArticles.value = posts.map((post) => ({
-            id: post.id,
-            title: post.title,
-            excerpt: post.excerpt,
-            image: parseMetadata(post.image),
-            slug: post.slugPost
-        }));
+        for (let categoryIndex = 0; categoryIndex < categoryAndPosts.length; categoryIndex++) {
+            const category = categoryAndPosts[categoryIndex];
+            for (let postIndex = 0; postIndex < category.posts.length; postIndex++) {
+                const post = category.posts[postIndex];
+                if(post.id !== currentPostId){
+                    relatedArticles.value.push({
+                        id: post.id,
+                        title: post.title,
+                        excerpt: post.excerpt,
+                        image: parseMetadata(post.image),
+                        slug: post.slugPost,
+                    });
+                }
+            }
+        }
     } catch (error) {
         console.error("Error fetching related articles:", error);
     }
@@ -155,10 +159,10 @@ const parseMetadata = (metadata) => {
             let imagePath = metaObj.Files[0].replace(/\\/g, "/");
             return baseURL.value + imagePath;
         }
-        return "https://via.placeholder.com/600x300";
+        return "";
     } catch (error) {
         console.error("Error parsing metadata:", error);
-        return "https://via.placeholder.com/600x300";
+        return "";
     }
 };
 

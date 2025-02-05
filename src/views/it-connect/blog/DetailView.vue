@@ -14,13 +14,13 @@
                         </div>
                         <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
                         <div class="text-muted mb-3" v-html="featuredArticle?.details"></div>
-                        <div class="text-muted"><strong>Tác giả:</strong> {{ featuredArticle?.author }}</div>
+                        <strong>{{ featuredArticle?.author }}</strong>
                     </div>
                 </div>
             </div>
             <!-- Right Column: Category List -->
             <div class="position-relative col-lg-4">
-                <div class="d-flex flex-column gap-3 p-4" style="position: sticky; top: 1rem;">
+                <div class="d-flex flex-column gap-3 p-4" style="position: sticky; top: 1rem">
                     <div class="">
                         <h4 class="mb-3 fw-bold">Danh Mục</h4>
                         <ul v-if="categories.length" class="list-unstyled">
@@ -131,18 +131,20 @@ const getCategories = async () => {
 const getRelatedArticles = async () => {
     try {
         const response = await axios.get(`/api/posts/categories-with-posts?categorySlug=${categoryOfThisPost.slug}&limit=5`);
-        let categoryAndPosts = response.data[0];
+        let categoryAndPosts = response.data;
         console.log(categoryAndPosts);
 
-        const posts = categoryAndPosts.posts.filter((post) => post.id !== currentPostId);
-
-        relatedArticles.value = posts.map((post) => ({
-            id: post.id,
-            title: post.title,
-            excerpt: post.excerpt,
-            image: parseMetadata(post.image),
-            slug: post.slugPost
-        }));
+        categoryAndPosts.foreach((category) => {
+            category.posts.foreach((post) => {
+                relatedArticles.value.push({
+                    id: post.id,
+                    title: post.title,
+                    excerpt: post.excerpt,
+                    image: parseMetadata(post.image),
+                    slug: post.slugPost,
+                });
+            });
+        });
     } catch (error) {
         console.error("Error fetching related articles:", error);
     }

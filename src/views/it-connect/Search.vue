@@ -1,13 +1,14 @@
 <template>
   <div class="container py-3">
-    <div class="rounded-3 p-3 border-new-gray border shadow-sm bg-white">
-      <h3>Search Results</h3>
-      <div v-if="getSearchBlogResult.length">
-        <div v-for="blog in getSearchBlogResult" :key="blog.id" class="search-item mb-3 shadow-sm p-3 clickable-test" @click="viewBlog(blog.id)" style="cursor: pointer;"> 
-          <h4 class="mb-3 clickable-text" @click="viewBlog(blog.id)">{{ blog.title }}</h4>
-          <p>{{ blog.excerpt }}</p>
-          <p><strong>Category:</strong> {{ blog.categoryName }}</p>
-          <p><strong>Published At:</strong> {{ new Date(blog.publishedAt).toLocaleDateString() }}</p>
+    <div class="rounded-3 p-3 border-new-gray border bg-white">
+      <div v-if="getSearchBlogResult.length" class="d-flex flex-column gap-3">
+        <div v-for="blog in getSearchBlogResult" :key="blog.id" class="">
+          <a :href="`/blog/detail/${blog.slug}`" target="_blank" class="text-black hover_underline" style="cursor: pointer;">
+            <strong class="" style="font-size: 1.2rem;">{{ blog.title }}</strong>
+            <div class="text-muted">{{ blog.excerpt }}</div>
+            <!-- <div><strong>Category:</strong> {{ blog.categoryName }}</div>
+            <div><strong>Published At:</strong> {{ new Date(blog.publishedAt).toLocaleDateString() }}</div> -->
+          </a>
         </div>
       </div>
       <div v-else>
@@ -37,11 +38,17 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useTemplateStore } from "@/stores/template";
 
 const store = useTemplateStore();
-const router = useRouter();
+const route = useRoute()
+
+const searchParams = route.query.q
+
+store.setBreadcrumb([
+      { name: "Kết quả tìm kiếm", path: `/search?q=${searchParams}` },
+  ]);
 
 const getSearchBlogResult = computed(() => store.searchBlogResult);
 const videos = ref([
@@ -65,14 +72,4 @@ const videos = ref([
   },
 ]);
 
-const viewBlog = (id) => {
-  router.push({ name: "Detail", params: { id: id.toString() } });
-};
 </script>
-
-<style>
-.search-item:hover {
-  background-color: #EFF6FF;
-}
-
-</style>

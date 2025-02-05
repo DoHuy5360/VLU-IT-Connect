@@ -16,7 +16,7 @@
                     <div class="mb-4">
                         <label class="form-label" for="parentCategory">Chọn thể loại cha</label>
                         <select class="form-select" id="parentCategory" v-model="formData.parentCategory" @change="checkParentCategory">
-                            <option value="">-- Không có thể loại cha --</option>
+                            <option value="">-- Chọn --</option>
                             <option v-for="category in allCategories" :key="category.id" :value="category.id">
                                 {{ category.name }}
                             </option>
@@ -27,15 +27,7 @@
                     <!-- Category Name -->
                     <div class="mb-4">
                         <label class="form-label" for="categoryName">Tên thể loại</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="categoryName"
-                            v-model="formData.categoryName"
-                            placeholder="Nhập tên thể loại"
-                            maxlength="50"
-                            required
-                        />
+                        <input type="text" class="form-control" id="categoryName" v-model="formData.categoryName" placeholder="Nhập tên thể loại" maxlength="50" required />
                         <small v-if="errors.categoryName" class="text-danger">{{ errors.categoryName }}</small>
                     </div>
 
@@ -82,8 +74,8 @@ export default {
 
                 console.log("🔍 Request API:", params);
 
-                const response = await axios.get("https://localhost:7017/api/Categories/getallcategories", {
-                    headers: { Authorization: `Bearer ${token}` },
+                const response = await axios.get("/api/Categories/getallcategories", {
+                    headers: { Authorization: token },
                     params: params,
                 });
 
@@ -113,7 +105,7 @@ export default {
                 id: node.Id,
                 name: node.Name,
                 parentId: parentId, // Lưu ID danh mục cha
-                description: node.Description
+                description: node.Description,
             };
 
             result.push(formattedNode);
@@ -152,23 +144,23 @@ export default {
                 code: this.formData.categoryName.toLowerCase().replace(/\s+/g, "-"),
                 description: this.formData.categoryDetail,
                 parentId: this.formData.parentCategory || null, // Lấy `id` của danh mục cha từ dropdown
-                nestLeft: 0, 
-                nestRight: 0, 
+                nestLeft: 0,
+                nestRight: 0,
                 nestDepth: 0,
             };
 
             try {
                 const token = localStorage.getItem("authToken");
-                await axios.post("https://localhost:7017/api/Categories/createcategory", payload, {
-                    headers: { Authorization: `Bearer ${token}` }
+                await axios.post("/api/Categories/createcategory", payload, {
+                    headers: { Authorization: `Bearer ${token}` },
                 });
 
                 toast.success("Tạo thể loại thành công!");
 
                 // 🔄 Cập nhật danh sách danh mục ngay sau khi tạo mới
                 this.getCategories();
-                this.$router.push('/administrator/category');
-                
+                this.$router.push("/administrator/category");
+
                 this.clearForm();
             } catch (error) {
                 toast.error("Tạo thể loại thất bại. Vui lòng thử lại.");
@@ -186,7 +178,7 @@ export default {
     },
     mounted() {
         this.getCategories();
-    }
+    },
 };
 </script>
 

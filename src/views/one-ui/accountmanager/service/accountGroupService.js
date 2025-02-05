@@ -177,12 +177,14 @@ const accountGroupService = {
   // Get group permissions
   async getGroupPermissions(groupId) {
     try {
-      const response = await axiosInstance.get(`/AccountGroup/permissions/${groupId}`);
-      console.log('Raw API Response:', response.data); // Debug log
-      
+      const response = await axiosInstance.get(
+        `/AccountGroup/permissions/${groupId}`
+      );
+      console.log("Raw API Response:", response.data); // Debug log
+
       const data = response.data;
       if (!data) {
-        throw new Error('Invalid response data');
+        throw new Error("Invalid response data");
       }
 
       // Format lại data để component có thể hiển thị
@@ -190,19 +192,20 @@ const accountGroupService = {
         success: true,
         data: {
           data: {
-            groupName: data.data.groupName || '',
-            description: data.data.description || '',
+            groupName: data.data.groupName || "",
+            description: data.data.description || "",
             roleId: data.data.roleId || groupId,
             userPermissions: data.data.userPermissions || [],
-            actionPermissions: data.data.actionPermissions || []
-          }
-        }
+            actionPermissions: data.data.actionPermissions || [],
+          },
+        },
       };
     } catch (error) {
       console.error("Error fetching group permissions:", error);
       return {
         success: false,
-        message: error.response?.data?.message || "Không thể tải quyền của nhóm",
+        message:
+          error.response?.data?.message || "Không thể tải quyền của nhóm",
       };
     }
   },
@@ -210,16 +213,13 @@ const accountGroupService = {
   // Update group permissions
   async updateGroupPermissions(groupId, permissions) {
     try {
-      const response = await axiosInstance.put(
-        `/AccountGroup/edit`,
-        {
-          GroupName: permissions.groupName,
-          Description: permissions.description,
-          UserPermissions: permissions.userPermissions,
-          ActionPermissions: permissions.actionPermissions,
-          RoleId: permissions.roleId // Sử dụng roleId từ permissions
-        }
-      );
+      const response = await axiosInstance.put(`/AccountGroup/edit`, {
+        GroupName: permissions.groupName,
+        Description: permissions.description,
+        UserPermissions: permissions.userPermissions,
+        ActionPermissions: permissions.actionPermissions,
+        RoleId: permissions.roleId, // Sử dụng roleId từ permissions
+      });
       return {
         success: true,
         data: response.data,
@@ -228,8 +228,32 @@ const accountGroupService = {
       console.error("Error updating permissions:", error);
       return {
         success: false,
+        message: error.response?.data?.message || "Không thể cập nhật quyền",
+      };
+    }
+  },
+
+  // Gán người dùng vào nhóm
+  async assignUsersToGroup(groupName, userIds) {
+    try {
+      const response = await axiosInstance.post(
+        "/AccountGroup/assign-users-to-group",
+        {
+          GroupName: groupName,
+          UserIds: userIds,
+        }
+      );
+      return {
+        success: true,
+        message: "Đã thêm người dùng vào nhóm thành công",
+        data: response.data,
+      };
+    } catch (error) {
+      console.error("Lỗi khi thêm người dùng vào nhóm:", error);
+      return {
+        success: false,
         message:
-          error.response?.data?.message || "Không thể cập nhật quyền",
+          error.response?.data?.message || "Không thể thêm người dùng vào nhóm",
       };
     }
   },

@@ -88,13 +88,12 @@ export default {
                     const token = localStorage.getItem("authToken");
                     console.log(`🚀 Deleting category: ${this.category.code}`);
 
-                    const response = await axios.delete("https://localhost:7017/api/Categories/deletecategory", {
+                    const response = await axios.delete("/api/Categories/deletecategory", {
                         headers: { Authorization: token },
                         params: { cateCode: this.category.code }, // Truyền cateCode trong params
                     });
 
                     if (response.status === 200) {
-                        toast.success("Danh mục đã được xóa thành công!");
                         this.$emit("delete", this.category); // Emit event để cập nhật danh sách
                     }
                 } catch (error) {

@@ -12,6 +12,15 @@
         <BaseBlock title="">
             <div class="space-y-5 w-full pb-4">
                 <form @submit.prevent="submitForm" class="w-full">
+                    <div class="mb-4">
+                        <div>
+                            <img :src="formData.image" class="img-fluid" style="" alt="" />
+                        </div>
+                        <br>
+                        <div>Hình ảnh</div>
+                        <input type="file" id="image-file" accept="image/*" class="form-control" ref="selectedImageFile" />
+                    </div>
+
                     <!-- Title Field -->
                     <div class="mb-4">
                         <label class="form-label" for="title">Tiêu đề</label>
@@ -58,7 +67,8 @@
                     </div>
 
                     <div v-if="uploadOption.type === 'file'" class="mb-4">
-                        <VideoDropzone />
+                        <label>Video file</label>
+                        <input type="file" id="video-file" accept="video/*" class="form-control" ref="selectedVideoFile" />
                     </div>
 
                     <!-- Blog Content -->
@@ -91,192 +101,175 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import SlugInput from "./components/SlugInput.vue";
-import VideoDropzone from "./components/VideoDropzone.vue";
 
-export default {
-    components: {
-        SlugInput,
-        VideoDropzone,
-    },
-    setup() {
-        const router = useRouter();
-        const route = useRoute();
+const baseURL = "https://localhost:7017/"
+const router = useRouter();
+const route = useRoute();
+const selectedImageFile = ref(null);
+const selectedVideoFile = ref(null);
 
-        const formData = ref({
-            title: "",
-            slug: "",
-            categoryId: "",
-            contentHtml: "",
-            excerpt: "",
-            videoType: "",
-            videoUrl: "",
-            published: false,
-            enableComments: false,
-            image: "",
-        });
+const formData = ref({
+    title: "",
+    slug: "",
+    categoryId: "",
+    contentHtml: "",
+    excerpt: "",
+    videoType: "",
+    videoUrl: "",
+    published: false,
+    enableComments: false,
+    image: "",
+});
 
-        const uploadOption = ref({
-            type: "", // "link" hoặc "file"
-        });
+const uploadOption = ref({ type: "" });
+const categories = ref([]);
 
-        const categories = ref([]);
-
-        // Hàm lấy dữ liệu dựa vào ID
-        const fetchDataById = async () => {
-            try {
-                const id = route.params.id; // Lấy ID từ route
-                if (!id) {
-                    console.error("ID không tồn tại trong route.");
-                    return;
-                }
-
-                const token = localStorage.getItem("authToken");
-                if (!token) {
-                    alert("Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn.");
-                    router.push("/login");
-                    return;
-                }
-
-                const response = await axios.get(`/api/admin/posts/${id}`, {
-                    headers: { Authorization: token },
-                });
-
-                if (response.data?.data) {
-                    const data = response.data.data;
-
-                    // Gán dữ liệu vào form
-                    formData.value = {
-                        title: data.title || "",
-                        slug: data.slug || "",
-                        categoryId: data.categoryName || "",
-                        contentHtml: data.contentHtml || "",
-                        excerpt: data.excerpt || "",
-                        videoType: data.metadata?.Video?.type || "",
-                        videoUrl: data.metadata?.Video?.url || "",
-                        published: data.published || false,
-                        enableComments: JSON.parse(data.metadata)?.EnableComments || false,
-                        image: "", // Nếu có ảnh, bổ sung logic lấy ảnh
-                    };
-
-                    // Xác định kiểu tải video
-                    uploadOption.value.type = formData.value.videoType === "file" ? "file" : "link";
-
-                    console.log("Dữ liệu bài viết:", formData.value);
-                } else {
-                    console.error("Không tìm thấy dữ liệu bài viết.");
-                }
-            } catch (error) {
-                console.error("Lỗi khi lấy dữ liệu:", error);
-            }
-        };
-
-        // Lấy danh mục từ API
-        const fetchCategories = async () => {
-            try {
-                const token = localStorage.getItem("authToken");
-                if (!token) {
-                    console.error("Token không tồn tại.");
-                    return;
-                }
-
-                const response = await axios.get("/api/Categories/getallcategories", {
-                    params: {
-                        cateName: "",
-                        indexPage: 1,
-                        limitRange: 100,
-                    },
-                    headers: { Authorization: token },
-                });
-
-                if (response.data?.data?.categories) {
-                    const mainCategory = response.data.data.categories;
-                    const allCategories = [];
-
-                    if (mainCategory) {
-                        allCategories.push({
-                            id: mainCategory.Id,
-                            name: mainCategory.Name,
-                        });
-
-                        if (mainCategory.LeftChild) {
-                            allCategories.push({
-                                id: mainCategory.LeftChild.Id,
-                                name: mainCategory.LeftChild.Name,
-                            });
-                        }
-                        if (mainCategory.RightChild) {
-                            allCategories.push({
-                                id: mainCategory.RightChild.Id,
-                                name: mainCategory.RightChild.Name,
-                            });
-                        }
-                    }
-
-                    categories.value = allCategories;
-                }
-            } catch (error) {
-                console.error("Lỗi khi lấy danh mục:", error);
-            }
-        };
-
-        // Khi component được tải
-        onMounted(() => {
-            fetchDataById(); // Lấy dữ liệu bài viết
-            fetchCategories(); // Lấy danh mục
-        });
-
-        const submitForm = async () => {
-            try {
-                const token = localStorage.getItem("authToken");
-                if (!token) {
-                    alert("Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn.");
-                    router.push("/login");
-                    return;
-                }
-
-                if (!formData.value.title.trim()) {
-                    alert("Tiêu đề không được để trống.");
-                    return;
-                }
-
-                const formDataToSend = new FormData();
-                formDataToSend.append("Title", formData.value.title);
-                formDataToSend.append("Slug", formData.value.slug);
-                formDataToSend.append("CategoryIds[0]", categories.value.find((category) => category.name === formData.value.categoryId)?.id);
-                formDataToSend.append("ContentHtml", formData.value.contentHtml);
-                formDataToSend.append("Excerpt", formData.value.excerpt || "");
-                formDataToSend.append("Published", formData.value.published.toString());
-                formDataToSend.append("EnableComments", formData.value.enableComments.toString());
-
-                const response = await axios.put(`/api/admin/posts/${route.params.id}`, formDataToSend, {
-                    headers: { Authorization: token },
-                });
-
-                router.push("/administrator/blog");
-            } catch (error) {
-                console.error("Lỗi khi cập nhật bài viết:", error);
-            }
-        };
-
-        return {
-            formData,
-            uploadOption,
-            categories,
-            ClassicEditor,
-            submitForm,
-        };
-    },
-};
-</script>
-
-<style scoped>
-.ck-editor__editable {
-    min-height: 300px;
+function getTypeOfVideo(metadata) {
+    
 }
-</style>
+
+const parseMetadata = (metadata) => {
+    try {
+        const metaObj = JSON.parse(metadata);
+        
+        if (metaObj.Files?.length) {
+            let imagePath = metaObj.Files[0].replace(/\\/g, "/");
+            return baseURL + imagePath;
+        }
+        return "";
+    } catch (error) {
+        console.error("Error parsing metadata:", error);
+        return "";
+    }
+};
+const parseMetadataVideo = (metadata) => {
+    try {
+        const metaObj = JSON.parse(metadata);
+        
+        if (metaObj.Video.file) {
+            let path = metaObj.Video.file.replace(/\\/g, "/");
+            return baseURL + path;
+        }
+        return "";
+    } catch (error) {
+        console.error("Error parsing metadata:", error);
+        return "";
+    }
+};
+
+const fetchDataById = async () => {
+    try {
+        const id = route.params.id;
+        if (!id) return console.error("ID không tồn tại trong route.");
+
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            alert("Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn.");
+            router.push("/login");
+            return;
+        }
+
+        const response = await axios.get(`/api/admin/posts/${id}`, {
+            headers: { Authorization: token },
+        });
+
+        if (response.data?.data) {
+            const data = response.data.data;
+            formData.value = {
+                title: data.title || "",
+                slug: data.slug || "",
+                categoryId: data.categoryName || "",
+                contentHtml: data.contentHtml || "",
+                excerpt: data.excerpt || "",
+                videoType: data.metadata?.Video?.type || "",
+                videoUrl: data.metadata?.Video?.url || "",
+                published: data.published || false,
+                enableComments: JSON.parse(data.metadata)?.EnableComments || false,
+                image: parseMetadata(data.metadata),
+            };
+            uploadOption.value.type = formData.value.videoType === "file" ? "file" : "link";
+        }
+    } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+    }
+};
+
+const fetchCategories = async () => {
+    try {
+        const token = localStorage.getItem("authToken");
+        if (!token) return console.error("Token không tồn tại.");
+
+        const response = await axios.get("/api/Categories/getallcategories", {
+            params: { cateName: "", indexPage: 1, limitRange: 100 },
+            headers: { Authorization: token },
+        });
+
+        if (response.data?.data?.categories) {
+            const mainCategory = response.data.data.categories;
+            const allCategories = [];
+
+            if (mainCategory) {
+                allCategories.push({ id: mainCategory.Id, name: mainCategory.Name });
+                if (mainCategory.LeftChild) {
+                    allCategories.push({ id: mainCategory.LeftChild.Id, name: mainCategory.LeftChild.Name });
+                }
+                if (mainCategory.RightChild) {
+                    allCategories.push({ id: mainCategory.RightChild.Id, name: mainCategory.RightChild.Name });
+                }
+            }
+
+            categories.value = allCategories;
+        }
+    } catch (error) {
+        console.error("Lỗi khi lấy danh mục:", error);
+    }
+};
+
+const submitForm = async () => {
+    try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            alert("Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn.");
+            router.push("/login");
+            return;
+        }
+
+        if (!formData.value.title.trim()) {
+            alert("Tiêu đề không được để trống.");
+            return;
+        }
+
+        const formDataToSend = new FormData();
+        formDataToSend.append("Title", formData.value.title);
+        formDataToSend.append("Slug", formData.value.slug);
+        formDataToSend.append("CategoryIds[0]", categories.value.find((c) => c.name === formData.value.categoryId)?.id);
+        formDataToSend.append("ContentHtml", formData.value.contentHtml);
+        formDataToSend.append("Excerpt", formData.value.excerpt || "");
+        formDataToSend.append("Published", formData.value.published.toString());
+        formDataToSend.append("EnableComments", formData.value.enableComments.toString());
+        formDataToSend.append("Files", selectedImageFile.value?.files[0]);
+        formDataToSend.append("VideoFile", selectedVideoFile.value?.files[0]);
+
+        await axios.put(`/api/admin/posts/${route.params.id}`, formDataToSend, {
+            headers: { 
+                "Content-Type": "multipart/form-data",
+                Authorization: token },
+
+        });
+        // router.push("/administrator/blog");
+    } catch (error) {
+        console.error("Lỗi khi cập nhật bài viết:", error);
+    }
+};
+
+onMounted(() => {
+    fetchDataById();
+    fetchCategories();
+});
+</script>

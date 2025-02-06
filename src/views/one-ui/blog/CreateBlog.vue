@@ -33,7 +33,7 @@
                         <textarea v-model="formData.excerpt" class="form-control" placeholder="Mô tả ngắn bài viết"></textarea>
                     </div>
                     <div>
-                        <label for="pic-file">File Hình Ảnh</label>
+                        <label for="pic-file">Hình ảnh</label>
                         <input type="file" id="image-file" accept="image/*" class="form-control" ref="selectedImageFile" />
                     </div>
 
@@ -44,31 +44,33 @@
 
                     <div>
                         <label>Loại Video</label>
-                        <input v-model="formData.videoType" class="form-control" />
+                        <select v-model="formData.videoType" class="form-select">
+                            <option value="link">Link</option>
+                            <option value="file">File</option>
+                        </select>
                     </div>
 
-                    <div>
-                        <label>URL Video</label>
+                    <div v-if="formData.videoType == 'link'">
+                        <label>Video link</label>
                         <input v-model="formData.videoUrl" class="form-control" />
                     </div>
 
-                    <div>
-                        <label>File Video</label>
+                    <div v-if="formData.videoType == 'file'">
+                        <label>Video file</label>
                         <input type="file" id="video-file" accept="video/*" class="form-control" ref="selectedVideoFile" />
                     </div>
 
-                    <div class="flex space-x-4">
-                        <label>
-                            <input type="checkbox" v-model="formData.enableComments" />
-                            Cho phép bình luận
-                        </label>
-
-                        <label>
-                            <input type="checkbox" v-model="formData.published" />
-                            Công bố
-                        </label>
+                    <div style="user-select: none;">
+                        <div class="form-check">
+                            <label class="form-check-label" for="allowComment">Cho phép bình luận</label>
+                            <input class="form-check-input" type="checkbox" v-model="formData.enableComments" id="allowComment"/>
+                        </div>
+                        <br>
+                        <div class="form-check">
+                            <label class="form-check-label" for="publish">Công bố</label>
+                            <input class="form-check-input" type="checkbox" v-model="formData.published" checked id="publish"/>
+                        </div>
                     </div>
-
                     <button type="submit" class="btn btn-success">Hoàn tất</button>
                     <button type="button" class="btn btn-alt-secondary ms-2" @click="navigateToSimulation">Xem trước</button>
                 </form>
@@ -97,7 +99,7 @@ const formData = ref({
     contentHtml: "",
     excerpt: "",
     file: "",
-    videoType: "",
+    videoType: "link",
     videoUrl: "",
     published: false,
     enableComments: false,
@@ -154,7 +156,7 @@ onMounted(() => {
         contentHtml: route.query.contentHtml || "",
         file: route.query.file || "",
         excerpt: route.query.excerpt || "",
-        videoType: route.query.videoType || "",
+        videoType: route.query.videoType || "link",
         videoUrl: route.query.videoUrl || "",
         published: route.query.published === "true",
         enableComments: route.query.enableComments === "true",
@@ -182,11 +184,12 @@ const submitForm = async () => {
         formDataToSend.append("CategoryIds[0]", formData.value.categoryId);
         formDataToSend.append("ContentHtml", formData.value.contentHtml.trim());
         formDataToSend.append("Files", selectedImageFile.value?.files[0]);
-        formDataToSend.append("Excerpt", formData.value.excerpt || "");
+        formDataToSend.append("Excerpt", formData.value.excerpt);
         formDataToSend.append("Published", formData.value.published.toString());
         formDataToSend.append("EnableComments", formData.value.enableComments.toString());
-        formDataToSend.append("VideoType", formData.value.videoType || "");
-        formDataToSend.append("VideoUrl", formData.value.videoUrl || "");
+        formDataToSend.append("VideoType", formData.value.videoType);
+        formDataToSend.append("VideoUrl", formData.value.videoUrl);
+        formDataToSend.append("VideoFile", selectedVideoFile.value?.files[0]);
 
         await axios.post("/api/admin/posts", formDataToSend, {
             headers: { "Content-Type": "multipart/form-data", Authorization: token },
@@ -195,7 +198,7 @@ const submitForm = async () => {
         router.push("/administrator/blog");
     } catch (error) {
         console.error("Error creating post:", error);
-        
+
         await Swal.fire({
             title: "Lỗi khi tạo bài viết",
             text: error.response.data.error,

@@ -3,11 +3,11 @@
         <div class="bg-white px-4 rounded rounded-lg border border-new-pale-gray">
             <!-- Featured Article -->
             <div class="row gy-2 align-items-stretch">
-                <div class="col-lg-6 h-120 d-flex flex-column" v-if="featuredArticle">
+                <div class="col-lg-8 h-120 d-flex flex-column" v-if="featuredArticle">
                     <div class="rounded py-4 flex-grow-1">
                         <a :href="`/blog/detail/${featuredArticle.slug}`" class="text-black">
                             <div class="featured-article-box d-flex flex-column gap-3" style="cursor: pointer">
-                                <img :src="featuredArticle.image" alt="Featured Article Image" class="rounded mb-3" style="width: 100%; height: 300px; object-fit: contain" />
+                                <img :src="featuredArticle.image" alt="Featured Article Image" class="rounded mb-3" style="width: 100%; object-fit: contain" />
                                 <div>
                                     <h4 class="mb-3 clickable-text">{{ featuredArticle.title }}</h4>
                                     <p class="text-muted mb-3">{{ truncateText(featuredArticle.details, 600) }}</p>
@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <!-- Old Articles with Pagination -->
-                <div class="col-lg-6 d-flex flex-column" v-if="oldArticles.length">
+                <div class="col-lg-4 d-flex flex-column" v-if="oldArticles.length">
                     <div class="rounded d-flex flex-column py-4 flex-grow-1">
                         <ul class="list-unstyled flex-grow-1">
                             <li v-for="(article, index) in paginatedArticles" :key="index" class="old-posts p-2 mb-2 rounded" style="cursor: pointer">
@@ -60,11 +60,18 @@
                     <b class="text-primary hover_underline" style="cursor: pointer">Xem tất cả</b>
                 </div>
                 <div class="row" id="wrapVideo">
-                    <div class="col-auto col-sm" v-for="video in videos" :key="video.id">
-                        <iframe :src="video.url" width="100%" height="200px" frameborder="0" allowfullscreen class="rounded"></iframe>
+                    <div v-if="featuredArticle" class="col-auto col-sm">
+                        <video :src="featuredArticle.video" controls class="rounded w-100"></video>
                         <div class="mt-2">
-                            <strong>{{ video.title }}</strong>
-                            <div>{{ video.description }}</div>
+                            <strong>{{ featuredArticle.title }}</strong>
+                            <div>{{ truncateText(featuredArticle.excerpt, 100) }}</div>
+                        </div>
+                    </div>
+                    <div class="col-auto col-sm" v-for="(article, index) in paginatedArticles.slice(0,3)" :key="index">
+                        <video :src="article.video" controls class="rounded w-100"></video>
+                        <div class="mt-2">
+                            <strong>{{ article.title }}</strong>
+                            <div>{{ truncateText(article.excerpt, 100) }}</div>
                         </div>
                     </div>
                 </div>
@@ -91,28 +98,9 @@ const featuredArticle = ref(null);
 const oldArticles = ref([]);
 const currentPage = ref(1); // Trang hiện tại
 const articlesPerPage = 5; // Số bài viết mỗi trang
-const videos = ref([
-    {
-        id: "v1",
-        url: "https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6",
-        title: "Hướng dẫn 1",
-        description: "Clip hướng dẫn chi tiết về việc sử dụng nền tảng của bạn.",
-    },
-    {
-        id: "v2",
-        url: "https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6",
-        title: "Hướng dẫn 2",
-        description: "Giới thiệu các tính năng nâng cao và cách tận dụng.",
-    },
-    {
-        id: "v3",
-        url: "https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6",
-        title: "Hướng dẫn 3",
-        description: "Tips và tricks cho người dùng mới bắt đầu.",
-    },
-]);
 
 const totalPages = computed(() => Math.ceil(oldArticles.value.length / articlesPerPage));
+console.log(totalPages.value);
 const paginatedArticles = computed(() => {
     const start = (currentPage.value - 1) * articlesPerPage;
     return oldArticles.value.slice(start, start + articlesPerPage);
@@ -125,9 +113,26 @@ const truncateText = (text, maxLength) => {
 const parseMetadata = (metadata) => {
     try {
         const metaObj = JSON.parse(metadata);
+        
         if (metaObj.Files?.length) {
             let imagePath = metaObj.Files[0].replace(/\\/g, "/");
             return baseURL + imagePath;
+        }
+        return "";
+    } catch (error) {
+        console.error("Error parsing metadata:", error);
+        return "";
+    }
+};
+
+const parseMetadataVideo = (metadata) => {
+    try {
+        const metaObj = JSON.parse(metadata);
+        console.log(metaObj.Video);
+        
+        if (metaObj.Video.file) {
+            let path = metaObj.Video.file.replace(/\\/g, "/");
+            return baseURL + path;
         }
         return "";
     } catch (error) {
@@ -169,9 +174,11 @@ onMounted(async () => {
                 title: posts[0].title,
                 details: posts[0].content,
                 image: parseMetadata(posts[0].metadata),
+                video: parseMetadataVideo(posts[0].metadata),
                 category: posts[0].category,
                 publishedAt: getDayFromDate(posts[0].publishedAt),
                 userName: posts[0].userName,
+                excerpt: posts[0].excerpt,
             };
 
             oldArticles.value = posts.slice(1).map((post) => ({
@@ -180,9 +187,11 @@ onMounted(async () => {
                 slug: post.slug,
                 details: post.excerpt,
                 image: parseMetadata(post.metadata),
+                video: parseMetadataVideo(post.metadata),
                 category: post.category,
                 publishedAt: getDayFromDate(post.publishedAt),
                 userName: post.userName,
+                excerpt: post.excerpt,
             }));
         }
     } catch (error) {

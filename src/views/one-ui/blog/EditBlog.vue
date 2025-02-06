@@ -13,11 +13,14 @@
             <div class="space-y-5 w-full pb-4">
                 <form @submit.prevent="submitForm" class="w-full">
                     <div class="mb-4">
-                        <div>
-                            <img :src="formData.image" class="img-fluid" style="" alt="" />
+                        <div v-if="formData.image !== ''" class="row">
+                            <div class="col-4">
+                                <img :src="formData.image" class="img-fluid w-100" style="" alt="" />
+                            </div>
                         </div>
-                        <br>
-                        <div>Hình ảnh</div>
+                        <div v-else>Bài viết này hiện chưa có ảnh bìa</div>
+                        <br />
+                        <label class="form-label">Đổi hình ảnh</label>
                         <input type="file" id="image-file" accept="image/*" class="form-control" ref="selectedImageFile" />
                     </div>
 
@@ -40,39 +43,45 @@
                     <div class="mb-4">
                         <label class="form-label" for="example-select">Thể loại</label>
                         <select class="form-select" id="example-select" v-model="formData.categoryId" required>
-                            <option value="" disabled>-- Chọn --</option>
-                            <option v-for="category in categories" :key="category.id" :value="category.name">
-                                {{ category.name }}
-                            </option>
+                            <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
                         </select>
+                    </div>
+
+                    <!-- Blog Content -->
+                    <div class="mb-4">
+                        <label class="form-label" for="">Nội dung</label>
+                        <ckeditor :editor="ClassicEditor" :config="editorConfig" v-model="formData.contentHtml" />
                     </div>
 
                     <!-- Video Upload Option -->
                     <div class="mb-4">
-                        <label class="form-label">Video</label>
+                        <label class="form-label">Video hiện tại</label>
+                        <div v-if="formData.video !== null" class="row">
+                            <div class="col-4">
+                                <video :src="formData.video" controls class="w-100"></video>
+                            </div>
+                        </div>
+                        <label class="form-label" for="">Loại video</label>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" id="upload-link" value="link" v-model="uploadOption.type" />
-                            <label class="form-check-label" for="upload-link">Link</label>
+                            <input type="radio" class="form-check-input" id="upload-link" value="link" v-model="formData.videoType" />
+                            <label class="form-check-label" for="upload-link">Gắn đường dẫn video</label>
                         </div>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" id="upload-file" value="file" v-model="uploadOption.type" />
-                            <label class="form-check-label" for="upload-file">Upload File</label>
+                            <input type="radio" class="form-check-input" id="upload-file" value="file" v-model="formData.videoType" />
+                            <label class="form-check-label" for="upload-file">Tải video từ máy</label>
                         </div>
                     </div>
 
                     <!-- Conditional Inputs for Video Upload -->
-                    <div v-if="uploadOption.type === 'link'" class="mb-4">
-                        <label class="form-label" for="video-link">Video Link</label>
+                    <div v-if="formData.videoType === 'link'" class="mb-4">
+                        <label class="form-label" for="video-link">Thay đổi Video</label>
                         <input type="url" class="form-control" id="video-link" v-model="formData.videoUrl" placeholder="Enter video link" />
                     </div>
 
-                    <div v-if="uploadOption.type === 'file'" class="mb-4">
-                        <label>Video file</label>
+                    <div v-if="formData.videoType === 'file'" class="mb-4">
+                        <label class="form-label" for="video-file">Thay đổi Video</label>
                         <input type="file" id="video-file" accept="video/*" class="form-control" ref="selectedVideoFile" />
                     </div>
-
-                    <!-- Blog Content -->
-                    <ckeditor :editor="ClassicEditor" :config="editorConfig" v-model="formData.contentHtml" />
 
                     <div class="my-4">
                         <!-- Visibility Switch -->
@@ -107,8 +116,20 @@ import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import SlugInput from "./components/SlugInput.vue";
+import { CustomUploadAdapter } from "./uploadAdapter";
 
-const baseURL = "https://localhost:7017/"
+const editorConfig = ref({
+    placeholder: "Start typing your blog content...",
+    extraPlugins: [CustomUploadAdapterPlugin], // Kích hoạt plugin upload
+});
+
+function CustomUploadAdapterPlugin(editor) {
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+        return new CustomUploadAdapter(loader);
+    };
+}
+
+const baseURL = "https://localhost:7017/";
 const router = useRouter();
 const route = useRoute();
 const selectedImageFile = ref(null);
@@ -117,7 +138,7 @@ const selectedVideoFile = ref(null);
 const formData = ref({
     title: "",
     slug: "",
-    categoryId: "",
+    categoryId: null,
     contentHtml: "",
     excerpt: "",
     videoType: "",
@@ -125,19 +146,21 @@ const formData = ref({
     published: false,
     enableComments: false,
     image: "",
+    video: "",
 });
 
 const uploadOption = ref({ type: "" });
 const categories = ref([]);
 
 function getTypeOfVideo(metadata) {
-    
+    const metaObj = JSON.parse(metadata);
+    return metaObj.Video?.type;
 }
 
 const parseMetadata = (metadata) => {
     try {
         const metaObj = JSON.parse(metadata);
-        
+
         if (metaObj.Files?.length) {
             let imagePath = metaObj.Files[0].replace(/\\/g, "/");
             return baseURL + imagePath;
@@ -151,12 +174,20 @@ const parseMetadata = (metadata) => {
 const parseMetadataVideo = (metadata) => {
     try {
         const metaObj = JSON.parse(metadata);
-        
-        if (metaObj.Video.file) {
-            let path = metaObj.Video.file.replace(/\\/g, "/");
-            return baseURL + path;
+
+        let path = "";
+        switch (metaObj.Video?.type) {
+            case "file":
+                path = baseURL + metaObj.Video.file.replace(/\\/g, "/");
+                break;
+            case "link":
+                path = metaObj.Video.url;
+                break;
+            default:
+                console.log("Missing video type in response");
+                return null;
         }
-        return "";
+        return path;
     } catch (error) {
         console.error("Error parsing metadata:", error);
         return "";
@@ -179,21 +210,22 @@ const fetchDataById = async () => {
             headers: { Authorization: token },
         });
 
-        if (response.data?.data) {
-            const data = response.data.data;
+        if (response.data) {
+            const data = response.data;
+
             formData.value = {
                 title: data.title || "",
                 slug: data.slug || "",
-                categoryId: data.categoryName || "",
+                categoryId: data.category.id,
                 contentHtml: data.contentHtml || "",
                 excerpt: data.excerpt || "",
-                videoType: data.metadata?.Video?.type || "",
-                videoUrl: data.metadata?.Video?.url || "",
+                videoType: getTypeOfVideo(data.metadata),
+                videoUrl: parseMetadataVideo(data.metadata),
                 published: data.published || false,
                 enableComments: JSON.parse(data.metadata)?.EnableComments || false,
                 image: parseMetadata(data.metadata),
+                video: parseMetadataVideo(data.metadata),
             };
-            uploadOption.value.type = formData.value.videoType === "file" ? "file" : "link";
         }
     } catch (error) {
         console.error("Lỗi khi lấy dữ liệu:", error);
@@ -248,19 +280,20 @@ const submitForm = async () => {
         const formDataToSend = new FormData();
         formDataToSend.append("Title", formData.value.title);
         formDataToSend.append("Slug", formData.value.slug);
-        formDataToSend.append("CategoryIds[0]", categories.value.find((c) => c.name === formData.value.categoryId)?.id);
+        formDataToSend.append("CategoryId", formData.value.categoryId);
         formDataToSend.append("ContentHtml", formData.value.contentHtml);
         formDataToSend.append("Excerpt", formData.value.excerpt || "");
         formDataToSend.append("Published", formData.value.published.toString());
         formDataToSend.append("EnableComments", formData.value.enableComments.toString());
+        formDataToSend.append("VideoUrl", formData.value.videoUrl);
         formDataToSend.append("Files", selectedImageFile.value?.files[0]);
         formDataToSend.append("VideoFile", selectedVideoFile.value?.files[0]);
 
         await axios.put(`/api/admin/posts/${route.params.id}`, formDataToSend, {
-            headers: { 
+            headers: {
                 "Content-Type": "multipart/form-data",
-                Authorization: token },
-
+                Authorization: token,
+            },
         });
         // router.push("/administrator/blog");
     } catch (error) {

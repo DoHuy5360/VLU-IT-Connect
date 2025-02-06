@@ -5,8 +5,8 @@
             <div class="col-lg-8">
                 <div class="rounded p-4">
                     <div class="blog-detail-box">
-                        <div class="text-muted mb-3">
-                            <strong>{{ featuredArticle?.date }}</strong> |
+                        <div class="d-flex gap-3 text-muted mb-3">
+                            <strong>{{ featuredArticle?.date }}</strong>
                             <span class="text-primary clickable-text">{{ featuredArticle?.category.name }}</span>
                         </div>
                         <div class="d-flex justify-content-start">
@@ -14,6 +14,13 @@
                         </div>
                         <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
                         <div class="text-muted mb-3" v-html="featuredArticle?.details"></div>
+                        <div class="">
+                            <video :src="featuredArticle?.video" controls class="w-100"></video>
+                            <div style="text-align: center;">
+                                <i>Video đính kèm</i>
+                            </div>
+                        </div>
+                        <br>
                         <strong>{{ featuredArticle?.author }}</strong>
                     </div>
                 </div>
@@ -77,13 +84,21 @@ import { useTemplateStore } from "@/stores/template";
 
 const props = defineProps(["postSlug", "category"]);
 const store = useTemplateStore();
-
+const baseURL = "https://localhost:7017/";
 const featuredArticle = ref(null);
 const categories = ref({});
 const relatedArticles = ref([]);
-const baseURL = ref("https://localhost:7017/");
 let currentPostId;
 let categoryOfThisPost;
+
+function getDayFromDate(stringDate) {
+    const date = new Date(stringDate);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+}
 
 const fetchFeaturedArticle = async () => {
     try {
@@ -99,9 +114,10 @@ const fetchFeaturedArticle = async () => {
                 title: post.title || "No Title Available",
                 category: post.category || "No Category",
                 details: post.contentHtml || "No details available.",
-                date: new Date(post.publishedAt).toLocaleDateString(),
+                date: getDayFromDate(post.publishedAt),
                 author: post.userName || "Unknown author",
                 image: parseMetadata(post.metadata),
+                video: parseMetadataVideo(post.metadata),
             };
             store.setBreadcrumb([
                 { name: "Kiến thức CNTT - Sinh viên", path: "/blog" },
@@ -157,7 +173,21 @@ const parseMetadata = (metadata) => {
         const metaObj = JSON.parse(metadata);
         if (metaObj.Files?.length) {
             let imagePath = metaObj.Files[0].replace(/\\/g, "/");
-            return baseURL.value + imagePath;
+            return baseURL + imagePath;
+        }
+        return "";
+    } catch (error) {
+        console.error("Error parsing metadata:", error);
+        return "";
+    }
+};
+const parseMetadataVideo = (metadata) => {
+    try {
+        const metaObj = JSON.parse(metadata);
+        
+        if (metaObj.Video.file) {
+            let path = metaObj.Video.file.replace(/\\/g, "/");
+            return baseURL + path;
         }
         return "";
     } catch (error) {

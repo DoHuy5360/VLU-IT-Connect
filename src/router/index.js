@@ -73,13 +73,11 @@ const routes = [
                         path: "edit/:id",
                         name: "AdminBlogEdit",
                         component: BlogEdit,
-                        props: true,
                     },
                     {
                         path: "viewdetail/:id",
                         name: "AdminBlogViewDetail",
                         component: BlogViewDetail,
-                        props: true,
                     },
                     {
                         path: "simulate",

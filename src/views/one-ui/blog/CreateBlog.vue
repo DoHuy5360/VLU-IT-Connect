@@ -39,7 +39,7 @@
 
                     <div>
                         <label>Nội dung</label>
-                        <ckeditor :editor="editor" v-model="formData.contentHtml" required></ckeditor>
+                        <ckeditor :editor="editor" :config="editorConfig" v-model="formData.contentHtml" required></ckeditor>
                     </div>
 
                     <div>
@@ -68,7 +68,7 @@
                         <br>
                         <div class="form-check">
                             <label class="form-check-label" for="publish">Công bố</label>
-                            <input class="form-check-input" type="checkbox" v-model="formData.published" checked id="publish"/>
+                            <input class="form-check-input" type="checkbox" v-model="formData.published" id="publish"/>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-success">Hoàn tất</button>
@@ -86,6 +86,19 @@ import axios from "axios";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import SlugInput from "./components/SlugInput.vue";
 import Swal from "sweetalert2";
+import { CustomUploadAdapter } from "./uploadAdapter";
+
+const editorConfig = ref({
+    placeholder: "Start typing your blog content...",
+    extraPlugins: [CustomUploadAdapterPlugin], // Kích hoạt plugin upload
+});
+
+function CustomUploadAdapterPlugin(editor) {
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+        return new CustomUploadAdapter(loader);
+    };
+}
+
 const selectedImageFile = ref(null);
 const selectedVideoFile = ref(null);
 
@@ -101,7 +114,7 @@ const formData = ref({
     file: "",
     videoType: "link",
     videoUrl: "",
-    published: false,
+    published: true,
     enableComments: false,
     image: "",
 });
@@ -158,7 +171,7 @@ onMounted(() => {
         excerpt: route.query.excerpt || "",
         videoType: route.query.videoType || "link",
         videoUrl: route.query.videoUrl || "",
-        published: route.query.published === "true",
+        // published: route.query.published,
         enableComments: route.query.enableComments === "true",
         image: route.query.image || "",
     });

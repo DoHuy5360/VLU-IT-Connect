@@ -14,7 +14,7 @@
                         </div>
                         <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
                         <div class="text-muted mb-3" v-html="featuredArticle?.details"></div>
-                        <div class="">
+                        <div v-if="featuredArticle?.video !== null" class="">
                             <video :src="featuredArticle?.video" controls class="w-100"></video>
                             <div style="text-align: center;">
                                 <i>Video đính kèm</i>
@@ -50,7 +50,7 @@
                         <h4 class="mb-3 fw-bold">Các bài Viết Liên Quan</h4>
                         <div v-if="relatedArticles.length" class="d-flex flex-column gap-2">
                             <div v-for="(article, index) in relatedArticles" :key="index">
-                                <a :href="`/blog/detail/${article.slug}`" class="relative-posts row py-2 text-black" style="cursor: pointer">
+                                <a :href="`/blog/detail/${article.slug}`" class="hover_underline row py-2 text-black" style="cursor: pointer">
                                     <div class="col-4 d-flex">
                                         <img :src="article.image" alt="Related Post Image" class="rounded border w-100 h-100" style="object-fit: contain" />
                                     </div>
@@ -184,12 +184,20 @@ const parseMetadata = (metadata) => {
 const parseMetadataVideo = (metadata) => {
     try {
         const metaObj = JSON.parse(metadata);
-        
-        if (metaObj.Video.file) {
-            let path = metaObj.Video.file.replace(/\\/g, "/");
-            return baseURL + path;
+
+        let path = "";
+        switch (metaObj.Video?.type) {
+            case "file":
+                path = baseURL + metaObj.Video.file.replace(/\\/g, "/");
+                break;
+            case "link":
+                path = metaObj.Video.url;
+                break;
+            default:
+                console.log("Missing video type in response");
+                return null;
         }
-        return "";
+        return path;
     } catch (error) {
         console.error("Error parsing metadata:", error);
         return "";
@@ -210,9 +218,3 @@ onMounted(async () => {
     await getRelatedArticles();
 });
 </script>
-
-<style>
-.relative-posts:hover {
-    background-color: #eff6ff;
-}
-</style>

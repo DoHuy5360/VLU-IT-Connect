@@ -140,7 +140,6 @@ onMounted(async () => {
 const isAllowComment = (metadata) => {
     try {
         const metaObj = JSON.parse(metadata);
-        console.log(metaObj.EnableComments);
         return metaObj.EnableComments
     } catch (error) {
         console.error("Error parsing metadata:", error);

@@ -48,32 +48,8 @@ export const useTemplateStore = defineStore({
             sideTransitions: true,
             mainContent: "", // 'boxed', ''narrow'
         },
-        searchBlogResult: [], // Corrected to ensure a single state definition
-        searchMetadata: {},
     }),
     actions: {
-        async filterSearchResults(query) {
-            try {
-                if (!query.trim()) {
-                    this.searchBlogResult = [];
-                    this.searchMetadata = {};
-                    return;
-                }
-
-                // Call the API with the search term
-                const response = await axios.get(`/api/posts/search`, {
-                    params: { searchTerm: query.trim() },
-                });
-
-                // Update state with response data
-                this.searchBlogResult = response.data.data.$values || []; // Extract posts data
-                this.searchMetadata = response.data.metadata || {}; // Extract pagination metadata
-            } catch (error) {
-                console.error("Error fetching search results:", error);
-                this.searchBlogResult = [];
-                this.searchMetadata = {};
-            }
-        },
         setLanguage(language) {
             this.app.language = language;
         },

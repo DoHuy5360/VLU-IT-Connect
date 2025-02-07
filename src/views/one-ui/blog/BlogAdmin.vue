@@ -9,182 +9,126 @@
     </BasePageHeading>
 
     <div class="content">
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <input type="text" class="form-control" v-model="searchTerm" placeholder="Tìm kiếm bài viết..." @input="onSearch" />
-            </div>
-            <div class="col-md-4">
-                <select class="form-select" v-model="selectedStatus" @change="onFilter">
-                    <option value="">Tất cả trạng thái</option>
-                    <option value="1">Public</option>
-                    <option value="0">Unpublic</option>
-                </select>
-            </div>
-        </div>
-
-        <div v-if="loading" class="text-center">
-            <p>Đang tải dữ liệu...</p>
-        </div>
-
-        <div v-else>
-            <BaseBlock title="Danh sách bài viết" class="shadow-sm rounded">
-                <div v-if="paginatedUsers.length">
-                    <table class="table table-bordered table-striped table-vcenter align-middle">
-                        <thead class="bg-primary-light">
-                            <tr>
-                                <th class="text-center" style="width: 50px">
-                                    <input type="checkbox" :checked="isAllSelected" @click="selectAll($event)" />
-                                </th>
-                                <th class="text-center">#</th>
-                                <th>Tiêu đề</th>
-                                <th>Tác giả</th>
-                                <th>Hiển thị</th>
-                                <th>Bình luận</th>
-                                <th class="text-center">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(user, index) in paginatedUsers" :key="user.id">
-                                <td class="text-center">
-                                    <input type="checkbox" :value="user.id" v-model="selectedUsers" @click.stop />
-                                </td>
-                                <td class="text-center">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
-                                <td class="clickable-row" style="cursor: pointer;" @click="viewBlog(user.id)">{{ user.title }}</td>
-                                <td>{{ user.author }}</td>
-                                <td>
-                                    <span :class="`badge bg-${user.state === 1 ? 'success' : 'warning'}`">
-                                        {{ user.state === 1 ? "Yes" : "No" }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span :class="`badge bg-${isAllowComment(user.metadata) ? 'success' : 'warning'}`">
-                                        {{ isAllowComment(user.metadata) ? "Yes" : "No" }}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="d-flex gap-2 justify-content-center">
-                                        <button class="btn btn-sm btn-alt-warning" @click.stop="editBlog(user.id)">
-                                            <i class="fa fa-fw fa-pencil-alt"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger" title="Xóa bài viết" @click="swalConfirm(user.id)">
-                                            <i class="fa fa-fw fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <nav v-if="filteredUsers.length > itemsPerPage" class="mt-3">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                                <button class="page-link" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Trước</button>
-                            </li>
-                            <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }">
-                                <button class="page-link" @click="changePage(page)">
-                                    {{ page }}
-                                </button>
-                            </li>
-                            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                                <button class="page-link" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">Tiếp</button>
-                            </li>
-                        </ul>
-                    </nav>
+        <BaseBlock title="Danh sách bài viết" content-full>
+            <Dataset v-slot="{ ds }" :ds-data="posts" :ds-sortby="sortBy" :ds-search-in="['title', 'author', 'visible', 'comment']">
+                <div class="row" :data-page-count="ds.dsPagecount">
+                    <div id="datasetLength" class="col-md-8 py-2">
+                        <DatasetShow />
+                    </div>
+                    <div class="col-md-4 py-2">
+                        <DatasetSearch ds-search-placeholder="Search..." />
+                    </div>
                 </div>
-                <div v-else class="text-center">
-                    <p class="text-muted">Không tìm thấy kết quả phù hợp</p>
+                <hr />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">ID</th>
+                                        <th v-for="(th, index) in cols" :key="th.field" :class="['sort', th.sort]" @click="onSort($event, index)">{{ th.name }} <i class="gg-select float-end"></i></th>
+                                    </tr>
+                                </thead>
+                                <DatasetItem tag="tbody" class="fs-sm">
+                                    <template #default="{ row, rowIndex }">
+                                        <tr>
+                                            <th scope="row">{{ rowIndex + 1 }}</th>
+                                            <td style="min-width: 150px;">
+                                                <a :href="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer;">{{ row.title }}</a>
+                                            </td>
+                                            <td>{{ row.author }}</td>
+                                            <td style="min-width: 150px">{{ row.isPublished ? "Có" : "Không" }}</td>
+                                            <td style="min-width: 150px">{{ isAllowComment(row.metadata) ? "Có" : "Không" }}</td>
+                                            <td style="min-width: 150px">
+                                                <div class="d-flex gap-2 justify-content-center">
+                                                    <a :href="`/administrator/blog/edit/${row.id}`" class="btn btn-sm btn-alt-warning">
+                                                        <i class="fa fa-fw fa-pencil-alt"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-danger" title="Xóa bài viết" @click="swalConfirm(row.id)">
+                                                        <i class="fa fa-fw fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </DatasetItem>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-            </BaseBlock>
-        </div>
+                <div class="d-flex flex-md-row flex-column justify-content-between align-items-center">
+                    <DatasetInfo class="py-3 fs-sm" />
+                    <DatasetPager class="flex-wrap py-3 fs-sm" />
+                </div>
+            </Dataset>
+        </BaseBlock>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, reactive } from "vue";
 import Swal from "sweetalert2";
 import { useRouter } from "vue-router";
 import axios from "axios";
+import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
+import authRequest from "../accountmanager/service/axiosConfig";
 
 const router = useRouter();
-const users = ref([]);
-const searchTerm = ref("");
-const selectedStatus = ref("");
-const itemsPerPage = ref(10);
-const currentPage = ref(1);
+const posts = ref([]);
 const loading = ref(true);
-const selectedUsers = ref([]);
 
 onMounted(async () => {
     try {
         const token = localStorage.getItem("authToken");
-        const response = await axios.get("/api/admin/posts", {
+        // const response = await axios.get("/api/admin/posts?PageNumber=1&PageSize=99999", {
+        const response = await authRequest.get("/api/admin/posts?PageNumber=1&PageSize=99999", {
             headers: {
                 Authorization: token,
             },
         });
-        users.value = response.data.data.$values.map((post) => ({
+        posts.value = response.data.data.$values.map((post) => ({
             id: post.id,
             author: post.author,
             slug: post.slug,
             title: post.title,
-            state: post.published ? 1 : 0,
+            isPublished: post.published,
             publishDate: post.publishedAt,
-            metadata: post.metadata
+            metadata: post.metadata,
         }));
     } catch (error) {
-        console.error("Error fetching posts:", error);
+        switch (error.code) {
+            case "ERR_NETWORK":
+                handleLogout()
+                break;
+            default:
+                console.error("Error fetching posts:", error);
+                break;
+        }
     } finally {
         loading.value = false;
     }
 });
 
+
+function handleLogout() {
+  localStorage.removeItem("authToken"); // Xóa token khỏi localStorage
+  router.push("/auth/signin?msg=timeout"); // Chuyển hướng về trang đăng nhập
+
+}
+
 const isAllowComment = (metadata) => {
     try {
         const metaObj = JSON.parse(metadata);
-        return metaObj.EnableComments
+        return metaObj.EnableComments;
     } catch (error) {
         console.error("Error parsing metadata:", error);
         return false;
     }
 };
 
-const filteredUsers = computed(() => {
-    const search = searchTerm.value.toLowerCase();
-    return users.value
-        .filter((user) => user.title.toLowerCase().includes(search) && (selectedStatus.value === "" || user.state.toString() === selectedStatus.value))
-        .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
-});
 
-const paginatedUsers = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage.value;
-    return filteredUsers.value.slice(start, start + itemsPerPage.value);
-});
-
-const totalPages = computed(() => Math.ceil(filteredUsers.value.length / itemsPerPage.value));
-
-const isAllSelected = computed(() => {
-    return paginatedUsers.value.length > 0 && paginatedUsers.value.every((user) => selectedUsers.value.includes(user.id));
-});
-
-const selectAll = (event) => {
-    selectedUsers.value = event.target.checked ? paginatedUsers.value.map((user) => user.id) : [];
-};
-
-const changePage = (page) => {
-    if (page >= 1 && page <= totalPages.value) {
-        currentPage.value = page;
-    }
-};
-
-const onSearch = () => (currentPage.value = 1);
-const onFilter = () => (currentPage.value = 1);
-
-const navigateToCreate = () => router.push('/administrator/blog/create');
-
-const viewBlog = (id) => {
-    router.push({ name: "AdminBlogViewDetail", params: { id: String(id) } });
-};
-
-const editBlog = (id) => router.push({ name: "AdminBlogEdit", params: { id: String(id) } });
+const navigateToCreate = () => router.push("/administrator/blog/create");
 
 const swalConfirm = async (id) => {
     const confirmation = await Swal.fire({
@@ -193,7 +137,7 @@ const swalConfirm = async (id) => {
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Đồng ý xóa!",
-        cancelButtonText: "Hủy"
+        cancelButtonText: "Hủy",
     });
 
     if (confirmation.isConfirmed) {
@@ -205,7 +149,7 @@ const swalConfirm = async (id) => {
                     Authorization: token,
                 },
             });
-            users.value = users.value.filter((user) => user.id !== id);
+            posts.value = posts.value.filter((user) => user.id !== id);
             Swal.fire("Đã xóa!", `Bài viết với ID: ${id} đã được xóa.`, "success");
         } catch (error) {
             Swal.fire("Lỗi", "Xóa bài viết thất bại. Vui lòng thử lại.", "error");
@@ -215,8 +159,125 @@ const swalConfirm = async (id) => {
         }
     }
 };
+// Helper variables
+const cols = reactive([
+    {
+        name: "Tiêu đề",
+        field: "title",
+        sort: "",
+    },
+    {
+        name: "Tác giả",
+        field: "author",
+        sort: "",
+    },
+    {
+        name: "Hiển thị",
+        field: "visible",
+        sort: "",
+    },
+    {
+        name: "Bình luận",
+        field: "comment",
+        sort: "",
+    },
+]);
+// Apply a few Bootstrap 5 optimizations
+onMounted(() => {
+    // Remove labels from
+    document.querySelectorAll("#datasetLength label").forEach((el) => {
+        el.remove();
+    });
+
+    // Replace select classes
+    let selectLength = document.querySelector("#datasetLength select");
+
+    selectLength.classList = "";
+    selectLength.classList.add("form-select");
+    selectLength.style.width = "80px";
+});
+// Sort by functionality
+const sortBy = computed(() => {
+    return cols.reduce((acc, o) => {
+        if (o.sort) {
+            o.sort === "asc" ? acc.push(o.field) : acc.push("-" + o.field);
+        }
+        return acc;
+    }, []);
+});
+// On sort th click
+function onSort(event, i) {
+    let toset;
+    const sortEl = cols[i];
+
+    if (!event.shiftKey) {
+        cols.forEach((o) => {
+            if (o.field !== sortEl.field) {
+                o.sort = "";
+            }
+        });
+    }
+
+    if (!sortEl.sort) {
+        toset = "asc";
+    }
+
+    if (sortEl.sort === "desc") {
+        toset = event.shiftKey ? "" : "asc";
+    }
+
+    if (sortEl.sort === "asc") {
+        toset = "desc";
+    }
+
+    sortEl.sort = toset;
+}
 </script>
 
-<style lang="css" scoped>
-/* Your styles here */
+<style lang="scss" scoped>
+.gg-select {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    transform: scale(1);
+    width: 22px;
+    height: 22px;
+}
+.gg-select::after,
+.gg-select::before {
+    content: "";
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    left: 7px;
+    transform: rotate(-45deg);
+}
+.gg-select::before {
+    border-left: 2px solid;
+    border-bottom: 2px solid;
+    bottom: 4px;
+    opacity: 0.3;
+}
+.gg-select::after {
+    border-right: 2px solid;
+    border-top: 2px solid;
+    top: 4px;
+    opacity: 0.3;
+}
+th.sort {
+    cursor: pointer;
+    user-select: none;
+    &.asc {
+        .gg-select::after {
+            opacity: 1;
+        }
+    }
+    &.desc {
+        .gg-select::before {
+            opacity: 1;
+        }
+    }
+}
 </style>

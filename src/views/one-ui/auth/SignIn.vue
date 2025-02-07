@@ -73,9 +73,11 @@
 </template>
 <script>
 import axios from "axios";
-import { reactive } from "vue";
+import { reactive, useRoute } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
+
+// Thông báo phiên đăng nhập đã hết
 
 export default {
     setup() {

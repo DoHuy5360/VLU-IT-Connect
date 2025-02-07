@@ -8,7 +8,35 @@
         </template>
     </BasePageHeading>
 
-    <div class="content">
+    <div class="content" :style="`display: ${isShowSimulate ? '' : 'none'}`">
+        <div class="mb-4">
+            <button type="button" class="btn btn-alt-primary" @click="switchToSimulateView(false)">
+                <i class="fa fa-arrow-left opacity-50 me-1"></i>
+                Quay lại
+            </button>
+        </div>
+        <div class="bg-white rounded mb-4">
+            <div class="p-4">
+                <div class="blog-detail-box">
+                    <div class="d-flex gap-3 text-muted mb-3">
+                        <strong>{{ getDayFromDate(new Date()) }}</strong>
+                        <span class="text-primary clickable-text">{{ featuredArticle?.categoryName }}</span>
+                    </div>
+                    <div class="d-flex justify-content-start">
+                        <img :src="featuredArticle?.image" alt="Blog Article Image" class="w-100 border border-new-pale-gray rounded mb-3" style="object-fit: contain" />
+                    </div>
+                    <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
+                    <div class="text-muted mb-3" v-html="featuredArticle?.details"></div>
+                    <div v-if="featuredArticle?.video !== null" class="">
+                        <video :src="featuredArticle?.video" controls class="w-100"></video>
+                    </div>
+                    <br />
+                    <strong>{{ featuredArticle?.author }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="content" :style="`display: ${isShowSimulate ? 'none' : ''}`">
         <BaseBlock title="">
             <div class="space-y-5 pb-4">
                 <form @submit.prevent="submitForm" class="space-y-4">
@@ -34,7 +62,7 @@
                     </div>
                     <div>
                         <label for="pic-file">Hình ảnh</label>
-                        <input type="file" id="image-file" accept="image/*" class="form-control" ref="selectedImageFile" />
+                        <input type="file" id="image-file" accept="image/*" @change="createImageBlob" class="form-control" ref="selectedImageFile" />
                     </div>
 
                     <div>
@@ -57,18 +85,18 @@
 
                     <div v-if="formData.videoType == 'file'">
                         <label>Video file</label>
-                        <input type="file" id="video-file" accept="video/*" class="form-control" ref="selectedVideoFile" />
+                        <input type="file" id="video-file" accept="video/*" @change="createVideoBlob" class="form-control" ref="selectedVideoFile" />
                     </div>
 
-                    <div style="user-select: none;">
+                    <div style="user-select: none">
                         <div class="form-check">
                             <label class="form-check-label" for="allowComment">Cho phép bình luận</label>
-                            <input class="form-check-input" type="checkbox" v-model="formData.enableComments" id="allowComment"/>
+                            <input class="form-check-input" type="checkbox" v-model="formData.enableComments" id="allowComment" />
                         </div>
-                        <br>
+                        <br />
                         <div class="form-check">
                             <label class="form-check-label" for="publish">Công bố</label>
-                            <input class="form-check-input" type="checkbox" v-model="formData.published" id="publish"/>
+                            <input class="form-check-input" type="checkbox" v-model="formData.published" id="publish" />
                         </div>
                     </div>
                     <button type="submit" class="btn btn-success">Hoàn tất</button>
@@ -80,8 +108,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 import axios from "axios";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import SlugInput from "./components/SlugInput.vue";
@@ -103,7 +131,6 @@ const selectedImageFile = ref(null);
 const selectedVideoFile = ref(null);
 
 const router = useRouter();
-const route = useRoute();
 
 const formData = ref({
     title: "",
@@ -160,22 +187,7 @@ const fetchCategories = async () => {
     }
 };
 
-onMounted(() => {
-    fetchCategories();
-    Object.assign(formData.value, {
-        title: route.query.title || "",
-        slug: route.query.slug || "",
-        categoryId: route.query.categoryId || "",
-        contentHtml: route.query.contentHtml || "",
-        file: route.query.file || "",
-        excerpt: route.query.excerpt || "",
-        videoType: route.query.videoType || "link",
-        videoUrl: route.query.videoUrl || "",
-        // published: route.query.published,
-        enableComments: route.query.enableComments === "true",
-        image: route.query.image || "",
-    });
-});
+fetchCategories();
 
 const submitForm = async () => {
     try {
@@ -195,7 +207,7 @@ const submitForm = async () => {
         formDataToSend.append("Title", formData.value.title.trim());
         formDataToSend.append("Slug", formData.value.slug || formData.value.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"));
         formDataToSend.append("CategoryIds[0]", formData.value.categoryId);
-        formDataToSend.append("ContentHtml", formData.value.contentHtml.trim());
+        formDataToSend.append("ContentHtml", formData.value.contentHtml);
         formDataToSend.append("Files", selectedImageFile.value?.files[0]);
         formDataToSend.append("Excerpt", formData.value.excerpt);
         formDataToSend.append("Published", formData.value.published.toString());
@@ -220,9 +232,49 @@ const submitForm = async () => {
     }
 };
 
-const navigateToSimulation = () => {
-    router.push({ path: "/administrator/blog/simulate", query: { ...formData.value } });
+const imageUrl = ref(null);
+const videoUrl = ref(null);
+const createImageBlob = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        imageUrl.value = URL.createObjectURL(file);
+    }
 };
+const createVideoBlob = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        videoUrl.value = URL.createObjectURL(file);
+    }
+};
+
+const featuredArticle = ref();
+const isShowSimulate = ref(false);
+
+const navigateToSimulation = () => {
+    const selectedCategory = categories.value.filter((category) => category.id === parseInt(formData.value.categoryId));
+
+    featuredArticle.value = {
+        title: formData.value.title.trim(),
+        details: formData.value.contentHtml,
+        categoryName: selectedCategory.length != 0 ? selectedCategory[0].name : "Chưa chọn thể loại bài viết",
+        image: imageUrl.value,
+        video: formData.value.videoType === "link" ? formData.value.videoUrl : videoUrl.value,
+    };
+    switchToSimulateView(true);
+};
+
+function getDayFromDate(stringDate) {
+    const date = new Date(stringDate);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+}
+
+function switchToSimulateView(status) {
+    isShowSimulate.value = status;
+}
 
 const editor = ClassicEditor;
 </script>

@@ -249,26 +249,10 @@
                     <b class="text-primary hover_underline" style="cursor: pointer">{{  store.isVietNamese() ? "Xem tất cả" : "View all" }}</b>
                 </div>
                 <div class="row" id="wrapVideo">
-                    <div class="col">
-                        <iframe width="100%" height="200px" src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6" frameborder="0" allowfullscreen class="rounded"></iframe>
-                        <div>
-                            <strong>Hướng dẫn</strong>
-                            <div>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime aliquid iusto tempore recusandae obcaecati</div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <iframe width="100%" height="200px" src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6" frameborder="0" allowfullscreen class="rounded"></iframe>
-                        <div>
-                            <strong>Hướng dẫn</strong>
-                            <div>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime aliquid iusto tempore recusandae obcaecati</div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <iframe width="100%" height="200px" src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6" frameborder="0" allowfullscreen class="rounded"></iframe>
-                        <div>
-                            <strong>Hướng dẫn</strong>
-                            <div>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime aliquid iusto tempore recusandae obcaecati</div>
-                        </div>
+                    <div v-for="post in posts" :key="post.id" class="col">
+                        <iframe width="100%" height="200px" :src="post.video" frameborder="0" allowfullscreen class="rounded"></iframe>
+                        <strong>{{ post.title }}</strong>
+                        <div>{{ truncateText(post.excerpt, 100) }}</div>
                     </div>
                 </div>
             </div>
@@ -280,6 +264,7 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useTemplateStore } from "../../stores/template";
+import axios from "axios";
 const store = useTemplateStore();
 const router = useRouter();
 const searchQuery = ref("");
@@ -288,14 +273,50 @@ const searchInput = ref(null)
 function onSearch() {
   const trimmedQuery = searchQuery.value.trim();
   if (trimmedQuery) {
-    store.filterSearchResults(trimmedQuery);
     router.push({ name: "ListResult", query: { q: trimmedQuery } });
   } else {
     searchInput.value.focus()
-    // store.searchBlogResult = [];
   }
 }
 
+const baseURL = "https://localhost:7017/";
+const parseMetadataVideo = (metadata) => {
+    try {
+        const metaObj = JSON.parse(metadata);
+
+        let path = "";
+        switch (metaObj.Video?.type) {
+            case "file":
+                path = baseURL + metaObj.Video.file.replace(/\\/g, "/");
+                break;
+            case "link":
+                path = metaObj.Video.url;
+                break;
+            default:
+                console.log("Missing video type in response");
+                return null;
+        }
+        return path;
+    } catch (error) {
+        console.error("Error parsing metadata:", error);
+        return "";
+    }
+};
+
+const truncateText = (text, maxLength) => {
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};
+const posts = ref([])
+async function getBlogs(){
+    const response = await axios.get(`/api/posts?PageNumber=1&PageSize=3`);
+    posts.value = response.data?.data.map(post => ({
+        title: post.title,
+        excerpt: post.excerpt,
+        video: parseMetadataVideo(post.metadata),
+    }));
+    
+}
+getBlogs()
 </script>
 
 <style lang="css" scoped>

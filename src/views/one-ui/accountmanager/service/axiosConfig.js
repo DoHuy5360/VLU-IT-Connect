@@ -1,17 +1,18 @@
 import axios from "axios";
 
 // Tạo instance axios với base URL
-const axiosInstance = axios.create({
-    baseURL: "/api", // Sử dụng URL đầy đủ của BE
+const authRequest = axios.create({
+    // baseURL: "/api", // Sử dụng URL đầy đủ của BE
     timeout: 10000,
     headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
     },
+    maxRedirects: 0
 });
 
 // Request interceptor
-axiosInstance.interceptors.request.use(
+authRequest.interceptors.request.use(
     (config) => {
         // Log URL để debug
         console.log("Request URL:", `${config.baseURL}${config.url}`);
@@ -27,4 +28,25 @@ axiosInstance.interceptors.request.use(
     }
 );
 
-export default axiosInstance;
+// Thêm interceptor cho phản hồi
+authRequest.interceptors.response.use(
+    (response) => {
+      // Nếu không có lỗi, trả về response
+      console.log(response);
+      if (response.status === 302) {
+          handleAuthorizeFail();
+      }
+      return response;
+    },
+    (error) => {
+      // Trả về lỗi để tiếp tục xử lý
+      return Promise.reject(error);
+    }
+  );
+
+const handleAuthorizeFail = () => {
+    console.log('Fail to authorize request');
+    
+  };
+
+export default authRequest;

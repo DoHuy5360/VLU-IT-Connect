@@ -3,7 +3,10 @@
     <template #extra>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb breadcrumb-alt">
-          <button class="btn btn-primary" @click="$router.push('/administrator/accountmanager')">
+          <button
+            class="btn btn-primary"
+            @click="$router.push('/administrator/accountmanager')"
+          >
             <i class="fa fa-arrow-left me-1"></i> Quay lại
           </button>
         </ol>
@@ -124,10 +127,7 @@
 
           <!-- Submit Buttons -->
           <div class="row mb-4">
-            <div
-              class=""
-              style="display: flex; justify-content: end"
-            >
+            <div class="" style="display: flex; justify-content: end">
               <button
                 type="submit"
                 class="btn btn-success me-2"
@@ -376,6 +376,34 @@ const loadPermissions = async () => {
                 code: "delete_group",
                 name: "Xóa nhóm",
                 description: "Xóa nhóm",
+              },
+            ],
+          },
+        },
+        {
+          groupKey: "category_management",
+          groupName: "Quản lý danh mục",
+          permissions: {
+            $values: [
+              {
+                code: "view_categories",
+                name: "Xem danh mục",
+                description: "Xem danh sách và chi tiết danh mục",
+              },
+              {
+                code: "create_category",
+                name: "Tạo danh mục",
+                description: "Tạo danh mục mới",
+              },
+              {
+                code: "edit_category",
+                name: "Sửa danh mục",
+                description: "Chỉnh sửa thông tin danh mục",
+              },
+              {
+                code: "delete_category",
+                name: "Xóa danh mục",
+                description: "Xóa danh mục",
               },
             ],
           },

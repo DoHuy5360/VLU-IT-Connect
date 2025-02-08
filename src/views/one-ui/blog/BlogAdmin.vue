@@ -81,12 +81,7 @@ const loading = ref(true);
 onMounted(async () => {
     try {
         const token = localStorage.getItem("authToken");
-        // const response = await axios.get("/api/admin/posts?PageNumber=1&PageSize=99999", {
-        const response = await authRequest.get("/api/admin/posts?PageNumber=1&PageSize=99999", {
-            headers: {
-                Authorization: token,
-            },
-        });
+        const response = await authRequest.get("/admin/posts?PageNumber=1&PageSize=99999");
         posts.value = response.data.data.$values.map((post) => ({
             id: post.id,
             author: post.author,

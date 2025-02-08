@@ -73,7 +73,7 @@
 </template>
 <script>
 import axios from "axios";
-import { reactive, useRoute } from "vue";
+import { reactive } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 

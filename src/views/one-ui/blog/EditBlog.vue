@@ -55,10 +55,15 @@
 
                     <!-- Video Upload Option -->
                     <div class="mb-4">
-                        <label class="form-label">Video hiện tại</label>
-                        <div v-if="formData.video !== null" class="row">
-                            <div class="col-4">
-                                <video :src="formData.video" controls class="w-100"></video>
+                        <div>
+                            <label class="form-label">Video hiện tại</label>
+                            <div v-if="formData.video !== null" class="row">
+                                <div class="col-4">
+                                    <video :src="formData.video" controls class="w-100"></video>
+                                </div>
+                            </div>
+                            <div v-else class="text-muted">
+                                Chưa có video
                             </div>
                         </div>
                         <label class="form-label" for="">Loại video</label>

@@ -15,7 +15,7 @@
 @import "@/assets/scss/oneui/themes/smooth";
 
 .hover_underline:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 *{
   scroll-behavior: smooth;

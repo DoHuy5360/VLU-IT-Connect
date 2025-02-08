@@ -68,10 +68,7 @@ function onSearch() {
   console.log("Search function triggered");
   const trimmedQuery = searchQuery.value.trim();
   if (trimmedQuery) {
-    store.filterSearchResults(trimmedQuery);
     router.push({ name: "ListResult", query: { q: trimmedQuery } });
-  } else {
-    store.searchBlogResult = [];
   }
 }
 

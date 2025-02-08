@@ -1,75 +1,104 @@
 <template>
-  <div class="container py-3">
-    <div class="rounded-3 p-3 border-new-gray border bg-white">
-      <div v-if="getSearchBlogResult.length" class="d-flex flex-column gap-3">
-        <div v-for="blog in getSearchBlogResult" :key="blog.id" class="">
-          <a :href="`/blog/detail/${blog.slug}`" target="_blank" class="text-black hover_underline" style="cursor: pointer;">
-            <strong class="" style="font-size: 1.2rem;">{{ blog.title }}</strong>
-            <div class="text-muted">{{ blog.excerpt }}</div>
-            <!-- <div><strong>Category:</strong> {{ blog.categoryName }}</div>
-            <div><strong>Published At:</strong> {{ new Date(blog.publishedAt).toLocaleDateString() }}</div> -->
-          </a>
-        </div>
-      </div>
-      <div v-else>
-        <p>No blog posts found.</p>
-      </div>
-      <hr style="border-top: dashed 2px black" />
-
-      <!-- Videos Section -->
-      <div class="py-2 mb-3">
-        <div class="d-flex justify-content-between">
-          <h4 class="mb-3 font-weight-bold">Clip hướng dẫn sử dụng</h4>
-          <b class="text-primary hover_underline" style="cursor: pointer">Xem tất cả</b>
-        </div>
-        <div class="row" id="wrapVideo">
-          <div class="col-auto col-sm" v-for="video in videos" :key="video.id">
-            <iframe :src="video.url" width="100%" height="200px" frameborder="0" allowfullscreen class="rounded"></iframe>
-            <div class="mt-2">
-              <strong>{{ video.title }}</strong>
-              <div>{{ video.description }}</div>
+    <div class="container py-3">
+        <div class="rounded-3 p-3 border-new-gray border bg-white">
+            <div v-if="searchResult.length" class="d-flex flex-column gap-3">
+                <div v-for="blog in searchResult" :key="blog.id" class="">
+                    <a :href="`/blog/detail/${blog.slug}`" target="_blank" class="text-black hover_underline" style="cursor: pointer">
+                        <strong class="" style="font-size: 1.2rem">{{ blog.title }}</strong>
+                        <div class="text-muted">{{ blog.excerpt }}</div>
+                    </a>
+                </div>
             </div>
-          </div>
+            <div v-else>
+                <p>Không tìm thấy bài viết liên quan.</p>
+            </div>
+            <hr style="border-top: dashed 2px black" />
+
+            <!-- Videos Section -->
+            <div class="py-2 mb-3">
+                <div class="d-flex justify-content-between">
+                    <h4 class="mb-3 font-weight-bold">Clip hướng dẫn sử dụng</h4>
+                    <b class="text-primary hover_underline" style="cursor: pointer">Xem tất cả</b>
+                </div>
+                <div v-if="searchResult.length" class="row" id="wrapVideo">
+                    <div class="col-auto col-sm" v-for="blog in searchResult.slice(0, 3)" :key="blog.id">
+                        <div v-if="blog.video !== null">
+                            <iframe :src="blog.video" width="100%" height="200px" frameborder="0" allowfullscreen class="rounded"></iframe>
+                            <div class="mt-2">
+                                <strong>{{ blog.title }}</strong>
+                                <div>{{ truncateText(blog.excerpt) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-else>
+                  <p>Không tìm thấy video liên quan.</p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useTemplateStore } from "@/stores/template";
+import axios from "axios";
 
 const store = useTemplateStore();
-const route = useRoute()
+const route = useRoute();
 
-const searchParams = route.query.q
+const searchParams = route.query.q;
 
-store.setBreadcrumb([
-      { name: "Kết quả tìm kiếm", path: `/search?q=${searchParams}` },
-  ]);
+const searchResult = ref([]);
 
-const getSearchBlogResult = computed(() => store.searchBlogResult);
-const videos = ref([
-  {
-    id: "v1",
-    url: "https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6",
-    title: "Hướng dẫn 1",
-    description: "Clip hướng dẫn chi tiết về việc sử dụng nền tảng của bạn.",
-  },
-  {
-    id: "v2",
-    url: "https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6",
-    title: "Hướng dẫn 2",
-    description: "Giới thiệu các tính năng nâng cao và cách tận dụng.",
-  },
-  {
-    id: "v3",
-    url: "https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6",
-    title: "Hướng dẫn 3",
-    description: "Tips và tricks cho người dùng mới bắt đầu.",
-  },
-]);
+async function searchBlog(searchValue) {
+    const response = await axios.get(`/api/posts/search`, {
+        params: { searchTerm: searchValue.trim() },
+    });
+    searchResult.value = response.data?.data.$values.map((blog) => ({
+        slug: blog.slug,
+        title: blog.title,
+        excerpt: blog.excerpt,
+        video: parseMetadataVideo(blog.metadata),
+    }));
+}
+searchBlog(searchParams);
 
+watch(
+    () => route.query.q,
+    (newSearchParam) => {
+        searchBlog(newSearchParam);
+    }
+);
+
+store.setBreadcrumb([{ name: "Kết quả tìm kiếm", path: `/search?q=${searchParams}` }]);
+
+const baseURL = "https://localhost:7017/";
+const parseMetadataVideo = (metadata) => {
+    try {
+        const metaObj = JSON.parse(metadata);
+
+        let path = "";
+        switch (metaObj.Video?.type) {
+            case "file":
+                path = baseURL + metaObj.Video.file.replace(/\\/g, "/");
+                break;
+            case "link":
+                path = metaObj.Video.url;
+                break;
+            default:
+                console.log("Missing video type in response");
+                return null;
+        }
+        return path;
+    } catch (error) {
+        console.error("Error parsing metadata:", error);
+        return "";
+    }
+};
+
+const truncateText = (text, maxLength) => {
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};
 </script>

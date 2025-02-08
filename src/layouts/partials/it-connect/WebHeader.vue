@@ -2,9 +2,11 @@
     <div class="bg-secondary d-none d-sm-block">
         <div class="container">
             <div class="d-flex gap-4 justify-content-end align-items-center">
-                <div class="bg-primary text-white p-2 text-center">
-                    {{ store.isVietNamese() ? "Trang Chủ" : "Home" }}
-                </div>
+                <a href="/" style="cursor: pointer;">
+                    <div class="bg-primary text-white p-2 text-center">
+                        {{ store.isVietNamese() ? "Trang Chủ" : "Home" }}
+                    </div>
+                </a>
                 <div class="text-white">
                     {{
                         store.isVietNamese()
@@ -101,7 +103,7 @@
     <div class="bg-white py-2">
         <div class="container">
             <div class="row justify-content-between">
-                <img src="@/../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" draggable="false"/>
+                <img src="@/../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" draggable="false" />
                 <div class="col d-flex gap-2 align-items-center justify-content-end d-sm-none">
                     <!-- Search icon -->
                     <span @click="toggleSearchBar">
@@ -127,25 +129,25 @@
                     </span>
                 </div>
                 <div class="col d-none d-sm-flex gap-4 justify-content-end align-items-center text-end menu" style="font-weight: bold">
-                    <a href="#frequentlyQuestions" style="cursor: pointer; color: black;">
+                    <a href="/blog?category=cac-cau-hoi-thuong-gap" class="text-black" style="cursor: pointer; color: black">
                         {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
                     </a>
-                    <div style="cursor: pointer">
+                    <a href="/support" class="text-black" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
-                    </div>
-                    <div style="cursor: pointer">
+                    </a>
+                    <a href="/blog?category=quy-dinh-chinh-sach" class="text-black" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
-                    </div>
-                    <div style="cursor: pointer">
+                    </a>
+                    <a href="tel:028 7109 9131" class="text-black" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
     <div ref="searchBar" class="container my-2 d-none">
         <div class="bg-white rounded-pill px-2 py-1 d-flex align-items-center border border-grey">
-            <input type="text" style="outline: none; border: none; width: 400px" autofocus />
+            <input type="text" style="outline: none; border: none; width: 400px" autofocus @keypress.enter="onSearch" v-model="searchQuery" ref="searchInput" />
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                     d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
@@ -176,7 +178,7 @@
             </div>
         </div>
         <div class="d-flex gap-2 p-3">
-            <div class="d-flex gap-2">
+            <div @click="selectLanguage('VN')" class="d-flex gap-2">
                 <!-- Viet Nam flag icon -->
                 <div>
                     <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -193,7 +195,7 @@
                 <span>VN</span>
             </div>
             <span>|</span>
-            <div class="d-flex gap-2">
+            <div @click="selectLanguage('EN')" class="d-flex gap-2">
                 <!-- UK flag icon -->
                 <div>
                     <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -223,24 +225,36 @@
             </div>
         </div>
         <div>
-            <div class="bg-primary-active text-white px-3 py-2" style="font-weight: 600">Trang chủ</div>
-            <div class="bg-secondary-active text-white px-3 py-2" style="font-weight: 600">Dịch vụ CNTT dành cho</div>
+            <a href="/" style="cursor: pointer;">
+                <div class="bg-primary-active text-white px-3 py-2" style="font-weight: 600">{{ store.isVietNamese() ? "Trang Chủ" : "Home" }}</div>
+            </a>
+            <div class="bg-secondary-active text-white px-3 py-2" style="font-weight: 600">
+                {{ store.isVietNamese() ? "Dịch vụ CNTT dành cho" : "Information Technology services for" }}
+            </div>
             <ul class="bg-secondary text-white mb-0" style="list-style-type: none">
-                <li class="p-2" style="font-weight: 600">Khách</li>
-                <li class="p-2" style="font-weight: 600">Sinh viên</li>
-                <li class="p-2" style="font-weight: 600">Cán bộ - Giảng viên - Nhân viên</li>
+                <li class="p-2" style="font-weight: 600">{{ store.isVietNamese() ? "Khách" : "Guest" }}</li>
+                <li class="p-2" style="font-weight: 600">{{ store.isVietNamese() ? "Sinh viên" : "Student" }}</li>
+                <li class="p-2" style="font-weight: 600">{{ store.isVietNamese() ? "Cán bộ - Giảng viên - Nhân viên" : "Staff - Lecture - Employee" }}</li>
             </ul>
             <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
-                {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
+                <a href="/blog?category=cac-cau-hoi-thuong-gap" class="text-black">
+                    {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
+                </a>
             </div>
-            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
-                {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
+            <div class="bg-white text-secondary px-3 py-2 border border-b">
+                <a href="/support" class="text-black" style="font-weight: bold">
+                    {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
+                </a>
             </div>
-            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
-                {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
+            <div class="bg-white text-secondary px-3 py-2 border border-b">
+                <a href="/blog?category=quy-dinh-chinh-sach" class="text-black" style="font-weight: bold">
+                    {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
+                </a>
             </div>
-            <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
-                {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
+            <div class="bg-white text-secondary px-3 py-2 border border-b">
+                <a href="tel:028 7109 9131" class="text-black" style="font-weight: bold">
+                    {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
+                </a>
             </div>
         </div>
     </div>
@@ -249,7 +263,21 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { inject } from "vue";
+import { useRouter } from "vue-router";
 import { useTemplateStore } from "@/stores/template";
+
+const router = useRouter();
+const searchQuery = ref("");
+const searchInput = ref(null);
+
+function onSearch() {
+    const trimmedQuery = searchQuery.value.trim();
+    if (trimmedQuery) {
+        router.push({ name: "ListResult", query: { q: trimmedQuery } });
+    } else {
+        searchInput.value.focus();
+    }
+}
 
 const isShowLanguageChoice = ref(false);
 

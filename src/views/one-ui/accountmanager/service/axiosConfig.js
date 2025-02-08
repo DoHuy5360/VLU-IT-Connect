@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Tạo instance axios với base URL
 const authRequest = axios.create({
-    // baseURL: "/api", // Sử dụng URL đầy đủ của BE
+    baseURL: "/api", // Sử dụng URL đầy đủ của BE
     timeout: 10000,
     headers: {
         "Content-Type": "application/json",

@@ -41,37 +41,60 @@
             <div class="space-y-5 pb-4">
                 <form @submit.prevent="submitForm" class="space-y-4">
                     <div>
-                        <label>Tiêu đề</label>
-                        <input v-model="formData.title" required class="form-control" />
+                        <label class="form-label">Tiêu đề</label>
+                        <input v-model="state.title" @input="generateSlug" @blur="v$.title.$touch" class="form-control" :class="{ 'is-invalid': v$.title.$errors.length }" />
+                        <div v-if="v$.title.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.title.$errors[0].$validator === 'required'"> Hãy nhập tiêu đề </span>
+                        </div>
                     </div>
 
-                    <SlugInput :title="formData.title" v-model="formData.slug" />
+                    <div>
+                        <label class="form-label" for="slug">Slug</label>
+                        <input type="text" v-model="state.slug" class="form-control" />
+                    </div>
 
                     <div>
-                        <label>Thể loại</label>
-                        <select v-model="formData.categoryId" required class="form-control">
+                        <label class="form-label">Thể loại</label>
+                        <select v-model="state.categoryId" class="form-control" @blur="v$.categoryId.$touch" :class="{ 'is-invalid': v$.categoryId.$errors.length }">
                             <option value="">Chọn thể loại</option>
+                            <option value="1">de</option>
                             <option v-for="category in categories" :key="category.id" :value="category.id">
                                 {{ category.name }}
                             </option>
                         </select>
+                        <div v-if="v$.categoryId.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.categoryId.$errors[0].$validator === 'required'"> Hãy chọn thể loại </span>
+                        </div>
                     </div>
                     <div>
-                        <label>Mô tả ngắn</label>
+                        <label class="form-label">Mô tả ngắn</label>
                         <textarea v-model="formData.excerpt" class="form-control" placeholder="Mô tả ngắn bài viết"></textarea>
                     </div>
                     <div>
                         <label for="pic-file">Hình ảnh</label>
-                        <input type="file" id="image-file" accept="image/*" @change="createImageBlob" class="form-control" ref="selectedImageFile" />
+                        <input
+                            @blur="v$.image.$touch"
+                            :class="{ 'is-invalid': v$.image.$errors.length }"
+                            type="file"
+                            id="image-file"
+                            accept="image/*"
+                            @change="createImageBlob"
+                            class="form-control"
+                            ref="selectedImageFile"
+                        />
+                        <div v-if="v$.image.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.image.$errors[0].$validator === 'required'"> Hãy chọn ảnh bìa </span>
+                        </div>
+                        <span v-if="v$.image.$errors.some((e) => e.$validator === 'maxSize')"> Kích thước file không được vượt quá 5MB. </span>
                     </div>
 
                     <div>
-                        <label>Nội dung</label>
+                        <label class="form-label">Nội dung</label>
                         <ckeditor :editor="editor" :config="editorConfig" v-model="formData.contentHtml" required></ckeditor>
                     </div>
 
                     <div>
-                        <label>Loại Video</label>
+                        <label class="form-label">Loại Video</label>
                         <select v-model="formData.videoType" class="form-select">
                             <option value="link">Link</option>
                             <option value="file">File</option>
@@ -79,12 +102,12 @@
                     </div>
 
                     <div v-if="formData.videoType == 'link'">
-                        <label>Video link</label>
+                        <label class="form-label">Video link</label>
                         <input v-model="formData.videoUrl" class="form-control" />
                     </div>
 
                     <div v-if="formData.videoType == 'file'">
-                        <label>Video file</label>
+                        <label class="form-label">Video file</label>
                         <input type="file" id="video-file" accept="video/*" @change="createVideoBlob" class="form-control" ref="selectedVideoFile" />
                     </div>
 
@@ -108,13 +131,50 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import SlugInput from "./components/SlugInput.vue";
 import Swal from "sweetalert2";
 import { CustomUploadAdapter } from "./uploadAdapter";
+import useVuelidate from "@vuelidate/core";
+import { required, minLength, maxLength } from "@vuelidate/validators";
+import authRequest from "../accountmanager/service/axiosConfig";
+
+// Validate
+const state = reactive({
+    title: "",
+    slug: "",
+    excerpt: "",
+    categoryId: "",
+    image: null,
+});
+const maxSize = (size) => (value) => {
+    return !value || value.size <= size;
+};
+const rules = {
+    title: { required, maxLengt: maxLength(225) },
+    slug: { required, maxLengt: maxLength(200) },
+    excerpt: { maxLengt: maxLength(160) },
+    categoryId: { required },
+    image: { required, maxSize: maxSize(5 * 1024 * 1024) },
+};
+
+const v$ = useVuelidate(rules, state);
+
+// Slug
+function generateSlug() {
+    state.slug = state.title
+        .toLowerCase()
+        .normalize("NFD") // Chuyển thành dạng decomposed để tách dấu
+        .replace(/[\u0300-\u036f]/g, "") // Loại bỏ dấu
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "d") // Chuyển đ -> d
+        .replace(/[^a-z0-9\s-]/g, "") // Loại bỏ ký tự đặc biệt
+        .trim()
+        .replace(/\s+/g, "-"); // Chuyển khoảng trắng thành dấu gạch ngang
+}
 
 const editorConfig = ref({
     placeholder: "Start typing your blog content...",
@@ -190,19 +250,16 @@ const fetchCategories = async () => {
 fetchCategories();
 
 const submitForm = async () => {
+    v$.value.$touch(); // Đánh dấu tất cả các trường
+    if (v$.value.$invalid) {
+        console.log("khong hop le");
+
+        return;
+    } else {
+        console.log("hop le");
+        console.log(state);
+    }
     try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-            alert("Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn");
-            router.push("/login");
-            return;
-        }
-
-        if (!formData.value.title.trim() || !formData.value.contentHtml.trim() || !formData.value.categoryId) {
-            alert("Vui lòng nhập đầy đủ thông tin bắt buộc");
-            return;
-        }
-
         const formDataToSend = new FormData();
         formDataToSend.append("Title", formData.value.title.trim());
         formDataToSend.append("Slug", formData.value.slug || formData.value.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"));
@@ -216,11 +273,23 @@ const submitForm = async () => {
         formDataToSend.append("VideoUrl", formData.value.videoUrl);
         formDataToSend.append("VideoFile", selectedVideoFile.value?.files[0]);
 
-        await axios.post("/api/admin/posts", formDataToSend, {
-            headers: { "Content-Type": "multipart/form-data", Authorization: token },
+        await authRequest.post("/api/admin/posts", formDataToSend, {
+            headers: { "Content-Type": "multipart/form-data" },
         });
 
-        router.push("/administrator/blog");
+        const userConfirmed = await Swal.fire({
+            title: "Tạo bài viết thành công",
+            text: "",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Đồng ý",
+            cancelButtonText: "Hủy",
+        });
+
+        if (userConfirmed.isConfirmed) {
+            router.push("/administrator/blog");
+        }
+
     } catch (error) {
         console.error("Error creating post:", error);
 
@@ -238,6 +307,9 @@ const createImageBlob = (event) => {
     const file = event.target.files[0];
     if (file) {
         imageUrl.value = URL.createObjectURL(file);
+
+        state.image = file ? file : null; // Cập nhật state
+        v$.value.image.$touch(); // Kích hoạt kiểm tra lỗi ngay sau khi chọn file
     }
 };
 const createVideoBlob = (event) => {

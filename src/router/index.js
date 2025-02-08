@@ -4,6 +4,7 @@ import NProgress from "nprogress/nprogress.js";
 // Import components
 const WelcomeAdmin = () => import("@/views/one-ui/WelcomeAdmin.vue");
 const Home = () => import("@/views/it-connect/Home.vue");
+const RequestSupport = () => import("@/views/it-connect/RequestSupport.vue");
 const Categories = () => import("@/views/it-connect/Categories.vue");
 const Videos = () => import("@/views/it-connect/Videos.vue");
 const Search = () => import("@/views/it-connect/Search.vue");
@@ -162,6 +163,13 @@ const routes = [
                 component: Home,
                 meta: { breadcrumb: "Home" },
             },
+            {
+                path: "support",
+                name: "RequestSupport",
+                component: RequestSupport,
+                meta: { breadcrumb: "RequestSupport" },
+            },
+
         ],
     },
     {

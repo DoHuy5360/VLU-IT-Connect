@@ -25,7 +25,7 @@
                 <div class="position-absolute w-100" id="threeRepresentItems" style="opacity: 0.9">
                     <div class="container">
                         <div class="row justify-content-center bg-white rounded">
-                            <div class="col-sm-4 p-3">
+                            <a href="/support" class="col-sm-4 p-3 text-black">
                                 <img
                                     src="@/../assets/media/other/browse knowledge.png"
                                     style="object-fit: cover; display: block; width: 100%; height: 120px"
@@ -35,7 +35,7 @@
                                     <b>{{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}</b>
                                     <span style="">{{ store.isVietNamese() ? "Hỗ trợ nhanh theo các danh mục dịch vụ Công nghệ thông tin sẵn có." : "Quick support according to available Information Technology service categories." }}</span>
                                 </div>
-                            </div>
+                            </a>
                             <div class="col-sm-4 p-3">
                                 <img
                                     src="@/../assets/media/other/submit a ticket.png"
@@ -265,6 +265,7 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useTemplateStore } from "../../stores/template";
 import axios from "axios";
+
 const store = useTemplateStore();
 const router = useRouter();
 const searchQuery = ref("");

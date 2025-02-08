@@ -10,7 +10,7 @@
 
     <div class="content">
         <BaseBlock title="Danh sách bài viết" content-full>
-            <Dataset v-slot="{ ds }" :ds-data="posts" :ds-sortby="sortBy" :ds-search-in="['title', 'author', 'visible', 'comment']">
+            <Dataset v-slot="{ ds }" :ds-data="posts" :ds-sortby="sortBy" :ds-search-in="['title', 'author']">
                 <div class="row" :data-page-count="ds.dsPagecount">
                     <div id="datasetLength" class="col-md-8 py-2">
                         <DatasetShow />
@@ -35,7 +35,7 @@
                                         <tr>
                                             <th scope="row">{{ rowIndex + 1 }}</th>
                                             <td style="min-width: 150px;">
-                                                <a :href="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer;">{{ row.title }}</a>
+                                                <a :href="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer;">{{ truncateText(row.title, 50) }}</a>
                                             </td>
                                             <td>{{ row.author }}</td>
                                             <td style="min-width: 150px">{{ row.isPublished ? "Có" : "Không" }}</td>
@@ -78,15 +78,14 @@ const router = useRouter();
 const posts = ref([]);
 const loading = ref(true);
 
+const truncateText = (text, maxLength) => {
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};
+
 onMounted(async () => {
     try {
         const token = localStorage.getItem("authToken");
-        // const response = await axios.get("/api/admin/posts?PageNumber=1&PageSize=99999", {
-        const response = await authRequest.get("/api/admin/posts?PageNumber=1&PageSize=99999", {
-            headers: {
-                Authorization: token,
-            },
-        });
+        const response = await authRequest.get("/admin/posts?PageNumber=1&PageSize=99999");
         posts.value = response.data.data.$values.map((post) => ({
             id: post.id,
             author: post.author,

@@ -114,10 +114,16 @@ const accountGroupService = {
 
   // Delete multiple groups
   async deleteMultipleGroups(groupIds) {
+    console.log("Deleting Multiple Groups:", {
+      groupIds,
+      type: typeof groupIds,
+      isArray: Array.isArray(groupIds),
+    });
     try {
       const response = await axiosInstance.delete("/AccountGroup/deletes", {
         data: groupIds,
       });
+      console.log("Delete Response:", response);
       return {
         success: true,
         data: response.data,
@@ -125,6 +131,10 @@ const accountGroupService = {
       };
     } catch (error) {
       console.error("Error deleting groups:", error);
+      console.log("Error Details:", {
+        errorResponse: error.response,
+        errorData: error.response?.data,
+      });
       return {
         success: false,
         message: error.response?.data?.message || "Xóa nhóm thất bại",

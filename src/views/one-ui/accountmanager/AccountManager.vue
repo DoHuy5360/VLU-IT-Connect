@@ -12,6 +12,18 @@
             @input="handleSearch"
           />
         </div>
+
+        <!-- Nút xóa đã chọn - Chỉ hiện khi có nhóm được chọn -->
+        <button
+          v-if="selectedGroups.length > 0"
+          type="button"
+          class="btn btn-danger"
+          @click="deleteSelected"
+        >
+          <i class="fa fa-trash opacity-50 me-1"></i>
+          Xóa đã chọn ({{ selectedGroups.length }})
+        </button>
+
         <!-- Nút thêm mới -->
         <button
           type="button"
@@ -21,6 +33,7 @@
           <i class="fa fa-plus opacity-50 me-1"></i>
           Thêm nhóm phân quyền
         </button>
+
         <button
           type="button"
           class="btn btn-alt-success"
@@ -34,129 +47,130 @@
   </BasePageHeading>
 
   <div class="content">
-      <BaseBlock title="" class="shadow-sm">
-        <template #options>
-          <div class="d-flex align-items-center">
-            <button
-              v-if="selectedGroups.length > 0"
-              type="button"
-              class="btn btn-danger me-2"
-              @click="deleteSelected"
-            >
-              <i class="fa fa-trash opacity-50 me-1"></i>
-              Xóa đã chọn ({{ selectedGroups.length }})
-            </button>
-          </div>
-        </template>
-    
-        <div v-if="loading" class="text-center my-4">
-          <i class="fa fa-spinner fa-spin"></i> Đang tải dữ liệu...
-        </div>
-    
-        <div v-else-if="error" class="text-center my-4">
-          {{ error }}
-        </div>
-    
-        <div v-else>
-          <table class="table table-bordered table-striped table-vcenter">
-            <thead>
-              <tr>
-                <th class="text-center" style="width: 50px">
-                  <div class="form-check">
-                    <input
-                      type="checkbox"
-                      class="form-check-input"
-                      :checked="isAllSelected"
-                      @change="toggleSelectAll"
-                    />
-                  </div>
-                </th>
-                <th>Tên Nhóm</th>
-                <th class="d-none d-md-table-cell">Mô Tả</th>
-                <th class="text-center">Quyền Hạn</th>
-                <th class="text-center">Số Lượng</th>
-                <th class="d-none d-md-table-cell">Ngày Tạo</th>
-                <th class="text-center">Thao Tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="group in groups" :key="group.id">
-                <td class="text-center">
-                  <div class="form-check">
-                    <input
-                      type="checkbox"
-                      class="form-check-input"
-                      :checked="selectedGroups.includes(group.id)"
-                      @change="toggleGroupSelection(group.id)"
-                    />
-                  </div>
-                </td>
-                <td>{{ group.name }}</td>
-                <td class="d-none d-md-table-cell">
-                  {{ group.description || "-" }}
-                </td>
-                <td class="text-center">{{ group.permissionCount }}</td>
-                <td class="text-center">{{ group.accountCount }}</td>
-                <td class="d-none d-md-table-cell">
-                  {{ formatDate(group.createdDate) }}
-                </td>
-                <td class="text-center">
-                  <button
-                    class="btn btn-sm btn-alt-danger me-2"
-                    @click="
-                      $router.push(`/administrator/accountmanager/edit/${group.id}`)
-                    "
-                  >
-                    <i class="fa fa-pencil"></i>
-                  </button>
-                  <button
-                    class="btn btn-sm btn-danger"
-                    @click="confirmDelete(group.id)"
-                  >
-                    <i class="fa fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-              <tr v-if="groups.length === 0">
-                <td colspan="7" class="text-center">Không có dữ liệu</td>
-              </tr>
-            </tbody>
-          </table>
-    
-          <!-- Phân trang -->
-          <div class="d-flex justify-content-between align-items-center">
-            <div>Hiển thị {{ groups.length }} / {{ totalItems }} kết quả</div>
-            <nav aria-label="Page navigation">
-              <ul class="pagination">
-                <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                  <a class="page-link" @click="changePage(currentPage - 1)"
-                    >Trước</a
-                  >
-                </li>
-                <li
-                  v-for="page in totalPages"
-                  :key="page"
-                  class="page-item"
-                  :class="{ active: currentPage === page }"
+    <BaseBlock title="" class="shadow-sm">
+      <!-- Thêm thông tin về số lượng đã chọn -->
+      <div v-if="selectedGroups.length > 0" class="alert alert-info mb-3">
+        Đã chọn {{ selectedGroups.length }} nhóm
+      </div>
+
+      <div v-if="loading" class="text-center my-4">
+        <i class="fa fa-spinner fa-spin"></i> Đang tải dữ liệu...
+      </div>
+
+      <div v-else-if="error" class="text-center my-4">
+        {{ error }}
+      </div>
+
+      <div v-else>
+        <table class="table table-bordered table-striped table-vcenter">
+          <thead>
+            <tr>
+              <th class="text-center" style="width: 50px">
+                <div class="form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    :checked="isAllSelected"
+                    @change="toggleSelectAll"
+                  />
+                </div>
+              </th>
+              <th>Tên Nhóm</th>
+              <th class="d-none d-md-table-cell">Mô Tả</th>
+              <th class="text-center">Quyền Hạn</th>
+              <th class="text-center">Số Lượng</th>
+              <th class="d-none d-md-table-cell">Ngày Tạo</th>
+              <th class="text-center">Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="group in groups" :key="group.id">
+              <td class="text-center">
+                <div class="form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    :checked="selectedGroups.includes(group.id)"
+                    @change="toggleGroupSelection(group.id)"
+                  />
+                </div>
+              </td>
+              <td>{{ group.name }}</td>
+              <td class="d-none d-md-table-cell">
+                {{ group.description || "-" }}
+              </td>
+              <td class="text-center">{{ group.permissionCount }}</td>
+              <td class="text-center">{{ group.accountCount }}</td>
+              <td class="d-none d-md-table-cell">
+                {{ formatDate(group.createdDate) }}
+              </td>
+              <td class="text-center">
+                <button
+                  class="btn btn-sm btn-alt-danger me-2"
+                  @click="
+                    $router.push(
+                      `/administrator/accountmanager/edit/${group.id}`
+                    )
+                  "
                 >
-                  <a class="page-link" @click="changePage(page)">{{ page }}</a>
-                </li>
-                <li
-                  class="page-item"
-                  :class="{ disabled: currentPage === totalPages }"
+                  <i class="fa fa-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  @click="confirmDelete(group.id)"
                 >
-                  <a class="page-link" @click="changePage(currentPage + 1)">Sau</a>
-                </li>
-              </ul>
-            </nav>
-          </div>
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr v-if="groups.length === 0">
+              <td colspan="7" class="text-center">Không có dữ liệu</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Phân trang -->
+        <div class="d-flex justify-content-between align-items-center">
+          <div>Hiển thị {{ groups.length }} / {{ totalItems }} kết quả</div>
+          <nav aria-label="Page navigation">
+            <ul class="pagination">
+              <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                <a class="page-link" @click="changePage(currentPage - 1)"
+                  >Trước</a
+                >
+              </li>
+              <li
+                v-for="page in totalPages"
+                :key="page"
+                class="page-item"
+                :class="{ active: currentPage === page }"
+              >
+                <a class="page-link" @click="changePage(page)">{{ page }}</a>
+              </li>
+              <li
+                class="page-item"
+                :class="{ disabled: currentPage === totalPages }"
+              >
+                <a class="page-link" @click="changePage(currentPage + 1)"
+                  >Sau</a
+                >
+              </li>
+            </ul>
+          </nav>
         </div>
-      </BaseBlock>
+      </div>
+    </BaseBlock>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+// Log toàn cục để kiểm tra việc import và khởi tạo
+console.log("AccountManager Component Script Loaded", {
+  timestamp: new Date().toISOString(),
+  location: window.location.href,
+});
+
+import { ref, computed, onMounted, watch, nextTick, onUpdated } from "vue";
 import { debounce } from "lodash";
 import accountGroupService from "@/views/one-ui/accountmanager/service/accountGroupService";
 import Swal from "sweetalert2";
@@ -183,12 +197,31 @@ const isAllSelected = computed(() => {
 
 // Xử lý chọn/bỏ chọn một nhóm
 const toggleGroupSelection = (groupId) => {
-  const index = selectedGroups.value.indexOf(groupId);
+  console.log("Toggle Group Selection:", {
+    groupId,
+    currentSelectedGroups: [...selectedGroups.value],
+    isCurrentlySelected: selectedGroups.value.includes(groupId),
+  });
+
+  // Tạo một bản sao mới của mảng để đảm bảo reactivity
+  const updatedSelectedGroups = [...selectedGroups.value];
+  const index = updatedSelectedGroups.indexOf(groupId);
+
   if (index === -1) {
-    selectedGroups.value.push(groupId);
+    updatedSelectedGroups.push(groupId);
   } else {
-    selectedGroups.value.splice(index, 1);
+    updatedSelectedGroups.splice(index, 1);
   }
+
+  // Sử dụng nextTick để đảm bảo cập nhật UI
+  nextTick(() => {
+    selectedGroups.value = updatedSelectedGroups;
+
+    console.log("After Toggle with nextTick:", {
+      selectedGroups: selectedGroups.value,
+      length: selectedGroups.value.length,
+    });
+  });
 };
 
 // Xử lý chọn/bỏ chọn tất cả
@@ -337,16 +370,12 @@ const confirmDelete = async (id) => {
 };
 
 const deleteSelected = async () => {
-  if (selectedGroups.value.length === 0) {
-    Swal.fire({
-      title: "Thông báo",
-      text: "Vui lòng chọn ít nhất một nhóm để xóa",
-      icon: "warning",
-    });
-    return;
-  }
-
   try {
+    console.log("Delete Selected Groups:", {
+      selectedGroups: selectedGroups.value,
+      count: selectedGroups.value.length,
+    });
+
     const result = await Swal.fire({
       title: "Xác nhận xóa",
       text: `Bạn có chắc muốn xóa ${selectedGroups.value.length} nhóm đã chọn?`,
@@ -364,6 +393,12 @@ const deleteSelected = async () => {
         selectedGroups.value
       );
 
+      console.log("Delete Multiple Groups Response:", {
+        success: response.success,
+        message: response.message,
+        data: response.data,
+      });
+
       if (response.success) {
         Swal.fire({
           title: "Thành công",
@@ -379,13 +414,6 @@ const deleteSelected = async () => {
   } catch (error) {
     console.error("Delete multiple error:", error);
     let errorMessage = "Đã có lỗi xảy ra khi xóa các nhóm";
-
-    if (error.response?.status === 403) {
-      errorMessage = "Bạn không có quyền xóa nhóm";
-    } else if (error.response?.status === 404) {
-      errorMessage = "Không tìm thấy một số nhóm để xóa";
-    }
-
     Swal.fire({
       title: "Lỗi",
       text: errorMessage,
@@ -399,7 +427,40 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString("vi-VN", options);
 };
 
+watch(
+  () => selectedGroups.value,
+  (newValue) => {
+    console.log("Selected Groups Changed:", {
+      length: newValue.length,
+      groups: newValue,
+    });
+  }
+);
+
+onUpdated(() => {
+  console.log("Component Updated:", {
+    selectedGroupsLength: selectedGroups.value.length,
+    selectedGroupsContent: [...selectedGroups.value],
+  });
+
+  // Log trực tiếp vào DOM để kiểm tra
+  nextTick(() => {
+    const deleteButton = document.querySelector(".btn-danger");
+    console.log("Delete Button DOM Check:", {
+      buttonExists: !!deleteButton,
+      buttonText: deleteButton ? deleteButton.textContent : null,
+      buttonDisplay: deleteButton
+        ? window.getComputedStyle(deleteButton).display
+        : null,
+    });
+  });
+});
+
 onMounted(() => {
+  console.log("AccountManager Component Mounted:", {
+    selectedGroupsInitial: selectedGroups.value,
+    groups: groups.value,
+  });
   loadGroups();
 });
 </script>

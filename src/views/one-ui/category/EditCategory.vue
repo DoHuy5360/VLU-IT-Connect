@@ -12,27 +12,46 @@
                     <!-- Parent Category Dropdown -->
                     <div class="mb-4">
                         <label class="form-label" for="parentCategory">Thể loại cha</label>
-                        <select class="form-select" id="parentCategory" v-model="formData.parentCategory">
+                        <select class="form-select" id="parentCategory" v-model="formData.parentId">
                             <option value="">-- Không có thể loại cha --</option>
-                            <option v-for="category in allCategories" :key="category.id" :value="category.id">
-                                {{ category.name }}
+                            <option v-for="category in categories" :key="category.Id" :value="category.Id">
+                                {{ `${repeatChar("-", category.NestDepth)} ${category.Name}` }}
                             </option>
                         </select>
-                        <small v-if="errors.parentCategory" class="text-danger">{{ errors.parentCategory }}</small>
                     </div>
 
                     <!-- Category Name -->
                     <div class="mb-4">
                         <label class="form-label" for="categoryName">Tên thể loại</label>
-                        <input type="text" class="form-control" id="categoryName" v-model="formData.categoryName" placeholder="Nhập tên thể loại" required />
-                        <small v-if="errors.categoryName" class="text-danger">{{ errors.categoryName }}</small>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="categoryName"
+                            v-model="formData.name"
+                            placeholder="Nhập tên thể loại"
+                            @blur="v$.name.$touch"
+                            :class="{ 'is-invalid': v$.name.$errors.length }"
+                        />
+                        <div v-if="v$.name.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.name.$errors[0].$validator === 'required'"> Hãy nhập tên thể loại </span>
+                        </div>
                     </div>
 
-                    <!-- Detail -->
+                    <!-- Description -->
                     <div class="mb-4">
                         <label class="form-label" for="categoryDetail">Mô tả</label>
-                        <input type="text" class="form-control" id="categoryDetail" v-model="formData.categoryDetail" placeholder="Nhập mô tả" required />
-                        <small v-if="errors.categoryDetail" class="text-danger">{{ errors.categoryDetail }}</small>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="categoryDetail"
+                            v-model="formData.description"
+                            placeholder="Nhập mô tả"
+                            @blur="v$.description.$touch"
+                            :class="{ 'is-invalid': v$.description.$errors.length }"
+                        />
+                        <div v-if="v$.description.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.description.$errors[0].$validator === 'required'"> Hãy nhập mô tả </span>
+                        </div>
                     </div>
 
                     <div class="mb-4">
@@ -44,155 +63,178 @@
     </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, toRefs } from "vue";
 import axios from "axios";
 import { useToast } from "vue-toastification";
+import { useRouter } from "vue-router";
+import { defineProps } from "vue";
+import authRequest from "../accountmanager/service/axiosConfig";
+import useVuelidate from "@vuelidate/core";
+import { required, minLength, maxLength } from "@vuelidate/validators";
+import { reactive } from "vue";
 
-export default {
-    props: ["code"], // Nhận `cateCode` từ route params
-    data() {
-        return {
-            formData: {
-                id: "",
-                parentCategory: "",
-                categoryName: "",
-                categoryDetail: "",
-                code: "",
-            },
-            errors: {},
-            allCategories: [],
-        };
-    },
-    async mounted() {
-        await this.getAllCategories(); // Lấy danh sách tất cả thể loại trước
-        if (this.code) {
-            await this.getCategoryByCode(this.code);
-        }
-    },
-    methods: {
-        // 🔍 Lấy danh sách tất cả thể loại (duyệt cây)
-        async getAllCategories() {
-            try {
-                const token = localStorage.getItem("authToken");
-                const response = await axios.get("/api/Categories/getallcategories?indexPage=1&limitRange=20", {
-                    headers: { Authorization: token },
-                });
-
-                if (response.data?.data?.categories) {
-                    // Chuyển đổi dữ liệu cây thành danh sách phẳng
-                    this.allCategories = this.flattenCategories(response.data.data.categories);
-                    console.log("✅ All Categories Loaded:", this.allCategories);
-                }
-            } catch (error) {
-                console.error("❌ Lỗi lấy danh sách thể loại:", error.response?.data || error.message);
-            }
-        },
-
-        // 🔄 Chuyển đổi danh mục cây thành danh sách phẳng
-        flattenCategories(category, depth = 0) {
-            let flatList = [];
-            if (!category) return flatList;
-
-            // Thêm danh mục hiện tại
-            flatList.push({
-                id: category.Id,
-                name: `${"— ".repeat(depth)}${category.Name}`, // Hiển thị cấp bậc bằng dấu gạch
-            });
-
-            // Duyệt cây con (nếu có)
-            if (category.LeftChild) {
-                flatList = flatList.concat(this.flattenCategories(category.LeftChild, depth + 1));
-            }
-            if (category.RightChild) {
-                flatList = flatList.concat(this.flattenCategories(category.RightChild, depth + 1));
-            }
-
-            return flatList;
-        },
-
-        // 🔍 Lấy danh mục theo `cateCode`
-        async getCategoryByCode(cateCode) {
-            try {
-                const token = localStorage.getItem("authToken");
-                if (!token) {
-                    console.error("❌ Không tìm thấy token, hãy đăng nhập lại!");
-                    return;
-                }
-
-                console.log("🔍 Fetching category with cateCode:", cateCode);
-
-                const response = await axios.get("/api/Categories/getcategorybycode", {
-                    headers: { Authorization: token },
-                    params: { cateCode: cateCode }, // Dùng `params`
-                });
-
-                console.log("✅ API Response:", response.data);
-
-                if (response.data?.data?.category) {
-                    this.populateForm(response.data.data.category);
-                } else {
-                    console.error("❌ Không tìm thấy danh mục.");
-                }
-            } catch (error) {
-                console.error("❌ API Error:", error.response?.data || error.message);
-            }
-        },
-
-        // Điền dữ liệu vào form
-        populateForm(category) {
-            this.formData.id = category.Id;
-            this.formData.parentCategory = category.ParentId ? category.ParentId.toString() : "";
-            this.formData.categoryName = category.Name;
-            this.formData.categoryDetail = category.Description;
-            this.formData.code = category.Code;
-
-            console.log("✅ Populated Form Data:", this.formData);
-        },
-
-        // 🚀 Gửi API cập nhật danh mục
-        async updateCategory() {
-            const toast = useToast();
-            this.errors = {};
-
-            if (!this.formData.categoryName) {
-                this.errors.categoryName = "Tên thể loại không được để trống.";
-            }
-            if (!this.formData.categoryDetail) {
-                this.errors.categoryDetail = "Mô tả thể loại không được để trống.";
-            }
-
-            if (Object.keys(this.errors).length === 0) {
-                try {
-                    const token = localStorage.getItem("authToken");
-                    if (!token) {
-                        console.error("❌ Không tìm thấy token, hãy đăng nhập lại!");
-                        return;
-                    }
-
-                    const payload = {
-                        Id: this.formData.id,
-                        ParentId: this.formData.parentCategory || null,
-                        Name: this.formData.categoryName,
-                        Description: this.formData.categoryDetail,
-                        Code: this.formData.code,
-                    };
-
-                    console.log("🚀 Updating category:", payload);
-
-                    const response = await axios.put("/api/Categories/updatecategory", payload, {
-                        headers: { Authorization: token },
-                    });
-
-                    if (response.status === 200) {
-                        toast.success("Cập nhật danh mục thành công!");
-                        this.$router.push("/administrator/category");
-                    }
-                } catch (error) {
-                    console.error("❌ Lỗi cập nhật danh mục:", error.response?.data || error.message);
-                    toast.error("Cập nhật danh mục thất bại!");
-                }
-            }
-        },
-    },
+const rules = {
+    name: { required, maxLengt: maxLength(225) },
+    description: { required, maxLengt: maxLength(160) },
+    parentId: {},
 };
+
+// Nhận props
+const props = defineProps({
+    code: {
+        type: String,
+        required: true,
+    },
+});
+
+// Khai báo biến trạng thái
+const categories = ref([]);
+const formData = reactive({
+    id: null,
+    name: "",
+    description: "",
+    parentId: null,
+    slug: "",
+    code: "",
+    nestLeft: 0,
+    nestRight: 0,
+    nestDepth: 0,
+    children: [],
+    createdAt: "",
+    updatedAt: "",
+});
+
+const v$ = useVuelidate(rules, formData);
+
+// Khởi tạo router và toast
+const router = useRouter();
+const toast = useToast();
+
+const repeatChar = (char, times) => char.repeat(times);
+
+function spreadCategory(categoryJsonTree) {
+    for (let index = 0; index < categoryJsonTree.length; index++) {
+        const category = categoryJsonTree[index];
+        if (category.Children.$values.length === 0) {
+            categories.value.push({
+                Id: category.Id,
+                Name: category.Name,
+                NestDepth: category.NestDepth,
+            });
+        } else {
+            categories.value.push({
+                Id: category.Id,
+                Name: category.Name,
+                NestDepth: category.NestDepth,
+            });
+            spreadCategory(category.Children.$values);
+        }
+    }
+}
+
+// Hàm lấy danh sách categories
+const getCategories = async () => {
+    try {
+        const response = await authRequest.get("/Categories/getallcategories", {
+            params: {
+                indexPage: 1,
+                limitRange: 20,
+            },
+        });
+
+        if (response.data?.data?.categories?.$values) {
+            spreadCategory(response.data.data.categories.$values);
+            console.log("📂 Danh sách thể loại:", categories.value);
+        }
+    } catch (error) {
+        console.error("❌ Lỗi khi tải danh sách thể loại:", error);
+        toast.error("Không thể tải danh sách thể loại!");
+    }
+};
+
+// Hàm lấy thông tin thể loại theo code
+const getCategoryByCode = async () => {
+    try {
+        const encodedCateCode = encodeURIComponent(props.code);
+        console.log("🔍 Đang tải thông tin thể loại với code:", encodedCateCode);
+
+        const response = await authRequest.get("/Categories/getcategorybycode", {
+            params: {
+                cateCode: encodedCateCode,
+            },
+        });
+
+        if (response.data?.data?.category) {
+            const category = response.data.data.category;
+
+            formData.id = category.Id;
+            formData.name = category.Name;
+            formData.description = category.Description;
+            formData.parentId = category.ParentId;
+            formData.slug = category.Slug;
+            formData.code = category.Code;
+            formData.nestLeft = category.NestLeft;
+            formData.nestRight = category.NestRight;
+            formData.nestDepth = category.NestDepth;
+            formData.children = category.Children?.$values || [];
+            formData.createdAt = category.CreatedAt;
+            formData.updatedAt = new Date().toISOString();
+
+            console.log("✅ Đã tải thông tin thể loại:", formData);
+        } else {
+            toast.error("Không tìm thấy thông tin thể loại!");
+            router.push("/administrator/category");
+        }
+    } catch (error) {
+        console.error("❌ Lỗi khi tải thông tin thể loại:", error);
+        if (error.response?.status === 404) {
+            toast.error("Không tìm thấy thể loại với mã này!");
+        } else {
+            toast.error("Không thể tải thông tin thể loại!");
+        }
+        router.push("/administrator/category");
+    }
+};
+
+// Hàm cập nhật thể loại
+const updateCategory = async () => {
+    v$.value.$touch(); // Đánh dấu tất cả các trường
+    if (v$.value.$invalid) {
+        console.log("khong hop le");
+
+        return;
+    } else {
+        console.log("hop le");
+        console.log(formData);
+    }
+    try {
+        const payload = {
+            ...formData,
+            updatedAt: new Date().toISOString(),
+        };
+
+        console.log("🚀 Đang cập nhật thể loại:", payload);
+
+        const response = await authRequest.put("/Categories/updatecategory", payload, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.data) {
+            toast.success("Cập nhật thể loại thành công!");
+            router.push("/administrator/category");
+        }
+    } catch (error) {
+        console.error("❌ Lỗi khi cập nhật thể loại:", error);
+        toast.error("Cập nhật thể loại thất bại!");
+    }
+};
+
+// Gọi hàm khi component được mount
+onMounted(async () => {
+    await getCategories();
+    await getCategoryByCode();
+});
 </script>

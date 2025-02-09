@@ -2,11 +2,11 @@
     <div class="bg-secondary d-none d-sm-block">
         <div class="container">
             <div class="d-flex gap-4 justify-content-end align-items-center">
-                <a href="/" style="cursor: pointer;">
+                <RouterLink to="/" style="cursor: pointer">
                     <div class="bg-primary text-white p-2 text-center">
                         {{ store.isVietNamese() ? "Trang Chủ" : "Home" }}
                     </div>
-                </a>
+                </RouterLink>
                 <div class="text-white">
                     {{
                         store.isVietNamese()
@@ -129,18 +129,18 @@
                     </span>
                 </div>
                 <div class="col d-none d-sm-flex gap-4 justify-content-end align-items-center text-end menu" style="font-weight: bold">
-                    <a href="/blog?category=cac-cau-hoi-thuong-gap" class="text-black" style="cursor: pointer; color: black">
+                    <RouterLink to="/blog?category=cac-cau-hoi-thuong-gap" class="text-black" style="cursor: pointer; color: black">
                         {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
-                    </a>
-                    <a href="/support" class="text-black" style="cursor: pointer">
+                    </RouterLink>
+                    <RouterLink to="/support" class="text-black" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
-                    </a>
-                    <a href="/blog?category=quy-dinh-chinh-sach" class="text-black" style="cursor: pointer">
+                    </RouterLink>
+                    <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-black" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
-                    </a>
-                    <a href="tel:028 7109 9131" class="text-black" style="cursor: pointer">
+                    </RouterLink>
+                    <RouterLink to="tel:028 7109 9131" class="text-black" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
-                    </a>
+                    </RouterLink>
                 </div>
             </div>
         </div>
@@ -225,9 +225,9 @@
             </div>
         </div>
         <div>
-            <a href="/" style="cursor: pointer;">
+            <RouterLink to="/" style="cursor: pointer">
                 <div class="bg-primary-active text-white px-3 py-2" style="font-weight: 600">{{ store.isVietNamese() ? "Trang Chủ" : "Home" }}</div>
-            </a>
+            </RouterLink>
             <div class="bg-secondary-active text-white px-3 py-2" style="font-weight: 600">
                 {{ store.isVietNamese() ? "Dịch vụ CNTT dành cho" : "Information Technology services for" }}
             </div>
@@ -237,24 +237,24 @@
                 <li class="p-2" style="font-weight: 600">{{ store.isVietNamese() ? "Cán bộ - Giảng viên - Nhân viên" : "Staff - Lecture - Employee" }}</li>
             </ul>
             <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
-                <a href="/blog?category=cac-cau-hoi-thuong-gap" class="text-black">
+                <RouterLink to="/blog?category=cac-cau-hoi-thuong-gap" class="text-black">
                     {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
-                </a>
+                </RouterLink>
             </div>
             <div class="bg-white text-secondary px-3 py-2 border border-b">
-                <a href="/support" class="text-black" style="font-weight: bold">
+                <RouterLink to="/support" class="text-black" style="font-weight: bold">
                     {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
-                </a>
+                </RouterLink>
             </div>
             <div class="bg-white text-secondary px-3 py-2 border border-b">
-                <a href="/blog?category=quy-dinh-chinh-sach" class="text-black" style="font-weight: bold">
+                <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-black" style="font-weight: bold">
                     {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
-                </a>
+                </RouterLink>
             </div>
             <div class="bg-white text-secondary px-3 py-2 border border-b">
-                <a href="tel:028 7109 9131" class="text-black" style="font-weight: bold">
+                <RouterLink to="tel:028 7109 9131" class="text-black" style="font-weight: bold">
                     {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
-                </a>
+                </RouterLink>
             </div>
         </div>
     </div>
@@ -263,7 +263,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { inject } from "vue";
-import { useRouter } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { useTemplateStore } from "@/stores/template";
 
 const router = useRouter();

@@ -3,7 +3,7 @@
         <div class="row gx-2 gy-2 bg-white rounded rounded-lg">
             <!-- Left Column: Blog Details -->
             <div class="col-lg-8">
-                <div class="rounded p-4">
+                <div v-if="featuredArticle !== null" class="rounded p-4">
                     <div class="blog-detail-box">
                         <div class="d-flex gap-3 text-muted mb-3">
                             <strong>{{ featuredArticle?.date }}</strong>
@@ -14,43 +14,47 @@
                         </div>
                         <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
                         <div class="text-muted mb-3" v-html="featuredArticle?.details"></div>
-                        <div v-if="featuredArticle?.video !== null" class="">
-                            <video :src="featuredArticle?.video" controls class="w-100"></video>
-                            <div style="text-align: center;">
+                        <div v-if="featuredArticle?.video !== null" class="" style="height: 50vh">
+                            <iframe :src="featuredArticle?.video" width="100%" height="100%" frameborder="0" allowfullscreen class="rounded"></iframe>
+
+                            <div style="text-align: center">
                                 <i>Video đính kèm</i>
                             </div>
                         </div>
-                        <br>
+                        <br />
                         <strong>{{ featuredArticle?.author }}</strong>
                     </div>
                 </div>
+                <div v-else class="h-100 d-grid align-items-center" style="text-align: center">Bài viết không tồn tại</div>
             </div>
             <!-- Right Column: Category List -->
             <div class="position-relative col-lg-4">
                 <div class="d-flex flex-column gap-3 p-4" style="position: sticky; top: 1rem">
                     <div class="">
-                        <h4 class="mb-3 fw-bold">Danh Mục</h4>
+                        <RouterLink to="/categories" class="hover_underline text-black">
+                            <h4 class="mb-3 fw-bold">{{ store.isVietNamese() ? "Danh Mục" : "Category" }}</h4>
+                        </RouterLink>
                         <ul v-if="categories.length" class="list-unstyled">
                             <li v-for="(category, index) in categories" :key="index" class="hover_underline mb-1" style="cursor: pointer">
-                                <a :href="`/blog?category=${category.slug}`" class="text-black d-flex justify-content-between">
+                                <RouterLink :to="`/blog?category=${category.slug}`" class="text-black d-flex justify-content-between">
                                     <span>
                                         {{ category.categoryName }}
                                     </span>
                                     <strong>
                                         {{ category.posts.length }}
                                     </strong>
-                                </a>
+                                </RouterLink>
                             </li>
                         </ul>
-                        <p v-else class="text-muted">Không có danh mục nào để hiển thị.</p>
+                        <p v-else class="text-muted">{{ store.isVietNamese() ? "Không có danh mục nào để hiển thị." : "Nothing to show" }}</p>
                     </div>
 
                     <!-- Related Posts -->
                     <div class="">
-                        <h4 class="mb-3 fw-bold">Các bài Viết Liên Quan</h4>
+                        <h4 class="mb-3 fw-bold">{{ store.isVietNamese() ? "Các bài Viết Liên Quan" : "Related blogs" }}</h4>
                         <div v-if="relatedArticles.length" class="d-flex flex-column gap-2">
                             <div v-for="(article, index) in relatedArticles" :key="index">
-                                <a :href="`/blog/detail/${article.slug}`" class="hover_underline row py-2 text-black" style="cursor: pointer">
+                                <RouterLink :to="`/blog/detail/${article.slug}`" class="hover_underline row py-2 text-black" style="cursor: pointer">
                                     <div class="col-4 d-flex">
                                         <img :src="article.image" alt="Related Post Image" class="rounded border w-100 h-100" style="object-fit: contain" />
                                     </div>
@@ -66,10 +70,12 @@
                                             <span>{{ article.date }}</span>
                                         </div>
                                     </div>
-                                </a>
+                                </RouterLink>
                             </div>
                         </div>
-                        <p v-else class="text-muted">Không có bài viết liên quan nào.</p>
+                        <p v-else class="text-muted">
+                            {{ store.isVietNamese() ? "Không có bài viết liên quan nào." : "Nothing to show" }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -100,7 +106,7 @@ function getDayFromDate(stringDate) {
     return `${day}/${month}/${year}`;
 }
 
-const fetchFeaturedArticle = async () => {
+const getPost = async () => {
     try {
         const response = await axios.get(`/api/posts/by-slug/${props.postSlug}`);
         const post = response.data.data[0];
@@ -128,7 +134,7 @@ const fetchFeaturedArticle = async () => {
             featuredArticle.value = null;
         }
     } catch (error) {
-        console.error("Error fetching article:", error.message);
+        featuredArticle.value = null;
     } finally {
     }
 };
@@ -152,7 +158,7 @@ const getRelatedArticles = async () => {
             const category = categoryAndPosts[categoryIndex];
             for (let postIndex = 0; postIndex < category.posts.length; postIndex++) {
                 const post = category.posts[postIndex];
-                if(post.id !== currentPostId){
+                if (post.id !== currentPostId) {
                     relatedArticles.value.push({
                         id: post.id,
                         title: post.title,
@@ -209,11 +215,11 @@ const truncateText = (text, maxLength) => {
 };
 
 // Watcher để theo dõi slug
-watch(() => props.postSlug, fetchFeaturedArticle);
+watch(() => props.postSlug, getPost);
 
 // Lifecycle hook
 onMounted(async () => {
-    await fetchFeaturedArticle();
+    await getPost();
     await getCategories();
     await getRelatedArticles();
 });

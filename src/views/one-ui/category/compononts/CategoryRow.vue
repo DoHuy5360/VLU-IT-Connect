@@ -9,6 +9,7 @@
                 <span v-if="hasChildren" class="btn btn-sm btn-link p-0 me-2" :style="{ marginLeft: `${20 * category.nestDepth}px` }">
                     <i :class="isExpanded ? 'fa fa-chevron-down' : 'fa fa-chevron-right'"></i>
                 </span>
+                <span v-else class="btn btn-sm btn-link p-0 me-2" :style="{ marginLeft: `${20 * category.nestDepth}px` }"> </span>
                 <span>
                     {{ category.name }}
                 </span>

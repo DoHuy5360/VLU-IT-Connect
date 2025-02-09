@@ -12,80 +12,108 @@
         <BaseBlock title="">
             <div class="space-y-5 w-full pb-4">
                 <form @submit.prevent="submitForm" class="w-full">
-                    <div class="mb-4">
-                        <div v-if="formData.image !== ''" class="row">
-                            <div class="col-4">
-                                <img :src="formData.image" class="img-fluid w-100" style="" alt="" />
-                            </div>
-                        </div>
-                        <div v-else>Bài viết này hiện chưa có ảnh bìa</div>
-                        <br />
-                        <label class="form-label">Đổi hình ảnh</label>
-                        <input type="file" id="image-file" accept="image/*" class="form-control" ref="selectedImageFile" />
-                    </div>
-
                     <!-- Title Field -->
-                    <div class="mb-4">
-                        <label class="form-label" for="title">Tiêu đề</label>
-                        <input type="text" class="form-control" id="title" v-model="formData.title" placeholder="Enter blog title" required />
+                    <div>
+                        <label class="form-label">Tiêu đề</label>
+                        <input v-model="state.title" @input="generateSlug" @blur="v$.title.$touch" class="form-control" :class="{ 'is-invalid': v$.title.$errors.length }" />
+                        <div v-if="v$.title.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.title.$errors[0].$validator === 'required'"> Hãy nhập tiêu đề </span>
+                        </div>
                     </div>
 
-                    <!-- Slug Field -->
-                    <SlugInput :title="formData.title" v-model="formData.slug" />
-
-                    <!-- Excerpt Field -->
-                    <div class="mb-4">
-                        <label class="form-label" for="excerpt">Đoạn trích</label>
-                        <textarea class="form-control" id="excerpt" v-model="formData.excerpt" placeholder="Enter excerpt"></textarea>
+                    <div>
+                        <label class="form-label" for="slug">Slug</label>
+                        <input type="text" v-model="state.slug" @blur="v$.slug.$touch" class="form-control" :class="{ 'is-invalid': v$.slug.$errors.length }" />
+                        <div v-if="v$.slug.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.slug.$errors[0].$validator === 'required'"> Hãy nhập slug </span>
+                        </div>
                     </div>
 
                     <!-- Category Field -->
                     <div class="mb-4">
-                        <label class="form-label" for="example-select">Thể loại</label>
-                        <select class="form-select" id="example-select" v-model="formData.categoryId" required>
-                            <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+                        <label class="form-label">Thể loại</label>
+                        <select v-model="state.categoryId" class="form-control" @blur="v$.categoryId.$touch" :class="{ 'is-invalid': v$.categoryId.$errors.length }">
+                            <option v-for="category in categories" :key="category.id" :value="category.id">
+                                {{ `${repeatChar("-", category.NestDepth)} ${category.name}` }}
+                            </option>
                         </select>
+                        <div v-if="v$.categoryId.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.categoryId.$errors[0].$validator === 'required'"> Hãy chọn thể loại </span>
+                        </div>
+                    </div>
+
+                    <!-- Excerpt -->
+                    <div class="mb-4">
+                        <label class="form-label">Mô tả ngắn</label>
+                        <textarea v-model="state.excerpt" class="form-control" placeholder=""></textarea>
                     </div>
 
                     <!-- Blog Content -->
                     <div class="mb-4">
                         <label class="form-label" for="">Nội dung</label>
-                        <ckeditor :editor="ClassicEditor" :config="editorConfig" v-model="formData.contentHtml" />
+                        <ckeditor :editor="ClassicEditor" :config="editorConfig" v-model="state.contentHtml" />
+                    </div>
+
+                    <!-- Image -->
+                    <div class="mb-4">
+                        <div v-if="state.imageURL !== ''" class="row">
+                            <div class="col-4">
+                                <img :src="state.imageURL" class="img-fluid w-100" style="" alt="" />
+                            </div>
+                        </div>
+                        <div v-else>Bài viết này hiện chưa có ảnh bìa</div>
+                        <br />
+                        <label class="form-label">Đổi hình ảnh</label>
+                        <input
+                            @blur="v$.image.$touch"
+                            :class="{ 'is-invalid': v$.image.$errors.length }"
+                            type="file"
+                            id="image-file"
+                            accept=".jpg, .jpeg, .png,"
+                            @change="createImageBlob"
+                            class="form-control"
+                        />
+                        <div v-if="v$.image.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.image.$errors[0].$validator === 'required'"> Không được để trống </span>
+                        </div>
+                        <span v-if="v$.image.$errors.some((e) => e.$validator === 'maxSize')" class="invalid-feedback"> Kích thước tệp không được vượt quá 5MB. </span>
                     </div>
 
                     <!-- Video Upload Option -->
                     <div class="mb-4">
-                        <div>
+                        <div class="mb-4">
                             <label class="form-label">Video hiện tại</label>
-                            <div v-if="formData.video !== null" class="row">
-                                <div class="col-4">
-                                    <video :src="formData.video" controls class="w-100"></video>
+                            <div v-if="state.videoUrl !== null" class="row">
+                                <div class="col-4" style="height: 50vh">
+                                    <iframe :src="state.videoUrl" width="100%" height="100%" frameborder="0" allowfullscreen class="rounded"></iframe>
                                 </div>
                             </div>
-                            <div v-else class="text-muted">
-                                Chưa có video
-                            </div>
+                            <div v-else class="text-muted">Chưa có video</div>
                         </div>
                         <label class="form-label" for="">Loại video</label>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" id="upload-link" value="link" v-model="formData.videoType" />
+                            <input type="radio" class="form-check-input" id="upload-link" value="none" v-model="state.videoType" />
+                            <label class="form-check-label" for="upload-link">Không dùng video</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" id="upload-link" value="link" v-model="state.videoType" />
                             <label class="form-check-label" for="upload-link">Gắn đường dẫn video</label>
                         </div>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" id="upload-file" value="file" v-model="formData.videoType" />
+                            <input type="radio" class="form-check-input" id="upload-file" value="file" v-model="state.videoType" />
                             <label class="form-check-label" for="upload-file">Tải video từ máy</label>
                         </div>
                     </div>
 
                     <!-- Conditional Inputs for Video Upload -->
-                    <div v-if="formData.videoType === 'link'" class="mb-4">
+                    <div v-if="state.videoType === 'link'" class="mb-4">
                         <label class="form-label" for="video-link">Thay đổi Video</label>
-                        <input type="url" class="form-control" id="video-link" v-model="formData.videoUrl" placeholder="Enter video link" />
+                        <input type="url" class="form-control" id="video-link" v-model="state.videoUrl" placeholder="Enter video link" />
                     </div>
 
-                    <div v-if="formData.videoType === 'file'" class="mb-4">
+                    <div v-if="state.videoType === 'file'" class="mb-4">
                         <label class="form-label" for="video-file">Thay đổi Video</label>
-                        <input type="file" id="video-file" accept="video/*" class="form-control" ref="selectedVideoFile" />
+                        <input type="file" id="video-file" accept="video/*" @change="createVideoBlob" class="form-control" />
                     </div>
 
                     <div class="my-4">
@@ -93,7 +121,7 @@
                         <div class="d-flex gap-2 align-items-center">
                             <span class="text-muted">Công bố</span>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="visibility-switch" v-model="formData.published" />
+                                <input class="form-check-input" type="checkbox" id="visibility-switch" v-model="state.published" />
                             </div>
                         </div>
 
@@ -101,7 +129,7 @@
                         <div class="d-flex gap-2 align-items-center">
                             <span class="text-muted">Cho phép bình luận</span>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="auto-comments-switch" v-model="formData.enableComments" />
+                                <input class="form-check-input" type="checkbox" id="auto-comments-switch" v-model="state.enableComments" />
                             </div>
                         </div>
                     </div>
@@ -116,12 +144,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import SlugInput from "./components/SlugInput.vue";
+import Swal from "sweetalert2";
 import { CustomUploadAdapter } from "./uploadAdapter";
+import useVuelidate from "@vuelidate/core";
+import { required, minLength, maxLength } from "@vuelidate/validators";
+import authRequest from "../accountmanager/service/axiosConfig";
 
 const editorConfig = ref({
     placeholder: "Start typing your blog content...",
@@ -133,28 +165,50 @@ function CustomUploadAdapterPlugin(editor) {
         return new CustomUploadAdapter(loader);
     };
 }
+function generateSlug() {
+    state.slug = state.title
+        .toLowerCase()
+        .normalize("NFD") // Chuyển thành dạng decomposed để tách dấu
+        .replace(/[\u0300-\u036f]/g, "") // Loại bỏ dấu
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "d") // Chuyển đ -> d
+        .replace(/[^a-z0-9\s-]/g, "") // Loại bỏ ký tự đặc biệt
+        .trim()
+        .replace(/\s+/g, "-"); // Chuyển khoảng trắng thành dấu gạch ngang
+}
 
 const baseURL = "https://localhost:7017/";
 const router = useRouter();
 const route = useRoute();
-const selectedImageFile = ref(null);
-const selectedVideoFile = ref(null);
-
-const formData = ref({
+const state = reactive({
     title: "",
     slug: "",
-    categoryId: null,
-    contentHtml: "",
+    categoryId: "",
     excerpt: "",
+    contentHtml: "",
+    image: null,
+    imageURL: "",
     videoType: "",
     videoUrl: "",
-    published: false,
+    video: null,
     enableComments: false,
-    image: "",
-    video: "",
+    published: true,
 });
 
-const uploadOption = ref({ type: "" });
+// Validate
+const maxSize = (size) => (value) => {
+    return !value || value.size <= size;
+};
+const rules = {
+    title: { required, maxLengt: maxLength(225) },
+    slug: { required, maxLengt: maxLength(200) },
+    excerpt: { maxLengt: maxLength(160) },
+    categoryId: { required },
+    image: { maxSize: maxSize(5 * 1024 * 1024) },
+};
+
+const v$ = useVuelidate(rules, state);
+
 const categories = ref([]);
 
 function getTypeOfVideo(metadata) {
@@ -199,7 +253,7 @@ const parseMetadataVideo = (metadata) => {
     }
 };
 
-const fetchDataById = async () => {
+const getPost = async () => {
     try {
         const id = route.params.id;
         if (!id) return console.error("ID không tồn tại trong route.");
@@ -211,103 +265,136 @@ const fetchDataById = async () => {
             return;
         }
 
-        const response = await axios.get(`/api/admin/posts/${id}`, {
-            headers: { Authorization: token },
-        });
+        const response = await authRequest.get(`/admin/posts/${id}`);
 
         if (response.data) {
             const data = response.data;
 
-            formData.value = {
-                title: data.title || "",
-                slug: data.slug || "",
-                categoryId: data.category.id,
-                contentHtml: data.contentHtml || "",
-                excerpt: data.excerpt || "",
-                videoType: getTypeOfVideo(data.metadata),
-                videoUrl: parseMetadataVideo(data.metadata),
-                published: data.published || false,
-                enableComments: JSON.parse(data.metadata)?.EnableComments || false,
-                image: parseMetadata(data.metadata),
-                video: parseMetadataVideo(data.metadata),
-            };
+            state.title = data.title;
+            state.slug = data.slug;
+            state.categoryId = data.category.id;
+            state.contentHtml = data.contentHtml;
+            state.excerpt = data.excerpt;
+            state.imageURL = parseMetadata(data.metadata);
+            state.videoUrl = parseMetadataVideo(data.metadata);
+            state.videoType = getTypeOfVideo(data.metadata);
+            state.published = data.published || false;
+            state.enableComments = JSON.parse(data.metadata)?.EnableComments || false;
         }
     } catch (error) {
         console.error("Lỗi khi lấy dữ liệu:", error);
     }
 };
 
+const previewImageUrl = ref(null);
+const previewVideoUrl = ref(null);
+const createImageBlob = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        previewImageUrl.value = URL.createObjectURL(file);
+
+        state.image = file; // Cập nhật state
+        v$.value.image.$touch(); // Kích hoạt kiểm tra lỗi ngay sau khi chọn file
+    }
+};
+const createVideoBlob = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        previewVideoUrl.value = URL.createObjectURL(file);
+
+        state.video = file;
+    }
+};
+
+const repeatChar = (char, times) => char.repeat(times);
+function spreadCategory(categoryJsonTree) {
+    for (let index = 0; index < categoryJsonTree.length; index++) {
+        const category = categoryJsonTree[index];
+        if (category.Children.$values.length === 0) {
+            categories.value.push({
+                id: category.Id,
+                name: category.Name,
+                NestDepth: category.NestDepth,
+            });
+        } else {
+            categories.value.push({
+                id: category.Id,
+                name: category.Name,
+                NestDepth: category.NestDepth,
+            });
+            spreadCategory(category.Children.$values);
+        }
+    }
+}
+
 const fetchCategories = async () => {
     try {
-        const token = localStorage.getItem("authToken");
-        if (!token) return console.error("Token không tồn tại.");
-
-        const response = await axios.get("/api/Categories/getallcategories", {
+        const response = await authRequest.get("/Categories/getallcategories", {
             params: { cateName: "", indexPage: 1, limitRange: 100 },
-            headers: { Authorization: token },
         });
+        const categoryTree = response.data?.data?.categories.$values;
 
-        if (response.data?.data?.categories) {
-            const mainCategory = response.data.data.categories;
-            const allCategories = [];
-
-            if (mainCategory) {
-                allCategories.push({ id: mainCategory.Id, name: mainCategory.Name });
-                if (mainCategory.LeftChild) {
-                    allCategories.push({ id: mainCategory.LeftChild.Id, name: mainCategory.LeftChild.Name });
-                }
-                if (mainCategory.RightChild) {
-                    allCategories.push({ id: mainCategory.RightChild.Id, name: mainCategory.RightChild.Name });
-                }
-            }
-
-            categories.value = allCategories;
+        if (categoryTree.length !== 0) {
+            spreadCategory(categoryTree);
         }
     } catch (error) {
-        console.error("Lỗi khi lấy danh mục:", error);
+        console.error("Error fetching categories:", error);
     }
 };
 
 const submitForm = async () => {
+    v$.value.$touch(); // Đánh dấu tất cả các trường
+    if (v$.value.$invalid) {
+        console.log("khong hop le");
+
+        return;
+    } else {
+        console.log("hop le");
+        console.log(state);
+    }
     try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-            alert("Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn.");
-            router.push("/login");
-            return;
-        }
+        const formData = new FormData();
+        formData.append("Title", state.title);
+        formData.append("Slug", state.slug);
+        formData.append("CategoryId", state.categoryId);
+        formData.append("ContentHtml", state.contentHtml);
+        formData.append("Excerpt", state.excerpt);
+        formData.append("Published", state.published);
+        formData.append("EnableComments", state.enableComments);
+        formData.append("VideoUrl", state.videoUrl);
+        formData.append("Files", state.image);
+        formData.append("VideoFile", state.video);
 
-        if (!formData.value.title.trim()) {
-            alert("Tiêu đề không được để trống.");
-            return;
-        }
-
-        const formDataToSend = new FormData();
-        formDataToSend.append("Title", formData.value.title);
-        formDataToSend.append("Slug", formData.value.slug);
-        formDataToSend.append("CategoryId", formData.value.categoryId);
-        formDataToSend.append("ContentHtml", formData.value.contentHtml);
-        formDataToSend.append("Excerpt", formData.value.excerpt || "");
-        formDataToSend.append("Published", formData.value.published.toString());
-        formDataToSend.append("EnableComments", formData.value.enableComments.toString());
-        formDataToSend.append("VideoUrl", formData.value.videoUrl);
-        formDataToSend.append("Files", selectedImageFile.value?.files[0]);
-        formDataToSend.append("VideoFile", selectedVideoFile.value?.files[0]);
-
-        await axios.put(`/api/admin/posts/${route.params.id}`, formDataToSend, {
+        await authRequest.put(`/admin/posts/${route.params.id}`, formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
-                Authorization: token,
             },
         });
-        // router.push("/administrator/blog");
+        const userConfirmed = await Swal.fire({
+            title: "Cập nhật bài viết thành công",
+            text: "",
+            icon: "success",
+            showCancelButton: false,
+            confirmButtonText: "Đồng ý",
+            cancelButtonText: "Hủy",
+        });
+
+        if (userConfirmed.isConfirmed) {
+            router.push("/administrator/blog");
+        }
     } catch (error) {
         console.error("Lỗi khi cập nhật bài viết:", error);
+
+        await Swal.fire({
+            title: "Lỗi khi tạo bài viết",
+            text: error.response.data.error,
+            icon: "error",
+        });
     }
 };
 
 onMounted(() => {
-    fetchDataById();
+    getPost();
     fetchCategories();
 });
 </script>

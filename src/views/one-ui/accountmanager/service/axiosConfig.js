@@ -8,7 +8,7 @@ const authRequest = axios.create({
         "Content-Type": "application/json",
         Accept: "application/json",
     },
-    maxRedirects: 0
+    maxRedirects: 0,
 });
 
 // Request interceptor
@@ -31,22 +31,20 @@ authRequest.interceptors.request.use(
 // Thêm interceptor cho phản hồi
 authRequest.interceptors.response.use(
     (response) => {
-      // Nếu không có lỗi, trả về response
-      console.log(response);
-      if (response.status === 302) {
-          handleAuthorizeFail();
-      }
-      return response;
+        // Nếu không có lỗi, trả về response
+        if (response.status === 302) {
+            handleAuthorizeFail();
+        }
+        return response;
     },
     (error) => {
-      // Trả về lỗi để tiếp tục xử lý
-      return Promise.reject(error);
+        // Trả về lỗi để tiếp tục xử lý
+        return Promise.reject(error);
     }
-  );
+);
 
 const handleAuthorizeFail = () => {
-    console.log('Fail to authorize request');
-    
-  };
+    console.log("Fail to authorize request");
+};
 
 export default authRequest;

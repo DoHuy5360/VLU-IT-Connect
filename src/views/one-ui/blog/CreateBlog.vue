@@ -8,41 +8,39 @@
         </template>
     </BasePageHeading>
 
-    <div class="content" :style="`display: ${isShowSimulate ? '' : 'none'}`">
+    <div class="content" :style="`display: ${isPreviewMode ? '' : 'none'}`">
         <div class="mb-4">
-            <button type="button" class="btn btn-alt-primary" @click="switchToSimulateView(false)">
+            <button type="button" class="btn btn-alt-primary" @click="switchToPreviewMode(false)">
                 <i class="fa fa-arrow-left opacity-50 me-1"></i>
                 Quay lại
             </button>
         </div>
         <div class="bg-white rounded mb-4">
             <div class="p-4">
-                <div class="blog-detail-box">
-                    <div class="d-flex gap-3 text-muted mb-3">
-                        <strong>{{ getDayFromDate(new Date()) }}</strong>
-                        <span class="text-primary clickable-text">{{ featuredArticle?.categoryName }}</span>
-                    </div>
-                    <div class="d-flex justify-content-start">
-                        <img :src="featuredArticle?.image" alt="Blog Article Image" class="w-100 border border-new-pale-gray rounded mb-3" style="object-fit: contain" />
-                    </div>
-                    <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
-                    <div class="text-muted mb-3" v-html="featuredArticle?.details"></div>
-                    <div v-if="featuredArticle?.video !== null" class="">
-                        <video :src="featuredArticle?.video" controls class="w-100"></video>
-                    </div>
-                    <br />
-                    <strong>{{ featuredArticle?.author }}</strong>
+                <div class="d-flex gap-3 text-muted mb-3">
+                    <strong>{{ getDayFromDate(new Date()) }}</strong>
+                    <span class="text-primary clickable-text">{{ previewBlogData?.categoryName }}</span>
                 </div>
+                <div class="d-flex justify-content-start">
+                    <img :src="previewBlogData?.image" class="w-100 border border-new-pale-gray rounded mb-3" style="object-fit: contain" alt="Chưa chọn hình ảnh" />
+                </div>
+                <h4 class="mb-3">{{ previewBlogData?.title }}</h4>
+                <div class="text-muted mb-3" v-html="previewBlogData?.details"></div>
+                <div v-if="previewBlogData?.video !== null" class="" style="height: 100vh">
+                    <iframe :src="previewBlogData?.video" width="100%" height="100%" frameborder="0" allowfullscreen class="rounded"></iframe>
+                </div>
+                <br />
+                <strong>{{ previewBlogData?.author }}</strong>
             </div>
         </div>
     </div>
-    <div class="content" :style="`display: ${isShowSimulate ? 'none' : ''}`">
+    <div class="content" :style="`display: ${isPreviewMode ? 'none' : ''}`">
         <BaseBlock title="">
             <div class="space-y-5 pb-4">
                 <form @submit.prevent="submitForm" class="space-y-4">
                     <div>
                         <label class="form-label">Tiêu đề</label>
-                        <input v-model="state.title" @input="generateSlug" @blur="v$.title.$touch" class="form-control" :class="{ 'is-invalid': v$.title.$errors.length }" />
+                        <input type="text" v-model="state.title" @input="generateSlug" @blur="v$.title.$touch" class="form-control" :class="{ 'is-invalid': v$.title.$errors.length }" />
                         <div v-if="v$.title.$errors.length" class="invalid-feedback">
                             <span v-if="v$.title.$errors[0].$validator === 'required'"> Hãy nhập tiêu đề </span>
                         </div>
@@ -50,76 +48,89 @@
 
                     <div>
                         <label class="form-label" for="slug">Slug</label>
-                        <input type="text" v-model="state.slug" class="form-control" />
+                        <input type="text" v-model="state.slug" @blur="v$.slug.$touch" class="form-control" :class="{ 'is-invalid': v$.slug.$errors.length }" />
+                        <div v-if="v$.slug.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.slug.$errors[0].$validator === 'required'"> Hãy nhập slug </span>
+                        </div>
                     </div>
-
+                    <!-- Category -->
                     <div>
                         <label class="form-label">Thể loại</label>
                         <select v-model="state.categoryId" class="form-control" @blur="v$.categoryId.$touch" :class="{ 'is-invalid': v$.categoryId.$errors.length }">
-                            <option value="">Chọn thể loại</option>
-                            <option value="1">de</option>
+                            <option value="">-- Chọn --</option>
                             <option v-for="category in categories" :key="category.id" :value="category.id">
-                                {{ category.name }}
+                                {{ `${repeatChar("-", category.NestDepth)} ${category.name}` }}
                             </option>
                         </select>
                         <div v-if="v$.categoryId.$errors.length" class="invalid-feedback">
                             <span v-if="v$.categoryId.$errors[0].$validator === 'required'"> Hãy chọn thể loại </span>
                         </div>
                     </div>
+                    <!-- Excerpt -->
                     <div>
                         <label class="form-label">Mô tả ngắn</label>
-                        <textarea v-model="formData.excerpt" class="form-control" placeholder="Mô tả ngắn bài viết"></textarea>
+                        <textarea v-model="state.excerpt" class="form-control" placeholder=""></textarea>
                     </div>
+
+                    <!-- Content -->
                     <div>
-                        <label for="pic-file">Hình ảnh</label>
+                        <label class="form-label">Nội dung</label>
+                        <ckeditor :editor="editor" :config="editorConfig" v-model="state.contentHtml"></ckeditor>
+                    </div>
+
+                    <!-- Image -->
+                    <div>
+                        <label for="pic-file" class="form-label">Ảnh</label>
                         <input
                             @blur="v$.image.$touch"
                             :class="{ 'is-invalid': v$.image.$errors.length }"
                             type="file"
                             id="image-file"
-                            accept="image/*"
+                            accept=".jpg, .jpeg, .png,"
                             @change="createImageBlob"
                             class="form-control"
-                            ref="selectedImageFile"
                         />
                         <div v-if="v$.image.$errors.length" class="invalid-feedback">
-                            <span v-if="v$.image.$errors[0].$validator === 'required'"> Hãy chọn ảnh bìa </span>
+                            <span v-if="v$.image.$errors[0].$validator === 'required'"> Không được để trống </span>
                         </div>
-                        <span v-if="v$.image.$errors.some((e) => e.$validator === 'maxSize')"> Kích thước file không được vượt quá 5MB. </span>
+                        <span v-if="v$.image.$errors.some((e) => e.$validator === 'maxSize')" class="invalid-feedback"> Kích thước tệp không được vượt quá 5MB. </span>
                     </div>
 
-                    <div>
-                        <label class="form-label">Nội dung</label>
-                        <ckeditor :editor="editor" :config="editorConfig" v-model="formData.contentHtml" required></ckeditor>
-                    </div>
-
+                    <!-- Video -->
                     <div>
                         <label class="form-label">Loại Video</label>
-                        <select v-model="formData.videoType" class="form-select">
-                            <option value="link">Link</option>
-                            <option value="file">File</option>
-                        </select>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" id="upload-link" value="none" v-model="state.videoType" />
+                            <label class="form-check-label" for="upload-link">Không dùng video</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" id="upload-link" value="link" v-model="state.videoType" />
+                            <label class="form-check-label" for="upload-link">Gắn đường dẫn video</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" id="upload-file" value="file" v-model="state.videoType" />
+                            <label class="form-check-label" for="upload-file">Tải video từ máy</label>
+                        </div>
                     </div>
 
-                    <div v-if="formData.videoType == 'link'">
+                    <div v-if="state.videoType == 'link'">
                         <label class="form-label">Video link</label>
-                        <input v-model="formData.videoUrl" class="form-control" />
+                        <input v-model="state.videoUrl" class="form-control" />
                     </div>
 
-                    <div v-if="formData.videoType == 'file'">
+                    <div v-if="state.videoType == 'file'">
                         <label class="form-label">Video file</label>
-                        <input type="file" id="video-file" accept="video/*" @change="createVideoBlob" class="form-control" ref="selectedVideoFile" />
+                        <input type="file" id="video-file" accept="video/*" @change="createVideoBlob" class="form-control" />
                     </div>
 
                     <div style="user-select: none">
                         <div class="form-check">
                             <label class="form-check-label" for="allowComment">Cho phép bình luận</label>
-                            <input class="form-check-input" type="checkbox" v-model="formData.enableComments" id="allowComment" />
+                            <input class="form-check-input" type="checkbox" v-model="state.enableComments" id="allowComment" />
                         </div>
-                        <br />
                         <div class="form-check">
                             <label class="form-check-label" for="publish">Công bố</label>
-                            <input class="form-check-input" type="checkbox" v-model="formData.published" id="publish" />
+                            <input class="form-check-input" type="checkbox" v-model="state.published" id="publish" />
                         </div>
                     </div>
                     <button type="submit" class="btn btn-success">Hoàn tất</button>
@@ -142,14 +153,20 @@ import useVuelidate from "@vuelidate/core";
 import { required, minLength, maxLength } from "@vuelidate/validators";
 import authRequest from "../accountmanager/service/axiosConfig";
 
-// Validate
 const state = reactive({
     title: "",
     slug: "",
-    excerpt: "",
     categoryId: "",
+    excerpt: "",
+    contentHtml: "",
     image: null,
+    videoType: "none",
+    videoUrl: "",
+    video: null,
+    enableComments: false,
+    published: true,
 });
+// Validate
 const maxSize = (size) => (value) => {
     return !value || value.size <= size;
 };
@@ -177,77 +194,52 @@ function generateSlug() {
 }
 
 const editorConfig = ref({
-    placeholder: "Start typing your blog content...",
+    placeholder: "Nội dung bài viết ...",
     extraPlugins: [CustomUploadAdapterPlugin], // Kích hoạt plugin upload
 });
 
-function CustomUploadAdapterPlugin(editor) {
-    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
-        return new CustomUploadAdapter(loader);
-    };
-}
-
-const selectedImageFile = ref(null);
-const selectedVideoFile = ref(null);
-
 const router = useRouter();
-
-const formData = ref({
-    title: "",
-    slug: "",
-    categoryId: "",
-    contentHtml: "",
-    excerpt: "",
-    file: "",
-    videoType: "link",
-    videoUrl: "",
-    published: true,
-    enableComments: false,
-    image: "",
-});
 
 const categories = ref([]);
 
-const fetchCategories = async () => {
+async function getCategories() {
     try {
-        const token = localStorage.getItem("authToken");
-        if (!token) return;
-
-        const response = await axios.get("/api/Categories/getallcategories", {
+        const response = await authRequest.get("/Categories/getallcategories", {
             params: { cateName: "", indexPage: 1, limitRange: 100 },
-            headers: { Authorization: token },
         });
-        if (response.data?.data?.categories) {
-            const mainCategory = response.data.data.categories;
-            const allCategories = [];
+        const categoryTree = response.data?.data?.categories.$values;
 
-            allCategories.push({
-                id: mainCategory.Id,
-                name: mainCategory.Name,
-            });
-
-            if (mainCategory.LeftChild) {
-                allCategories.push({
-                    id: mainCategory.LeftChild.Id,
-                    name: mainCategory.LeftChild.Name,
-                });
-            }
-
-            if (mainCategory.RightChild) {
-                allCategories.push({
-                    id: mainCategory.RightChild.Id,
-                    name: mainCategory.RightChild.Name,
-                });
-            }
-
-            categories.value = allCategories;
+        if (categoryTree.length !== 0) {
+            spreadCategory(categoryTree);
         }
     } catch (error) {
         console.error("Error fetching categories:", error);
     }
-};
+}
 
-fetchCategories();
+getCategories();
+
+const repeatChar = (char, times) => char.repeat(times);
+
+function spreadCategory(categoryJsonTree) {
+    for (let index = 0; index < categoryJsonTree.length; index++) {
+        const category = categoryJsonTree[index];
+        if (category.Children.$values.length === 0) {
+            categories.value.push({
+                id: category.Id,
+                name: category.Name,
+                NestDepth: category.NestDepth,
+            });
+        } else {
+            categories.value.push({
+                id: category.Id,
+                name: category.Name,
+                NestDepth: category.NestDepth,
+            });
+            spreadCategory(category.Children.$values);
+        }
+    }
+}
 
 const submitForm = async () => {
     v$.value.$touch(); // Đánh dấu tất cả các trường
@@ -260,20 +252,20 @@ const submitForm = async () => {
         console.log(state);
     }
     try {
-        const formDataToSend = new FormData();
-        formDataToSend.append("Title", formData.value.title.trim());
-        formDataToSend.append("Slug", formData.value.slug || formData.value.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"));
-        formDataToSend.append("CategoryIds[0]", formData.value.categoryId);
-        formDataToSend.append("ContentHtml", formData.value.contentHtml);
-        formDataToSend.append("Files", selectedImageFile.value?.files[0]);
-        formDataToSend.append("Excerpt", formData.value.excerpt);
-        formDataToSend.append("Published", formData.value.published.toString());
-        formDataToSend.append("EnableComments", formData.value.enableComments.toString());
-        formDataToSend.append("VideoType", formData.value.videoType);
-        formDataToSend.append("VideoUrl", formData.value.videoUrl);
-        formDataToSend.append("VideoFile", selectedVideoFile.value?.files[0]);
+        const formData = new FormData();
+        formData.append("Title", state.title.trim());
+        formData.append("Slug", state.slug);
+        formData.append("CategoryIds[0]", state.categoryId);
+        formData.append("ContentHtml", state.contentHtml);
+        formData.append("Files", state.image);
+        formData.append("Excerpt", state.excerpt);
+        formData.append("Published", state.published);
+        formData.append("EnableComments", state.enableComments);
+        formData.append("VideoType", state.videoType);
+        formData.append("VideoUrl", state.videoUrl);
+        formData.append("VideoFile", state.video);
 
-        await authRequest.post("/api/admin/posts", formDataToSend, {
+        await authRequest.post("/admin/posts", formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
 
@@ -281,7 +273,7 @@ const submitForm = async () => {
             title: "Tạo bài viết thành công",
             text: "",
             icon: "success",
-            showCancelButton: true,
+            showCancelButton: false,
             confirmButtonText: "Đồng ý",
             cancelButtonText: "Hủy",
         });
@@ -289,7 +281,6 @@ const submitForm = async () => {
         if (userConfirmed.isConfirmed) {
             router.push("/administrator/blog");
         }
-
     } catch (error) {
         console.error("Error creating post:", error);
 
@@ -301,38 +292,41 @@ const submitForm = async () => {
     }
 };
 
-const imageUrl = ref(null);
-const videoUrl = ref(null);
+const previewImageUrl = ref(null);
+const previewVideoUrl = ref(null);
 const createImageBlob = (event) => {
     const file = event.target.files[0];
     if (file) {
-        imageUrl.value = URL.createObjectURL(file);
+        previewImageUrl.value = URL.createObjectURL(file);
 
-        state.image = file ? file : null; // Cập nhật state
+        state.image = file; // Cập nhật state
         v$.value.image.$touch(); // Kích hoạt kiểm tra lỗi ngay sau khi chọn file
     }
 };
 const createVideoBlob = (event) => {
     const file = event.target.files[0];
     if (file) {
-        videoUrl.value = URL.createObjectURL(file);
+        previewVideoUrl.value = URL.createObjectURL(file);
+
+        state.video = file;
     }
 };
 
-const featuredArticle = ref();
-const isShowSimulate = ref(false);
+const previewBlogData = ref({});
+const isPreviewMode = ref(false);
 
 const navigateToSimulation = () => {
-    const selectedCategory = categories.value.filter((category) => category.id === parseInt(formData.value.categoryId));
+    const selectedCategory = categories.value.filter((category) => category.id === parseInt(state.categoryId));
 
-    featuredArticle.value = {
-        title: formData.value.title.trim(),
-        details: formData.value.contentHtml,
+    previewBlogData.value = {
+        title: state.title.trim(),
+        details: state.contentHtml,
         categoryName: selectedCategory.length != 0 ? selectedCategory[0].name : "Chưa chọn thể loại bài viết",
-        image: imageUrl.value,
-        video: formData.value.videoType === "link" ? formData.value.videoUrl : videoUrl.value,
+        image: previewImageUrl.value,
+        video: state.videoType !== "none" ? (state.videoType === "link" ? state.videoUrl : previewVideoUrl.value) : null,
+        author: "<Tên tác giả>",
     };
-    switchToSimulateView(true);
+    switchToPreviewMode(true);
 };
 
 function getDayFromDate(stringDate) {
@@ -344,8 +338,14 @@ function getDayFromDate(stringDate) {
     return `${day}/${month}/${year}`;
 }
 
-function switchToSimulateView(status) {
-    isShowSimulate.value = status;
+function switchToPreviewMode(status) {
+    isPreviewMode.value = status;
+}
+
+function CustomUploadAdapterPlugin(editor) {
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+        return new CustomUploadAdapter(loader);
+    };
 }
 
 const editor = ClassicEditor;

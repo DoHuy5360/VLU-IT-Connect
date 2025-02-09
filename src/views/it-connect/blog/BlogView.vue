@@ -5,7 +5,7 @@
             <div class="row gy-2 align-items-stretch">
                 <div class="col-lg-8 h-120 d-flex flex-column" v-if="featuredArticle">
                     <div class="rounded py-4 flex-grow-1">
-                        <a :href="`/blog/detail/${featuredArticle.slug}`" class="text-black">
+                        <RouterLink :to="`/blog/detail/${featuredArticle.slug}`" class="text-black">
                             <div class="featured-article-box d-flex flex-column gap-3" style="cursor: pointer">
                                 <img :src="featuredArticle.image" alt="Featured Article Image" class="rounded mb-3" style="width: 100%; object-fit: contain" />
                                 <div>
@@ -21,15 +21,15 @@
                                     </div>
                                 </div>
                             </div>
-                        </a>
+                        </RouterLink>
                     </div>
                 </div>
                 <!-- Old Articles with Pagination -->
                 <div class="col-lg-4 d-flex flex-column" v-if="oldArticles.length">
                     <div class="rounded d-flex flex-column py-4 flex-grow-1">
                         <ul class="list-unstyled flex-grow-1">
-                            <li v-for="(article, index) in paginatedArticles" :key="index" class="old-posts p-2 mb-2 rounded" style="cursor: pointer">
-                                <a :href="`/blog/detail/${article.slug}`" class="text-black">
+                            <li v-for="(article, index) in paginatedArticles" :key="index" class="hover_underline p-2 mb-2 rounded" style="cursor: pointer">
+                                <RouterLink :to="`/blog/detail/${article.slug}`" class="text-black">
                                     <h4 class="mb-2 clickable-text">{{ article.title }}</h4>
                                     <p class="text-muted small mb-1">{{ truncateText(article.details, 200) }}</p>
                                     <div class="d-flex gap-2 text-muted">
@@ -40,7 +40,7 @@
                                             {{ article.publishedAt }}
                                         </span>
                                     </div>
-                                </a>
+                                </RouterLink>
                             </li>
                         </ul>
 
@@ -56,23 +56,27 @@
             <hr />
             <div class="py-2 mb-3">
                 <div class="d-flex justify-content-between">
-                    <h4 class="mb-3 font-weight-bold">Clip hướng dẫn sử dụng</h4>
-                    <b class="text-primary hover_underline" style="cursor: pointer">Xem tất cả</b>
+                    <h4 class="mb-3 font-weight-bold">{{ store.isVietNamese() ? "Clip hướng dẫn sử dụng" : "Guiding clips" }}</h4>
+                    <RouterLink :to="`/videos?category=${category}`" class="text-primary hover_underline">
+                        <b>{{ store.isVietNamese() ? "Xem tất cả" : "View all" }}</b>
+                    </RouterLink>
                 </div>
                 <div class="row" id="wrapVideo">
-                    <div v-if="featuredArticle" class="col-auto col-sm">
+                    <div v-if="featuredArticle && featuredArticle.video !== null" class="col-auto col-sm-3">
                         <video :src="featuredArticle.video" controls class="rounded w-100"></video>
                         <div class="mt-2">
                             <strong>{{ featuredArticle.title }}</strong>
                             <div>{{ truncateText(featuredArticle.excerpt, 100) }}</div>
                         </div>
                     </div>
-                    <div class="col-auto col-sm" v-for="(article, index) in paginatedArticles.slice(0,3)" :key="index">
-                        <video :src="article.video" controls class="rounded w-100"></video>
-                        <div class="mt-2">
-                            <strong>{{ article.title }}</strong>
-                            <div>{{ truncateText(article.excerpt, 100) }}</div>
-                        </div>
+                    <div v-for="(blog, index) in paginatedArticles.filter((blog) => blog.video !== null).slice(0, 3)" :key="index" class="col-auto col-sm-3">
+                        <iframe :src="blog.video" width="100%" height="" frameborder="0" allowfullscreen class="rounded"></iframe>
+                        <RouterLink :to="`/blog/detail/${blog.slug}`" class="hover_underline text-black">
+                            <div class="mt-2">
+                                <strong>{{ blog.title }}</strong>
+                                <div>{{ truncateText(blog.excerpt, 100) }}</div>
+                            </div>
+                        </RouterLink>
                     </div>
                 </div>
             </div>
@@ -87,7 +91,7 @@ import { useTemplateStore } from "@/stores/template";
 
 const store = useTemplateStore();
 
-import { useRoute, useRouter } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
 const route = useRoute();
@@ -100,7 +104,7 @@ const currentPage = ref(1); // Trang hiện tại
 const articlesPerPage = 5; // Số bài viết mỗi trang
 
 const totalPages = computed(() => Math.ceil(oldArticles.value.length / articlesPerPage));
-console.log(totalPages.value);
+
 const paginatedArticles = computed(() => {
     const start = (currentPage.value - 1) * articlesPerPage;
     return oldArticles.value.slice(start, start + articlesPerPage);
@@ -113,7 +117,7 @@ const truncateText = (text, maxLength) => {
 const parseMetadata = (metadata) => {
     try {
         const metaObj = JSON.parse(metadata);
-        
+
         if (metaObj.Files?.length) {
             let imagePath = metaObj.Files[0].replace(/\\/g, "/");
             return baseURL + imagePath;
@@ -128,13 +132,20 @@ const parseMetadata = (metadata) => {
 const parseMetadataVideo = (metadata) => {
     try {
         const metaObj = JSON.parse(metadata);
-        console.log(metaObj.Video);
-        
-        if (metaObj.Video.file) {
-            let path = metaObj.Video.file.replace(/\\/g, "/");
-            return baseURL + path;
+
+        let path = "";
+        switch (metaObj.Video?.type) {
+            case "file":
+                path = baseURL + metaObj.Video.file.replace(/\\/g, "/");
+                break;
+            case "link":
+                path = metaObj.Video.url;
+                break;
+            default:
+                console.log("Missing video type in response");
+                return null;
         }
-        return "";
+        return path;
     } catch (error) {
         console.error("Error parsing metadata:", error);
         return "";
@@ -172,7 +183,7 @@ onMounted(async () => {
                 id: posts[0].id,
                 slug: posts[0].slug,
                 title: posts[0].title,
-                details: posts[0].content,
+                details: posts[0].excerpt,
                 image: parseMetadata(posts[0].metadata),
                 video: parseMetadataVideo(posts[0].metadata),
                 category: posts[0].category,
@@ -223,9 +234,3 @@ onMounted(async () => {
     }
 });
 </script>
-
-<style scoped>
-.old-posts:hover {
-    background-color: #eff6ff;
-}
-</style>

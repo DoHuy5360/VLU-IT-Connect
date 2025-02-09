@@ -34,17 +34,19 @@
                                     <template #default="{ row, rowIndex }">
                                         <tr>
                                             <th scope="row">{{ rowIndex + 1 }}</th>
-                                            <td style="min-width: 150px;">
-                                                <a :href="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer;">{{ truncateText(row.title, 50) }}</a>
+                                            <td style="min-width: 150px">
+                                                <RouterLink :to="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer">{{
+                                                    truncateText(row.title, 50)
+                                                }}</RouterLink>
                                             </td>
                                             <td>{{ row.author }}</td>
                                             <td style="min-width: 150px">{{ row.isPublished ? "Có" : "Không" }}</td>
                                             <td style="min-width: 150px">{{ isAllowComment(row.metadata) ? "Có" : "Không" }}</td>
                                             <td style="min-width: 150px">
                                                 <div class="d-flex gap-2 justify-content-center">
-                                                    <a :href="`/administrator/blog/edit/${row.id}`" class="btn btn-sm btn-alt-warning">
+                                                    <RouterLink :to="`/administrator/blog/edit/${row.id}`" class="btn btn-sm btn-alt-warning">
                                                         <i class="fa fa-fw fa-pencil-alt"></i>
-                                                    </a>
+                                                    </RouterLink>
                                                     <button type="button" class="btn btn-sm btn-danger" title="Xóa bài viết" @click="swalConfirm(row.id)">
                                                         <i class="fa fa-fw fa-trash"></i>
                                                     </button>
@@ -69,7 +71,7 @@
 <script setup>
 import { ref, computed, onMounted, reactive } from "vue";
 import Swal from "sweetalert2";
-import { useRouter } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import axios from "axios";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
 import authRequest from "../accountmanager/service/axiosConfig";
@@ -98,7 +100,7 @@ onMounted(async () => {
     } catch (error) {
         switch (error.code) {
             case "ERR_NETWORK":
-                handleLogout()
+                handleLogout();
                 break;
             default:
                 console.error("Error fetching posts:", error);
@@ -109,11 +111,9 @@ onMounted(async () => {
     }
 });
 
-
 function handleLogout() {
-  localStorage.removeItem("authToken"); // Xóa token khỏi localStorage
-  router.push("/auth/signin?msg=timeout"); // Chuyển hướng về trang đăng nhập
-
+    localStorage.removeItem("authToken"); // Xóa token khỏi localStorage
+    router.push("/auth/signin?msg=timeout"); // Chuyển hướng về trang đăng nhập
 }
 
 const isAllowComment = (metadata) => {
@@ -125,7 +125,6 @@ const isAllowComment = (metadata) => {
         return false;
     }
 };
-
 
 const navigateToCreate = () => router.push("/administrator/blog/create");
 

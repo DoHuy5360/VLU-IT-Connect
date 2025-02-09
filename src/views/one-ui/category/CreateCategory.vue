@@ -1,186 +1,213 @@
 <template>
-  <BasePageHeading title="Tạo Thể Loại" subtitle="">
-    <template #extra>
-      <button
-        type="button"
-        class="btn btn-alt-primary"
-        @click="$router.push('/administrator/category')"
-      >
-        <i class="fa fa-arrow-left opacity-50 me-1"></i>
-        Quay về
-      </button>
-    </template>
-  </BasePageHeading>
+    <BasePageHeading title="Tạo Thể Loại" subtitle="">
+        <template #extra>
+            <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/category')">
+                <i class="fa fa-arrow-left opacity-50 me-1"></i>
+                Quay về
+            </button>
+        </template>
+    </BasePageHeading>
 
-  <div class="content">
-    <BaseBlock title="">
-      <div class="space-y-5">
-        <form @submit.prevent="handleSubmit">
-          <!-- Parent Category Dropdown -->
-          <div class="mb-4">
-            <label class="form-label" for="parentCategory"
-              >Chọn thể loại cha</label
-            >
-            <select
-              class="form-select"
-              id="parentCategory"
-              v-model="formData.parentId"
-            >
-              <option value="">-- Chọn --</option>
-              <option
-                v-for="category in categories"
-                :key="category.Id"
-                :value="category.Id"
-              >
-                {{ category.Name }}
-              </option>
-            </select>
-          </div>
+    <div class="content">
+        <BaseBlock title="">
+            <div class="space-y-5">
+                <form @submit.prevent="handleSubmit">
+                    <!-- Parent Category Dropdown -->
+                    <div class="mb-4">
+                        <label class="form-label" for="parentCategory"> Chọn thể loại cha </label>
+                        <select class="form-select" id="parentCategory" v-model="formData.parentId" @blur="v$.name.$touch" :class="{ 'is-invalid': v$.name.$errors.length }">
+                            <option value="">-- Chọn --</option>
+                            <option v-for="category in categories" :key="category.Id" :value="category.Id">
+                                {{ `${repeatChar("-", category.NestDepth)} ${category.Name}` }}
+                            </option>
+                        </select>
+                        <div v-if="v$.parentId.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.parentId.$errors[0].$validator === 'required'"> Hãy nhập tên thể loại </span>
+                        </div>
+                    </div>
 
-          <!-- Category Name -->
-          <div class="mb-4">
-            <label class="form-label" for="categoryName">Tên thể loại</label>
-            <input
-              type="text"
-              class="form-control"
-              id="categoryName"
-              v-model="formData.name"
-              placeholder="Nhập tên thể loại"
-              required
-            />
-          </div>
+                    <!-- Category Name -->
+                    <div class="mb-4">
+                        <label class="form-label" for="categoryName">Tên thể loại</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="categoryName"
+                            v-model="formData.name"
+                            placeholder="Nhập tên thể loại"
+                            @blur="v$.name.$touch"
+                            :class="{ 'is-invalid': v$.name.$errors.length }"
+                        />
+                        <div v-if="v$.name.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.name.$errors[0].$validator === 'required'"> Hãy nhập tên thể loại </span>
+                        </div>
+                    </div>
 
-          <!-- Description -->
-          <div class="mb-4">
-            <label class="form-label" for="categoryDetail">Mô tả</label>
-            <input
-              type="text"
-              class="form-control"
-              id="categoryDetail"
-              v-model="formData.description"
-              placeholder="Nhập mô tả"
-              required
-            />
-          </div>
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <label class="form-label" for="categoryDetail">Mô tả</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="categoryDetail"
+                            v-model="formData.description"
+                            placeholder="Nhập mô tả"
+                            @blur="v$.description.$touch"
+                            :class="{ 'is-invalid': v$.description.$errors.length }"
+                        />
+                        <div v-if="v$.description.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.description.$errors[0].$validator === 'required'"> Hãy nhập mô tả </span>
+                        </div>
+                    </div>
 
-          <div class="mb-4">
-            <button type="submit" class="btn btn-success">Tạo</button>
-          </div>
-        </form>
-      </div>
-    </BaseBlock>
-  </div>
+                    <div class="mb-4">
+                        <button type="submit" class="btn btn-success">Tạo</button>
+                    </div>
+                </form>
+            </div>
+        </BaseBlock>
+    </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from "vue";
 import axios from "axios";
-import { useToast } from "vue-toastification";
+import { useRouter } from "vue-router";
+import authRequest from "../accountmanager/service/axiosConfig";
+import useVuelidate from "@vuelidate/core";
+import { required, minLength, maxLength } from "@vuelidate/validators";
+import { reactive } from "vue";
 
-export default {
-  data() {
-    return {
-      categories: [], // Danh sách categories để hiển thị trong dropdown
-      formData: {
-        name: "",
-        description: "",
-        parentId: "", // ID của category cha
-        slug: "",
-        code: "",
-        nestLeft: 0,
-        nestRight: 0,
-        nestDepth: 0,
-        children: [],
-        createdAt: "",
-        updatedAt: "",
-      },
-    };
-  },
-  methods: {
-    async getCategories() {
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          console.error("❌ Không tìm thấy token xác thực!");
-          this.$router.push("/login");
-          return;
+const rules = {
+    name: { required, maxLengt: maxLength(225) },
+    description: { required, maxLengt: maxLength(160) },
+    parentId: {},
+};
+
+const router = useRouter();
+const categories = ref([]);
+const formData = reactive({
+    name: "",
+    description: "",
+    parentId: "",
+    slug: "",
+    code: "",
+    nestLeft: 0,
+    nestRight: 0,
+    nestDepth: 0,
+    children: [],
+    createdAt: "",
+    updatedAt: "",
+});
+
+const v$ = useVuelidate(rules, formData);
+
+const repeatChar = (char, times) => char.repeat(times);
+
+function spreadCategory(categoryJsonTree) {
+    for (let index = 0; index < categoryJsonTree.length; index++) {
+        const category = categoryJsonTree[index];
+        if (category.Children.$values.length === 0) {
+            categories.value.push({
+                Id: category.Id,
+                Name: category.Name,
+                NestDepth: category.NestDepth,
+            });
+        } else {
+            categories.value.push({
+                Id: category.Id,
+                Name: category.Name,
+                NestDepth: category.NestDepth,
+            });
+            spreadCategory(category.Children.$values);
         }
+    }
+}
 
-        const response = await axios.get("/api/Categories/getallcategories", {
-          headers: {
-            Authorization: `${token}`,
-            "Content-Type": "application/json",
-          },
-          params: {
-            indexPage: 1,
-            limitRange: 100,
-          },
+// Hàm lấy danh sách categories
+const getCategories = async () => {
+    try {
+        const response = await authRequest.get("/Categories/getallcategories", {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            params: {
+                indexPage: 1,
+                limitRange: 100,
+            },
         });
 
-        // Xử lý dữ liệu từ API
         if (response.data?.data?.categories?.$values) {
-          this.categories = response.data.data.categories.$values;
-          console.log("📂 Danh sách thể loại:", this.categories);
+            spreadCategory(response.data.data.categories.$values);
+            console.log("📂 Danh sách thể loại:", categories.value);
         } else {
-          console.warn("⚠ Không tìm thấy dữ liệu categories!");
-          this.categories = [];
+            console.warn("⚠ Không tìm thấy dữ liệu categories!");
+            categories.value = [];
         }
-      } catch (error) {
+    } catch (error) {
         if (error.response?.status === 302 || error.response?.status === 401) {
-          console.error(
-            "❌ Phiên làm việc đã hết hạn, vui lòng đăng nhập lại!"
-          );
-          this.$router.push("/login");
-          return;
+            console.error("❌ Phiên làm việc đã hết hạn, vui lòng đăng nhập lại!");
+            router.push("/login");
+            return;
         }
         console.error("❌ Lỗi khi tải danh sách thể loại:", error);
-        this.categories = [];
-      }
-    },
+        categories.value = [];
+    }
+};
 
-    async handleSubmit() {
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          console.error("❌ Không tìm thấy token xác thực!");
-          this.$router.push("/login");
-          return;
-        }
+// Hàm xử lý khi gửi form
+const handleSubmit = async () => {
+    v$.value.$touch(); // Đánh dấu tất cả các trường
+    if (v$.value.$invalid) {
+        console.log("khong hop le");
 
-        // Chuẩn bị dữ liệu gửi đi
+        return;
+    } else {
+        console.log("hop le");
+        console.log(formData);
+    }
+    try {
         const now = new Date().toISOString();
         const payload = {
-          ...this.formData,
-          createdAt: now,
-          updatedAt: now,
-          id: 0,
-          slug: this.formData.name.toLowerCase().replace(/ /g, "-"),
-          code: this.formData.name.toLowerCase().replace(/ /g, "-"),
-          parentId: this.formData.parentId || null,
-          children: [],
+            ...formData,
+            createdAt: now,
+            updatedAt: now,
+            id: 0,
+            slug: generateSlug(formData.name),
+            code: generateSlug(formData.name),
+            parentId: formData.parentId || null,
+            children: [],
         };
 
-        const response = await axios.post(
-          "/api/Categories/createcategory",
-          payload,
-          {
+        const response = await authRequest.post("/Categories/createcategory", payload, {
             headers: {
-              Authorization: `${token}`,
-              "Content-Type": "application/json",
+                "Content-Type": "application/json",
             },
-          }
-        );
+        });
 
         if (response.data) {
-          console.log("✅ Tạo thể loại thành công!");
-          this.$router.push("/administrator/category");
+            console.log("✅ Tạo thể loại thành công!");
+            router.push("/administrator/category");
         }
-      } catch (error) {
+    } catch (error) {
         console.error("❌ Lỗi khi tạo thể loại:", error);
-      }
-    },
-  },
-  mounted() {
-    this.getCategories();
-  },
+    }
 };
+
+function generateSlug(originString) {
+    return originString
+        .toLowerCase()
+        .normalize("NFD") // Chuyển thành dạng decomposed để tách dấu
+        .replace(/[\u0300-\u036f]/g, "") // Loại bỏ dấu
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "d") // Chuyển đ -> d
+        .replace(/[^a-z0-9\s-]/g, "") // Loại bỏ ký tự đặc biệt
+        .trim()
+        .replace(/\s+/g, "-"); // Chuyển khoảng trắng thành dấu gạch ngang
+}
+
+// Gọi hàm lấy danh sách categories khi component được mount
+onMounted(() => {
+    getCategories();
+});
 </script>

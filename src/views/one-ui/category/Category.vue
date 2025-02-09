@@ -91,9 +91,6 @@ export default {
           limitRange: 20,
         };
 
-        console.log("🔍 Request API:", params);
-        console.log("🔑 Token:", token);
-
         const response = await axios.get("/api/Categories/getallcategories", {
           headers: { Authorization: token },
           params: params,

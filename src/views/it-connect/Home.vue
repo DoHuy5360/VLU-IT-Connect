@@ -220,50 +220,23 @@
                     <div class="col col-sm-12 col-lg rounded p-3 bg-white shadow-sm">
                         <h4 class="mb-3" style="font-weight: bold">{{ store.isVietNamese() ? "Thông báo" : "News" }}</h4>
                         <div class="d-flex flex-column gap-2">
-                            <div class="d-flex gap-2 align-items-center">
-                                <div style="width: 24px">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
-                                            d="M7.15128 3.15998C7.61991 2.67975 8.3797 2.67975 8.84833 3.15998L16.8483 11.358C17.317 11.8382 17.317 12.6168 16.8483 13.0971L9.29278 20.8396C8.82415 21.3199 8.06435 21.3199 7.59572 20.8396C7.12709 20.3594 7.12709 19.5808 7.59572 19.1006L14.3028 12.2275L7.15128 4.89904C6.68265 4.41881 6.68265 3.64021 7.15128 3.15998Z"
-                                            fill="#252F4A"
-                                        />
-                                    </svg>
+                            <div v-for="post in news" :key="post.id" class="">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <div style="width: 24px">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                fill-rule="evenodd"
+                                                clip-rule="evenodd"
+                                                d="M7.15128 3.15998C7.61991 2.67975 8.3797 2.67975 8.84833 3.15998L16.8483 11.358C17.317 11.8382 17.317 12.6168 16.8483 13.0971L9.29278 20.8396C8.82415 21.3199 8.06435 21.3199 7.59572 20.8396C7.12709 20.3594 7.12709 19.5808 7.59572 19.1006L14.3028 12.2275L7.15128 4.89904C6.68265 4.41881 6.68265 3.64021 7.15128 3.15998Z"
+                                                fill="#252F4A"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <RouterLink :to="`/blog/detail/${post.slug}`" class="hover_underline w-100 text-black" style="cursor: pointer">
+                                        <!-- {{ store.isVietNamese() ? "Nâng cấp hệ thống Wifi và dịch vụ CNTT" : "Update Wifi system and IT services" }} -->
+                                        <strong>{{ post.title }}</strong>
+                                    </RouterLink>
                                 </div>
-                                <b class="hover_underline" style="cursor: pointer">
-                                    {{ store.isVietNamese() ? "Nâng cấp hệ thống Wifi và dịch vụ CNTT" : "Update Wifi system and IT services" }}
-                                </b>
-                            </div>
-                            <div class="d-flex gap-2 align-items-center">
-                                <div style="width: 24px">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
-                                            d="M7.15128 3.15998C7.61991 2.67975 8.3797 2.67975 8.84833 3.15998L16.8483 11.358C17.317 11.8382 17.317 12.6168 16.8483 13.0971L9.29278 20.8396C8.82415 21.3199 8.06435 21.3199 7.59572 20.8396C7.12709 20.3594 7.12709 19.5808 7.59572 19.1006L14.3028 12.2275L7.15128 4.89904C6.68265 4.41881 6.68265 3.64021 7.15128 3.15998Z"
-                                            fill="#252F4A"
-                                        />
-                                    </svg>
-                                </div>
-                                <b class="hover_underline" style="cursor: pointer">
-                                    {{ store.isVietNamese() ? "Lịch thi (lần 1) học kỳ 1 năm học 2024-2025" : "The exam schedule of 1th semester 2024-2025 school year" }}
-                                </b>
-                            </div>
-                            <div class="d-flex gap-2 align-items-center">
-                                <div style="width: 24px">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
-                                            d="M7.15128 3.15998C7.61991 2.67975 8.3797 2.67975 8.84833 3.15998L16.8483 11.358C17.317 11.8382 17.317 12.6168 16.8483 13.0971L9.29278 20.8396C8.82415 21.3199 8.06435 21.3199 7.59572 20.8396C7.12709 20.3594 7.12709 19.5808 7.59572 19.1006L14.3028 12.2275L7.15128 4.89904C6.68265 4.41881 6.68265 3.64021 7.15128 3.15998Z"
-                                            fill="#252F4A"
-                                        />
-                                    </svg>
-                                </div>
-                                <b class="hover_underline" style="cursor: pointer">
-                                    {{ store.isVietNamese() ? "Lịch thi xếp lớp tiếng Anh K28" : "English placement test schedule" }}
-                                </b>
                             </div>
                         </div>
                     </div>
@@ -279,6 +252,7 @@
                 <div class="row" id="wrapVideo">
                     <div v-for="post in posts" :key="post.id" class="col-auto col-sm-4">
                         <iframe width="100%" height="200px" :src="post.video" frameborder="0" allowfullscreen class="rounded"></iframe>
+                        <RouterLink :to="`/blog/detail/${post.slug}`"></RouterLink>
                         <strong>{{ post.title }}</strong>
                         <div>{{ truncateText(post.excerpt, 100) }}</div>
                     </div>
@@ -336,15 +310,26 @@ const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };
 const posts = ref([]);
-async function getBlogs() {
+async function getBlogsHasVideo() {
     const response = await axios.get(`/api/posts?PageNumber=1&PageSize=3&HasVideo=true`);
     posts.value = response.data?.data.map((post) => ({
         title: post.title,
         excerpt: post.excerpt,
         video: parseMetadataVideo(post.metadata),
+        slug: post.slug,
     }));
 }
-getBlogs();
+getBlogsHasVideo();
+
+const news = ref([]);
+async function getBlogsAsNews() {
+    const response = await axios.get(`/api/posts?PageNumber=1&PageSize=5`);
+    news.value = response.data?.data.map((post) => ({
+        title: post.title,
+        slug: post.slug,
+    }));
+}
+getBlogsAsNews();
 </script>
 
 <style lang="css" scoped>

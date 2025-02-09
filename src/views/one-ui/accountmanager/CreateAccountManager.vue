@@ -3,7 +3,10 @@
     <template #extra>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb breadcrumb-alt">
-          <button class="btn btn-primary" @click="$router.push('/administrator/accountmanager')">
+          <button
+            class="btn btn-primary"
+            @click="$router.push('/administrator/accountmanager')"
+          >
             <i class="fa fa-arrow-left me-1"></i> Quay lại
           </button>
         </ol>
@@ -124,10 +127,7 @@
 
           <!-- Submit Buttons -->
           <div class="row mb-4">
-            <div
-              class=""
-              style="display: flex; justify-content: end"
-            >
+            <div class="" style="display: flex; justify-content: end">
               <button
                 type="submit"
                 class="btn btn-success me-2"
@@ -225,165 +225,22 @@ const loadPermissions = async () => {
   try {
     const response = await accountGroupService.getAvailablePermissions();
     if (response.success && response.data) {
-      permissionGroups.value = [
-        {
-          groupKey: "post_management",
-          groupName: "Quản lý bài viết",
-          permissions: {
-            $values: [
-              {
-                code: "view_post",
-                name: "Xem bài viết",
-                description: "Xem danh sách và chi tiết bài viết",
-              },
-              {
-                code: "create_post",
-                name: "Tạo bài viết",
-                description: "Tạo bài viết mới",
-              },
-              {
-                code: "edit_post",
-                name: "Sửa bài viết",
-                description: "Chỉnh sửa nội dung bài viết",
-              },
-              {
-                code: "delete_post",
-                name: "Xóa bài viết",
-                description: "Xóa một bài viết",
-              },
-              {
-                code: "bulk_delete_post",
-                name: "Xóa nhiều bài viết",
-                description:
-                  "Xóa nhiều bài viết cùng lúc (yêu cầu quyền quản trị)",
-              },
-              {
-                code: "publish_post",
-                name: "Xuất bản bài viết",
-                description: "Xuất bản hoặc hủy xuất bản bài viết",
-              },
-            ],
-          },
+      // Map dữ liệu từ API về đúng format
+      permissionGroups.value = response.data.data.$values.map((group) => ({
+        groupKey: group.groupKey,
+        groupName: group.groupName,
+        permissions: {
+          $values: group.permissions.$values.map((permission) => ({
+            code: permission.code,
+            name: permission.name,
+            description: permission.description,
+          })),
         },
-        {
-          groupKey: "user_management",
-          groupName: "Quản lý người dùng",
-          permissions: {
-            $values: [
-              {
-                code: "manage_users",
-                name: "Quản lý người dùng",
-                description: "Quản lý tổng thể người dùng",
-              },
-              {
-                code: "view_user",
-                name: "Xem người dùng",
-                description: "Xem danh sách và thông tin người dùng",
-              },
-              {
-                code: "create_user",
-                name: "Tạo người dùng",
-                description: "Tạo tài khoản người dùng mới",
-              },
-              {
-                code: "edit_user",
-                name: "Sửa người dùng",
-                description: "Chỉnh sửa thông tin người dùng",
-              },
-              {
-                code: "delete_user",
-                name: "Xóa người dùng",
-                description: "Xóa tài khoản người dùng",
-              },
-              {
-                code: "assign_roles",
-                name: "Gán vai trò",
-                description: "Gán vai trò cho người dùng",
-              },
-            ],
-          },
-        },
-        {
-          groupKey: "role_management",
-          groupName: "Quản lý vai trò và phân quyền",
-          permissions: {
-            $values: [
-              {
-                code: "manage_roles",
-                name: "Quản lý vai trò",
-                description: "Tạo, sửa, xóa vai trò",
-              },
-              {
-                code: "manage_permissions",
-                name: "Quản lý phân quyền",
-                description: "Gán, thu hồi quyền",
-              },
-            ],
-          },
-        },
-        {
-          groupKey: "report_management",
-          groupName: "Báo cáo và thống kê",
-          permissions: {
-            $values: [
-              {
-                code: "view_reports",
-                name: "Xem báo cáo",
-                description: "Xem các báo cáo thống kê",
-              },
-            ],
-          },
-        },
-        {
-          groupKey: "system_management",
-          groupName: "Cài đặt hệ thống",
-          permissions: {
-            $values: [
-              {
-                code: "edit_settings",
-                name: "Cài đặt hệ thống",
-                description: "Thay đổi cấu hình hệ thống",
-              },
-              {
-                code: "access_dashboard",
-                name: "Truy cập Dashboard",
-                description: "Xem trang tổng quan hệ thống",
-              },
-            ],
-          },
-        },
-        {
-          groupKey: "group_management",
-          groupName: "Quản lý nhóm",
-          permissions: {
-            $values: [
-              {
-                code: "view_group",
-                name: "Xem nhóm",
-                description: "Xem danh sách và thông tin nhóm",
-              },
-              {
-                code: "create_group",
-                name: "Tạo nhóm",
-                description: "Tạo nhóm mới",
-              },
-              {
-                code: "edit_group",
-                name: "Sửa nhóm",
-                description: "Chỉnh sửa thông tin nhóm",
-              },
-              {
-                code: "delete_group",
-                name: "Xóa nhóm",
-                description: "Xóa nhóm",
-              },
-            ],
-          },
-        },
-      ];
+      }));
+      console.log("✅ Danh sách quyền:", permissionGroups.value);
     }
   } catch (error) {
-    console.error("Error loading permissions:", error);
+    console.error("❌ Lỗi khi tải danh sách quyền:", error);
     Swal.fire({
       icon: "error",
       title: "Lỗi",

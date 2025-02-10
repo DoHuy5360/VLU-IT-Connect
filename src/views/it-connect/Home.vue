@@ -261,7 +261,7 @@
                 <div class="row" id="wrapVideo">
                     <div v-for="post in posts" :key="post.id" class="col-auto col-sm-4">
                         <iframe width="100%" height="200px" :src="post.video" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
-                        <RouterLink :to="`/blog/detail/${post.slug}`"></RouterLink>
+                        <RouterLink :to="`/blog/detail/${post.slug}`" :title="post.title"></RouterLink>
                         <strong>{{ post.title }}</strong>
                         <div>{{ truncateText(post.excerpt, 100) }}</div>
                     </div>

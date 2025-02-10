@@ -109,8 +109,8 @@
                     <div>
                         <label class="form-label">Loại Video</label>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" id="upload-link" value="none" v-model="state.videoType" />
-                            <label class="form-check-label" for="upload-link">Không dùng video</label>
+                            <input type="radio" class="form-check-input" id="upload-none" value="none" v-model="state.videoType" />
+                            <label class="form-check-label" for="upload-none">Không dùng video</label>
                         </div>
                         <div class="form-check">
                             <input type="radio" class="form-check-input" id="upload-link" value="link" v-model="state.videoType" />
@@ -124,10 +124,7 @@
 
                     <div v-if="state.videoType == 'link'">
                         <label class="form-label">Video link</label>
-                        <input v-model="state.videoUrl" @blur="v$.videoUrl.$touch" :class="{ 'is-invalid': v$.excerpt.$errors.length }" class="form-control" />
-                        <div v-if="v$.videoUrl.$errors.length" class="invalid-feedback">
-                            <span v-if="v$.videoUrl.$errors[0].$validator === 'url'">Không hợp lệ</span>
-                        </div>
+                        <input v-model="state.videoUrl" class="form-control" />
                     </div>
 
                     <div v-if="state.videoType == 'file'">

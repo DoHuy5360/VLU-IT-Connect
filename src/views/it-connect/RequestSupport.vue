@@ -78,4 +78,11 @@
 import { useTemplateStore } from "@/stores/template";
 
 const store = useTemplateStore();
+
+store.setBreadcrumb([
+    {
+        name: "Hỗ trợ",
+        path: "/support",
+    },
+]);
 </script>

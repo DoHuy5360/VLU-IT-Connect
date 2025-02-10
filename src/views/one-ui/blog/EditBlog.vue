@@ -84,8 +84,9 @@
                         <div class="mb-4">
                             <label class="form-label">Video hiện tại</label>
                             <div v-if="state.videoUrl !== null" class="row">
-                                <div class="col-4" style="height: 50vh">
-                                    <iframe :src="state.videoUrl" width="100%" height="100%" frameborder="0" allowfullscreen class="rounded"></iframe>
+                                <div class="col-4" style="">
+                                    <video v-if="store.isMP4(state.videoUrl)" :src="state.videoUrl" controls class="rounded w-100"></video>
+                                    <iframe v-else width="100%" height="200px" :src="state.videoUrl" frameborder="0" allowfullscreen class="rounded"></iframe>
                                 </div>
                             </div>
                             <div v-else class="text-muted">Chưa có video</div>
@@ -134,8 +135,9 @@
                         </div>
                     </div>
                     <!-- Submit Buttons -->
-                    <div class="col-6">
+                    <div class="col-6 d-flex gap-3">
                         <button type="submit" class="btn btn-success">Lưu</button>
+                        <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/blog')">Quay lại</button>
                     </div>
                 </form>
             </div>
@@ -146,14 +148,15 @@
 <script setup>
 import { ref, onMounted, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import axios from "axios";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import SlugInput from "./components/SlugInput.vue";
 import Swal from "sweetalert2";
 import { CustomUploadAdapter } from "./uploadAdapter";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength, maxLength } from "@vuelidate/validators";
 import authRequest from "../accountmanager/service/axiosConfig";
+import { useTemplateStore } from "../../../stores/template";
+
+const store = useTemplateStore();
 
 const editorConfig = ref({
     placeholder: "Start typing your blog content...",
@@ -177,7 +180,6 @@ function generateSlug() {
         .replace(/\s+/g, "-"); // Chuyển khoảng trắng thành dấu gạch ngang
 }
 
-const baseURL = "https://localhost:7017/";
 const router = useRouter();
 const route = useRoute();
 const state = reactive({
@@ -216,43 +218,6 @@ function getTypeOfVideo(metadata) {
     return metaObj.Video?.type;
 }
 
-const parseMetadata = (metadata) => {
-    try {
-        const metaObj = JSON.parse(metadata);
-
-        if (metaObj.Files?.length) {
-            let imagePath = metaObj.Files[0].replace(/\\/g, "/");
-            return baseURL + imagePath;
-        }
-        return "";
-    } catch (error) {
-        console.error("Error parsing metadata:", error);
-        return "";
-    }
-};
-const parseMetadataVideo = (metadata) => {
-    try {
-        const metaObj = JSON.parse(metadata);
-
-        let path = "";
-        switch (metaObj.Video?.type) {
-            case "file":
-                path = baseURL + metaObj.Video.file.replace(/\\/g, "/");
-                break;
-            case "link":
-                path = metaObj.Video.url;
-                break;
-            default:
-                console.log("Missing video type in response");
-                return null;
-        }
-        return path;
-    } catch (error) {
-        console.error("Error parsing metadata:", error);
-        return "";
-    }
-};
-
 const getPost = async () => {
     try {
         const id = route.params.id;
@@ -275,8 +240,8 @@ const getPost = async () => {
             state.categoryId = data.category.id;
             state.contentHtml = data.contentHtml;
             state.excerpt = data.excerpt;
-            state.imageURL = parseMetadata(data.metadata);
-            state.videoUrl = parseMetadataVideo(data.metadata);
+            state.imageURL = store.parseMetadataImage(data.metadata);
+            state.videoUrl = store.parseMetadataVideo(data.metadata);
             state.videoType = getTypeOfVideo(data.metadata);
             state.published = data.published || false;
             state.enableComments = JSON.parse(data.metadata)?.EnableComments || false;

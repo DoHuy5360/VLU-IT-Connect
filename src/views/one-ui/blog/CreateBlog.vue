@@ -44,6 +44,9 @@
                         <div v-if="v$.title.$errors.length" class="invalid-feedback">
                             <span v-if="v$.title.$errors[0].$validator === 'required'"> Hãy nhập tiêu đề </span>
                         </div>
+                        <div v-if="v$.title.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.title.$errors[0].$validator === 'maxLength'">Quá giới hạn ký tự cho phép </span>
+                        </div>
                     </div>
 
                     <div>
@@ -51,6 +54,9 @@
                         <input type="text" v-model="state.slug" @blur="v$.slug.$touch" class="form-control" :class="{ 'is-invalid': v$.slug.$errors.length }" />
                         <div v-if="v$.slug.$errors.length" class="invalid-feedback">
                             <span v-if="v$.slug.$errors[0].$validator === 'required'"> Hãy nhập slug </span>
+                        </div>
+                        <div v-if="v$.slug.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.slug.$errors[0].$validator === 'maxLength'">Quá giới hạn ký tự cho phép </span>
                         </div>
                     </div>
                     <!-- Category -->
@@ -69,7 +75,10 @@
                     <!-- Excerpt -->
                     <div>
                         <label class="form-label">Mô tả ngắn</label>
-                        <textarea v-model="state.excerpt" class="form-control" placeholder=""></textarea>
+                        <textarea v-model="state.excerpt" class="form-control" placeholder="" @blur="v$.excerpt.$touch" :class="{ 'is-invalid': v$.excerpt.$errors.length }"></textarea>
+                        <div v-if="v$.excerpt.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.excerpt.$errors[0].$validator === 'maxLength'">Quá giới hạn ký tự cho phép </span>
+                        </div>
                     </div>
 
                     <!-- Content -->
@@ -115,7 +124,10 @@
 
                     <div v-if="state.videoType == 'link'">
                         <label class="form-label">Video link</label>
-                        <input v-model="state.videoUrl" class="form-control" />
+                        <input v-model="state.videoUrl" @blur="v$.videoUrl.$touch" :class="{ 'is-invalid': v$.excerpt.$errors.length }" class="form-control" />
+                        <div v-if="v$.videoUrl.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.videoUrl.$errors[0].$validator === 'url'">Không hợp lệ</span>
+                        </div>
                     </div>
 
                     <div v-if="state.videoType == 'file'">
@@ -150,7 +162,7 @@ import SlugInput from "./components/SlugInput.vue";
 import Swal from "sweetalert2";
 import { CustomUploadAdapter } from "./uploadAdapter";
 import useVuelidate from "@vuelidate/core";
-import { required, minLength, maxLength } from "@vuelidate/validators";
+import { required, minLength, maxLength, url } from "@vuelidate/validators";
 import authRequest from "../accountmanager/service/axiosConfig";
 
 const state = reactive({
@@ -171,9 +183,9 @@ const maxSize = (size) => (value) => {
     return !value || value.size <= size;
 };
 const rules = {
-    title: { required, maxLengt: maxLength(225) },
-    slug: { required, maxLengt: maxLength(200) },
-    excerpt: { maxLengt: maxLength(160) },
+    title: { required, maxLength: maxLength(225) },
+    slug: { required, maxLength: maxLength(200) },
+    excerpt: { maxLength: maxLength(160) },
     categoryId: { required },
     image: { required, maxSize: maxSize(5 * 1024 * 1024) },
 };

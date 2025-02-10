@@ -163,19 +163,17 @@ const routes = [
                 component: Home,
                 meta: { breadcrumb: "Home" },
             },
-            {
-                path: "support",
-                name: "RequestSupport",
-                component: RequestSupport,
-                meta: { breadcrumb: "RequestSupport" },
-            },
-
         ],
     },
     {
         path: "/",
         component: ContentLayout,
         children: [
+            {
+                path: "support",
+                name: "RequestSupport",
+                component: RequestSupport,
+            },
             {
                 path: "categories",
                 name: "ListCategories",

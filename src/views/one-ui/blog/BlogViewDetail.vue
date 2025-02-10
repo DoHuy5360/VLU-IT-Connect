@@ -17,7 +17,7 @@
                 <tbody>
                     <tr>
                         <td style="white-space: nowrap">Ảnh bìa</td>
-                        <td><img :src="getThumbnail(post.metadata)" alt="" class="w-25" /></td>
+                        <td><img :src="post.imageUrl" alt="" class="w-25" /></td>
                     </tr>
                     <tr>
                         <td style="white-space: nowrap">Tác giả</td>
@@ -45,16 +45,17 @@
                     </tr>
                     <tr>
                         <td style="white-space: nowrap">Video</td>
-                        <td>
-                            <iframe :src="getVideo(post.metadata)" style="height: 20rem; width: 100%" frameborder="0"></iframe>
+                        <td style="height: 100vh">
+                            <video v-if="store.isMP4(post.videoUrl)" :src="post.videoUrl" controls class="rounded w-100"></video>
+                            <iframe v-else width="100%" height="100%" :src="post.videoUrl" frameborder="0" allowfullscreen class="rounded"></iframe>
                         </td>
                     </tr>
                     <tr>
                         <td style="white-space: nowrap">Công bố lúc</td>
-                        <td>{{ getDayFromDate(post.publishedAt) }}</td>
+                        <td>{{ post.publishedAt }}</td>
                     </tr>
                     <tr>
-                        <td style="white-space: nowrap">Công khai</td>
+                        <td style="white-space: nowrap">Hiển thị</td>
                         <td>{{ post.published ? "Có" : "Không" }}</td>
                     </tr>
                     <tr>
@@ -76,50 +77,17 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+
+import { useTemplateStore } from "../../../stores/template";
+import authRequest from "../accountmanager/service/axiosConfig";
+import { reactive } from "vue";
+
+const store = useTemplateStore();
 
 const route = useRoute();
 const router = useRouter();
-const post = ref({});
+const post = reactive({});
 const loading = ref(true);
-
-const baseURL = "https://localhost:7017/";
-const getThumbnail = (metadata) => {
-    try {
-        const metaObj = JSON.parse(metadata);
-
-        if (metaObj.Files?.length) {
-            let imagePath = metaObj.Files[0].replace(/\\/g, "/");
-            return baseURL + imagePath;
-        }
-        return "";
-    } catch (error) {
-        console.error("Error parsing metadata:", error);
-        return "";
-    }
-};
-const getVideo = (metadata) => {
-    try {
-        const metaObj = JSON.parse(metadata);
-
-        let path = "";
-        switch (metaObj.Video?.type) {
-            case "file":
-                path = baseURL + metaObj.Video.file.replace(/\\/g, "/");
-                break;
-            case "link":
-                path = metaObj.Video.url;
-                break;
-            default:
-                console.log("Missing video type in response");
-                return null;
-        }
-        return path;
-    } catch (error) {
-        console.error("Error parsing metadata:", error);
-        return "";
-    }
-};
 
 const goBack = () => {
     router.push("/administrator/blog");
@@ -137,17 +105,17 @@ function getDayFromDate(stringDate) {
 onMounted(async () => {
     const id = route.params.id;
     try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-            console.error("Token not found");
-            return;
-        }
-        const response = await axios.get(`/api/admin/posts/${id}`, {
-            headers: {
-                Authorization: token,
-            },
-        });
-        post.value = response.data;
+        const response = await authRequest.get(`/admin/posts/${id}`);
+
+        post.userName = response.data.userName;
+        post.title = response.data.title;
+        post.slug = response.data.slug;
+        post.excerpt = response.data.excerpt;
+        post.published = response.data.published;
+        post.publishedAt = getDayFromDate(response.data.publishedAt);
+        post.category = response.data.category;
+        post.imageUrl = store.parseMetadataImage(response.data.metadata);
+        post.videoUrl = store.parseMetadataVideo(response.data.metadata);
     } catch (error) {
         console.error("Error fetching blog details:", error);
     } finally {

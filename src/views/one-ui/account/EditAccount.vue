@@ -1,267 +1,188 @@
 <template>
-  <BasePageHeading title="Chỉnh Sửa Tài Khoản" subtitle="">
-    <template #extra>
-      <button
-        type="button"
-        class="btn btn-alt-primary"
-        @click="$router.push('/administrator/account')"
-      >
-        <i class="fa fa-arrow-left opacity-50 me-1"></i>
-        Quay lại
-      </button>
-    </template>
-  </BasePageHeading>
+    <BasePageHeading title="Chỉnh Sửa Tài Khoản" subtitle="">
+        <template #extra>
+            <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/account')">
+                <i class="fa fa-arrow-left opacity-50 me-1"></i>
+                Quay lại
+            </button>
+        </template>
+    </BasePageHeading>
 
-  <div class="content">
-    <BaseBlock title="">
-      <div class="space-y-5 pb-4">
-        <form @submit.prevent="handleSubmit">
-          <!-- Email -->
-          <div class="mb-4">
-            <label class="form-label" for="email">Email*</label>
-            <input
-              type="email"
-              class="form-control"
-              id="email"
-              v-model="formData.email"
-              placeholder="Email..."
-              required
-            />
-            <small v-if="errors.email" class="text-danger">{{
-              errors.email
-            }}</small>
-          </div>
+    <div class="content">
+        <BaseBlock title="">
+            <div class="space-y-5 pb-4">
+                <form @submit.prevent="handleSubmit">
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label class="form-label" for="email">Email*</label>
+                        <input type="email" class="form-control" id="email" v-model="formData.email" placeholder="Email..." required />
+                        <small v-if="errors.email" class="text-danger">{{ errors.email }}</small>
+                    </div>
 
-          <!-- Full Name -->
-          <div class="mb-4">
-            <label class="form-label" for="fullName">Họ và Tên*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="fullName"
-              v-model="formData.fullName"
-              placeholder="Họ và Tên..."
-              required
-            />
-            <small v-if="errors.fullName" class="text-danger">{{
-              errors.fullName
-            }}</small>
-          </div>
+                    <!-- Full Name -->
+                    <div class="mb-4">
+                        <label class="form-label" for="fullName">Họ và Tên*</label>
+                        <input type="text" class="form-control" id="fullName" v-model="formData.fullName" placeholder="Họ và Tên..." required />
+                        <small v-if="errors.fullName" class="text-danger">{{ errors.fullName }}</small>
+                    </div>
 
-          <!-- Username -->
-          <div class="mb-4">
-            <label class="form-label" for="userName">Tên đăng nhập*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="userName"
-              v-model="formData.userName"
-              placeholder="Tên đăng nhập..."
-              required
-            />
-            <small v-if="errors.userName" class="text-danger">{{
-              errors.userName
-            }}</small>
-          </div>
+                    <!-- Username -->
+                    <div class="mb-4">
+                        <label class="form-label" for="userName">Tên đăng nhập*</label>
+                        <input type="text" class="form-control" id="userName" v-model="formData.userName" placeholder="Tên đăng nhập..." required />
+                        <small v-if="errors.userName" class="text-danger">{{ errors.userName }}</small>
+                    </div>
 
-          <!-- Role -->
-          <div class="mb-4">
-            <label class="form-label" for="roleId">Vai trò*</label>
-            <select
-              class="form-select"
-              id="roleId"
-              v-model="formData.roleId"
-              required
-            >
-              <option value="">-- Chọn vai trò --</option>
-              <option v-for="role in roles" :key="role.id" :value="role.id">
-                {{ role.name }}
-              </option>
-            </select>
-            <small v-if="errors.roleId" class="text-danger">{{
-              errors.roleId
-            }}</small>
-          </div>
+                    <!-- Role -->
+                    <div class="mb-4">
+                        <label class="form-label" for="roleId">Vai trò*</label>
+                        <select class="form-select" id="roleId" v-model="formData.roleId" required>
+                            <option value="">-- Chọn vai trò --</option>
+                            <option v-for="role in roles" :key="role.id" :value="role.id">
+                                {{ role.name }}
+                            </option>
+                        </select>
+                        <small v-if="errors.roleId" class="text-danger">{{ errors.roleId }}</small>
+                    </div>
 
-          <!-- Submit Button -->
-          <button type="submit" class="btn btn-success">
-            <i class="fa fa-save opacity-50 me-1"></i> Lưu thay đổi
-          </button>
-        </form>
-      </div>
-    </BaseBlock>
-  </div>
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-success"><i class="fa fa-save opacity-50 me-1"></i> Lưu thay đổi</button>
+                </form>
+            </div>
+        </BaseBlock>
+    </div>
 </template>
 
-<script>
-import axios from "axios";
+<script setup>
+import { ref, onMounted, defineProps } from "vue";
 import { useToast } from "vue-toastification";
+import { useRouter } from "vue-router";
+import authRequest from "../accountmanager/service/axiosConfig";
 
-// Cấu hình base URL cho axios
-const apiClient = axios.create({
-  baseURL: "https://localhost:7017",
-  headers: {
-    "Content-Type": "application/json",
-  },
+const props = defineProps({
+    id: {
+        type: String,
+        required: true,
+    },
 });
 
-export default {
-  name: "EditAccount",
-  props: {
-    id: {
-      type: String,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      formData: {
-        email: "",
-        fullName: "",
-        userName: "",
-        roleId: "",
-      },
-      errors: {},
-      roles: [], // Danh sách vai trò sẽ được tải từ API
-    };
-  },
-  methods: {
-    // Tải danh sách vai trò
-    async fetchRoles() {
-      try {
-        const token = localStorage.getItem("authToken");
-        const response = await apiClient.get("/api/AccountGroup/list", {
-          headers: { Authorization: token },
-        });
+const router = useRouter();
+const toast = useToast();
+
+const formData = ref({
+    email: "",
+    fullName: "",
+    userName: "",
+    roleId: "",
+});
+const errors = ref({});
+const roles = ref([]);
+
+const fetchRoles = async () => {
+    try {
+        const response = await authRequest.get("/AccountGroup/list");
 
         if (response.data?.data?.$values) {
-          this.roles = response.data.data.$values.map((role) => ({
-            id: role.Id,
-            name: role.GroupName,
-          }));
-          console.log("✅ Danh sách vai trò:", this.roles);
+            roles.value = response.data.data.$values.map((role) => ({
+                id: role.Id,
+                name: role.GroupName,
+            }));
+            console.log("✅ Danh sách vai trò:", roles.value);
         }
-      } catch (error) {
+    } catch (error) {
         console.error("❌ Lỗi khi tải danh sách vai trò:", error);
-        const toast = useToast();
         toast.error("Không thể tải danh sách vai trò!");
-      }
-    },
+    }
+};
 
-    // Tải thông tin tài khoản
-    async fetchAccountDetails() {
-      try {
-        const token = localStorage.getItem("authToken");
-        const response = await apiClient.get("/api/UserManagement/users", {
-          headers: { Authorization: token },
-        });
+const fetchAccountDetails = async () => {
+    try {
+        const response = await authRequest.get("/UserManagement/users");
 
         if (response.data?.success && response.data?.data?.$values) {
-          // Tìm user theo id
-          const userData = response.data.data.$values.find(
-            (user) => user.Id === this.id
-          );
-
-          if (userData) {
-            this.formData = {
-              email: userData.Email,
-              fullName: userData.FullName,
-              userName: userData.Email, // Sử dụng email làm username
-              roleId: userData.Role === "quản lý bài viết" ? "2" : "1", // Map role name to id
-            };
-            console.log("✅ Thông tin tài khoản:", this.formData);
-          } else {
-            throw new Error("Không tìm thấy thông tin tài khoản");
-          }
+            const userData = response.data.data.$values.find((user) => user.Id === props.id);
+            if (userData) {
+                formData.value = {
+                    email: userData.Email,
+                    fullName: userData.FullName,
+                    userName: userData.Email,
+                    roleId: userData.Role === "quản lý bài viết" ? "2" : "1",
+                };
+                console.log("✅ Thông tin tài khoản:", formData.value);
+            } else {
+                throw new Error("Không tìm thấy thông tin tài khoản");
+            }
         }
-      } catch (error) {
+    } catch (error) {
         console.error("❌ Lỗi khi tải thông tin tài khoản:", error);
-        const toast = useToast();
         toast.error(error.message || "Không thể tải thông tin tài khoản!");
-        this.$router.push("/administrator/account");
-      }
-    },
+        router.push("/administrator/account");
+    }
+};
 
-    // Xử lý submit form
-    async handleSubmit() {
-      const toast = useToast();
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          toast.error("Vui lòng đăng nhập lại!");
-          this.$router.push("/login");
-          return;
-        }
+const handleSubmit = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+        toast.error("Vui lòng đăng nhập lại!");
+        router.push("/login");
+        return;
+    }
 
-        // Hiển thị thông báo đang xử lý
-        toast.info("Đang cập nhật tài khoản...");
+    toast.info("Đang cập nhật tài khoản...");
 
-        // Chuẩn bị dữ liệu gửi đi theo yêu cầu của BE
-        const payload = {
-          Email: this.formData.email,
-          FullName: this.formData.fullName,
-          UserName: this.formData.userName,
-          RoleId: this.formData.roleId,
-        };
+    const payload = {
+        Email: formData.value.email,
+        FullName: formData.value.fullName,
+        UserName: formData.value.userName,
+        RoleId: formData.value.roleId,
+    };
 
-        console.log("📤 Đang gửi dữ liệu:", payload);
+    console.log("📤 Đang gửi dữ liệu:", payload);
 
-        // Gọi API với id trong URL
-        const response = await apiClient.put(
-          `/api/UserManagement/users/${this.id}`,
-          payload,
-          {
-            headers: { Authorization: token },
-          }
-        );
+    try {
+        const response = await authRequest.put(`/UserManagement/users/${props.id}`, payload);
 
         if (response.data?.success) {
-          toast.success("Cập nhật tài khoản thành công!");
-          // Đợi 1 giây để người dùng thấy thông báo thành công
-          setTimeout(() => {
-            this.$router.push("/administrator/account");
-          }, 1000);
+            toast.success("Cập nhật tài khoản thành công!");
+            setTimeout(() => {
+                router.push("/administrator/account");
+            }, 1000);
         } else {
-          toast.error("Cập nhật tài khoản thất bại. Vui lòng thử lại!");
+            toast.error("Cập nhật tài khoản thất bại. Vui lòng thử lại!");
         }
-      } catch (error) {
+    } catch (error) {
         console.error("❌ Lỗi khi cập nhật tài khoản:", error.response?.data);
 
         if (error.response?.status === 400) {
-          // Xử lý lỗi validation
-          const errors = error.response.data?.errors;
-          if (errors) {
-            Object.keys(errors).forEach((field) => {
-              const fieldName = field.toLowerCase();
-              this.errors[fieldName] = errors[field][0];
-              toast.error(`Lỗi: ${errors[field][0]}`);
-            });
-          } else {
-            toast.error("Dữ liệu không hợp lệ. Vui lòng kiểm tra lại!");
-          }
+            const validationErrors = error.response.data?.errors;
+            if (validationErrors) {
+                Object.keys(validationErrors).forEach((field) => {
+                    const fieldName = field.toLowerCase();
+                    errors.value[fieldName] = validationErrors[field][0];
+                    toast.error(`Lỗi: ${validationErrors[field][0]}`);
+                });
+            } else {
+                toast.error("Dữ liệu không hợp lệ. Vui lòng kiểm tra lại!");
+            }
         } else if (error.response?.status === 409) {
-          toast.error("Email hoặc tên đăng nhập đã tồn tại!");
+            toast.error("Email hoặc tên đăng nhập đã tồn tại!");
         } else if (error.response?.status === 404) {
-          toast.error("Không tìm thấy tài khoản cần cập nhật!");
+            toast.error("Không tìm thấy tài khoản cần cập nhật!");
         } else if (error.response?.status === 401) {
-          toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!");
-          this.$router.push("/login");
+            toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!");
+            router.push("/login");
         } else {
-          toast.error(
-            "Có lỗi xảy ra khi cập nhật tài khoản. Vui lòng thử lại sau!"
-          );
+            toast.error("Có lỗi xảy ra khi cập nhật tài khoản. Vui lòng thử lại sau!");
         }
-      }
-    },
-
-    // Xóa thông báo lỗi
-    clearErrors() {
-      this.errors = {};
-    },
-  },
-  async mounted() {
-    await this.fetchRoles();
-    await this.fetchAccountDetails();
-  },
+    }
 };
+
+const clearErrors = () => {
+    errors.value = {};
+};
+
+onMounted(async () => {
+    await fetchRoles();
+    await fetchAccountDetails();
+});
 </script>

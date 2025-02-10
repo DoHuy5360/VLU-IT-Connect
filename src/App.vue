@@ -1,5 +1,5 @@
 <template>
-  <RouterView />
+    <RouterView />
 </template>
 
 <style lang="scss">
@@ -15,10 +15,10 @@
 @import "@/assets/scss/oneui/themes/smooth";
 
 .hover_underline:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
-*{
-  scroll-behavior: smooth;
-  scroll-padding-top: 3rem;
+* {
+    scroll-behavior: smooth;
+    scroll-padding-top: 3rem;
 }
 </style>

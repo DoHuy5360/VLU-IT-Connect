@@ -17,9 +17,9 @@
             <!-- Videos Section -->
             <div class="py-2 mb-3">
                 <div class="d-flex justify-content-between">
-                    <h4 class="mb-3 font-weight-bold">Clip hướng dẫn sử dụng</h4>
+                    <h4 class="mb-3 font-weight-bold">{{ store.isVietNamese() ? "Clip hướng dẫn sử dụng" : "Guiding clips" }}</h4>
                     <RouterLink :to="`/videos`" class="text-primary hover_underline">
-                        <b>Xem tất cả</b>
+                        <b>{{ store.isVietNamese() ? "Xem tất cả" : "View all" }}</b>
                     </RouterLink>
                 </div>
                 <div v-if="searchResult.length" class="row" id="wrapVideo">
@@ -64,7 +64,7 @@ async function searchBlog(searchValue) {
         slug: blog.slug,
         title: blog.title,
         excerpt: blog.excerpt,
-        video: parseMetadataVideo(blog.metadata),
+        video: store.parseMetadataVideo(blog.metadata),
     }));
 }
 searchBlog(searchParams);
@@ -77,30 +77,6 @@ watch(
 );
 
 store.setBreadcrumb([{ name: "Kết quả tìm kiếm", path: `/search?q=${searchParams}` }]);
-
-const baseURL = "https://localhost:7017/";
-const parseMetadataVideo = (metadata) => {
-    try {
-        const metaObj = JSON.parse(metadata);
-
-        let path = "";
-        switch (metaObj.Video?.type) {
-            case "file":
-                path = baseURL + metaObj.Video.file.replace(/\\/g, "/");
-                break;
-            case "link":
-                path = metaObj.Video.url;
-                break;
-            default:
-                console.log("Missing video type in response");
-                return null;
-        }
-        return path;
-    } catch (error) {
-        console.error("Error parsing metadata:", error);
-        return "";
-    }
-};
 
 const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;

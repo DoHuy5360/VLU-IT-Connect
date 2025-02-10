@@ -282,30 +282,6 @@ function onSearch() {
     }
 }
 
-const baseURL = "https://localhost:7017/";
-const parseMetadataVideo = (metadata) => {
-    try {
-        const metaObj = JSON.parse(metadata);
-
-        let path = "";
-        switch (metaObj.Video?.type) {
-            case "file":
-                path = baseURL + metaObj.Video.file.replace(/\\/g, "/");
-                break;
-            case "link":
-                path = metaObj.Video.url;
-                break;
-            default:
-                console.log("Missing video type in response");
-                return null;
-        }
-        return path;
-    } catch (error) {
-        console.error("Error parsing metadata:", error);
-        return "";
-    }
-};
-
 const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };
@@ -315,7 +291,7 @@ async function getBlogsHasVideo() {
     posts.value = response.data?.data.map((post) => ({
         title: post.title,
         excerpt: post.excerpt,
-        video: parseMetadataVideo(post.metadata),
+        video: store.parseMetadataVideo(post.metadata),
         slug: post.slug,
     }));
 }

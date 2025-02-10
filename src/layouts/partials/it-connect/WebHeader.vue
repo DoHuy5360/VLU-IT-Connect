@@ -7,12 +7,17 @@
                         {{ store.isVietNamese() ? "Trang Chủ" : "Home" }}
                     </div>
                 </RouterLink>
-                <div class="text-white">
-                    {{
-                        store.isVietNamese()
-                            ? "Dịch vụ CNTT dành cho: Khách | Sinh viên | Cán bộ - Giảng viên - Nhân viên"
-                            : "Information Technology services for: Guest | Student | Staff - Lecture - Employee"
-                    }}
+                <div class="d-flex gap-2">
+                    <span class="text-white">
+                        {{ store.isVietNamese() ? "Dịch vụ CNTT dành cho:" : "Information Technology services for:" }}
+                    </span>
+                    <RouterLink to="/blog?category=danh-cho-khach" class="hover_underline text-white">{{ store.isVietNamese() ? "Khách" : "Guest" }}</RouterLink>
+                    <span class="text-white">|</span>
+                    <RouterLink to="/blog?category=danh-cho-sinh-vien" class="hover_underline text-white">{{ store.isVietNamese() ? "Sinh viên" : "Student" }}</RouterLink>
+                    <span class="text-white">|</span>
+                    <RouterLink to="/blog?category=danh-cho-nhan-vien" class="hover_underline text-white">{{
+                        store.isVietNamese() ? "Cán bộ - Giảng viên - Nhân viên" : "Staff - Lecture - Employee"
+                    }}</RouterLink>
                 </div>
                 <div class="position-relative">
                     <div @click="toggleLanguageChoice" style="cursor: pointer">

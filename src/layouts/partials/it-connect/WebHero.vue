@@ -49,7 +49,6 @@ const router = useRouter();
 const searchQuery = ref("");
 
 function onSearch() {
-    console.log("Search function triggered");
     const trimmedQuery = searchQuery.value.trim();
     if (trimmedQuery) {
         router.push({ name: "ListResult", query: { q: trimmedQuery } });

@@ -1,7 +1,8 @@
 <template>
     <tr>
         <td class="text-center">
-            <input type="checkbox" v-model="selected" @change="emitSelection" />
+            <label hidden for="categoryRow">Thể loại</label>
+            <input id="categoryRow" type="checkbox" v-model="selected" @change="emitSelection" />
         </td>
 
         <td class="text-left">

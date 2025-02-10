@@ -12,7 +12,7 @@
                     <!-- Parent Category Dropdown -->
                     <div class="mb-4">
                         <label class="form-label" for="parentCategory">Thể loại cha</label>
-                        <select class="form-select" id="parentCategory" v-model="formData.parentId">
+                        <select class="form-select" id="parentCategory" v-model="formData.parentId" title="Chọn thể loại cha">
                             <option value="">-- Không có thể loại cha --</option>
                             <option v-for="category in categories" :key="category.Id" :value="category.Id">
                                 {{ `${repeatChar("-", category.NestDepth)} ${category.Name}` }}

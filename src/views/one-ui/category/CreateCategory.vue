@@ -15,7 +15,7 @@
                     <!-- Parent Category Dropdown -->
                     <div class="mb-4">
                         <label class="form-label" for="parentCategory"> Chọn thể loại cha </label>
-                        <select class="form-select" id="parentCategory" v-model="formData.parentId" @blur="v$.name.$touch" :class="{ 'is-invalid': v$.name.$errors.length }">
+                        <select class="form-select" id="parentCategory" v-model="formData.parentId" @blur="v$.name.$touch" :class="{ 'is-invalid': v$.name.$errors.length }" title="Chọn thể loại cha">
                             <option value="">-- Chọn --</option>
                             <option v-for="category in categories" :key="category.Id" :value="category.Id">
                                 {{ `${repeatChar("-", category.NestDepth)} ${category.Name}` }}

@@ -12,13 +12,13 @@
                             />
                         </svg>
                     </span>
-                    <a class="hover_underline text-black" style="font-size: 1rem" :href="`/blog/detail/${blog.slugPost}`">{{ blog.postTitle }}</a>
+                    <RouterLink :to="`/blog/detail/${blog.slugPost}`" class="hover_underline text-black" style="font-size: 1rem">{{ blog.postTitle }}</RouterLink>
                 </div>
             </div>
         </div>
         <div v-else style="word-break: break-all; color: #999">Không có bài viết</div>
         <div class="d-flex justify-content-end">
-            <a v-if="props.dataProps.posts.length > 0" :href="`/blog?category=${props.dataProps.slug}`" >Xem thêm</a>
+            <RouterLink :to="`/blog?category=${props.dataProps.slug}`" v-if="props.dataProps.posts.length > 0">Xem thêm</RouterLink>
         </div>
     </div>
 </template>
@@ -33,5 +33,4 @@ const props = defineProps({
 const store = useTemplateStore();
 
 const router = useRouter();
-
 </script>

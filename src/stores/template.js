@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import axios from "axios";
 
 // Main Pinia Store
 export const useTemplateStore = defineStore({
@@ -11,10 +10,16 @@ export const useTemplateStore = defineStore({
             version: "1.0",
             copyright: new Date().getFullYear(),
             language: "VN",
+            baseURL: import.meta.env.VITE_BASE_URL,
         },
 
         breadcrumb: {
             path: [],
+        },
+
+        heroTitleName: {
+            vn: "",
+            en: "",
         },
 
         // Default layout options
@@ -56,6 +61,9 @@ export const useTemplateStore = defineStore({
         isVietNamese() {
             return this.app.language === "VN";
         },
+        setHeroTitleName(name) {
+            this.heroTitleName = name;
+        },
         setBreadcrumb(path) {
             this.breadcrumb.path = path;
         },
@@ -65,6 +73,58 @@ export const useTemplateStore = defineStore({
             this.layout.sidebar = payload.sidebar;
             this.layout.sideOverlay = payload.sideOverlay;
             this.layout.footer = payload.footer;
+        },
+        formatDate(stringDate) {
+            const date = new Date(stringDate);
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
+            const year = date.getFullYear();
+
+            return `${day}/${month}/${year}`;
+        },
+        isMP4(source) {
+            console.log(source);
+            if (source) {
+                return source.endsWith(".mp4");
+            } else {
+                return false;
+            }
+        },
+        parseMetadataImage(metadata) {
+            try {
+                const metaObj = JSON.parse(metadata);
+
+                if (metaObj.Files?.length) {
+                    let imagePath = metaObj.Files[0].replace(/\\/g, "/");
+                    return this.app.baseURL + imagePath;
+                }
+                return "";
+            } catch (error) {
+                console.error("Error parsing metadata:", error);
+                return "";
+            }
+        },
+        parseMetadataVideo(metadata) {
+            try {
+                const metaObj = JSON.parse(metadata);
+
+                let path = "";
+                switch (metaObj.Video?.type) {
+                    case "file":
+                        path = this.app.baseURL + metaObj.Video.file.replace(/\\/g, "/");
+                        break;
+                    case "link":
+                        path = metaObj.Video.url;
+                        break;
+                    default:
+                        console.log("Missing video type in response");
+                        return null;
+                }
+                return path;
+            } catch (error) {
+                console.error("Error parsing metadata:", error);
+                return "";
+            }
         },
         // Sets sidebar visibility (open, close, toggle)
         sidebar(payload) {

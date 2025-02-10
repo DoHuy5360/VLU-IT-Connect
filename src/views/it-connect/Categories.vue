@@ -22,12 +22,16 @@ store.setBreadcrumb([
     },
 ]);
 
+store.setHeroTitleName({
+    vn: "Thể loại",
+    en: "Categories",
+});
 
 const categories = ref([]);
 async function getCategoryAndPosts() {
-    const res = await axios.get("/api/posts/categories-with-posts?limit=4")
-    
-    categories.value = res.data
+    const res = await axios.get("/api/posts/categories-with-posts?limit=4");
+
+    categories.value = res.data;
 }
-getCategoryAndPosts()
+getCategoryAndPosts();
 </script>

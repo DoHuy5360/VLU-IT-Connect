@@ -3,8 +3,9 @@
         <div class="row g-2 border border-new-gray rounded-3 shadow-sm">
             <div v-for="blog in blogs" :key="blog.id" class="col-sm-4">
                 <div class="gy-2 p-sm-4">
-                    <div class="col-auto col-sm">
-                        <iframe width="100%" height="200px" :src="blog.video" frameborder="0" allowfullscreen class="rounded"></iframe>
+                    <div v-if="blog.video !== null" class="col-auto col-sm">
+                        <video v-if="store.isMP4(blog.video)" :src="blog.video" controls class="w-100"></video>
+                        <iframe v-else width="100%" height="200px" :src="blog.video" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
                         <RouterLink :to="`/blog/detail/${blog.slug}`" class="hover_underline text-black">
                             <strong>{{ blog.title }}</strong>
                             <div>
@@ -27,18 +28,28 @@ import { RouterLink, useRoute } from "vue-router";
 const route = useRoute();
 const category = route.query.category;
 const store = useTemplateStore();
+const categoryName = ref("");
 
 store.setBreadcrumb([
     {
         name: "Video Clips hướng dẫn",
         path: "/videos",
     },
+    {
+        name: categoryName,
+        path: `/videos?category=${category}`,
+    },
 ]);
+
+store.setHeroTitleName({
+    vn: "Video và Clips",
+    en: "Video & Clips",
+});
 
 const blogs = ref([]);
 
 async function getBlogs() {
-    const response = await axios.get(`/api/posts?HasVideo=true&${category === undefined ? "" : `category=${category}`}`);
+    const response = await axios.get(`/api/posts?HasVideo=true&${category === undefined ? "" : `CategorySlug=${category}`}`);
     let posts = response.data?.data;
 
     if (posts.length > 0) {
@@ -46,36 +57,14 @@ async function getBlogs() {
             id: post.id,
             title: post.title,
             slug: post.slug,
-            video: parseMetadataVideo(post.metadata),
+            video: store.parseMetadataVideo(post.metadata),
             excerpt: post.excerpt,
         }));
+
+        categoryName.value = posts[0].category.name;
     }
 }
 getBlogs();
-
-const baseURL = "https://localhost:7017/";
-const parseMetadataVideo = (metadata) => {
-    try {
-        const metaObj = JSON.parse(metadata);
-
-        let path = "";
-        switch (metaObj.Video?.type) {
-            case "file":
-                path = baseURL + metaObj.Video.file.replace(/\\/g, "/");
-                break;
-            case "link":
-                path = metaObj.Video.url;
-                break;
-            default:
-                console.log("Missing video type in response");
-                return null;
-        }
-        return path;
-    } catch (error) {
-        console.error("Error parsing metadata:", error);
-        return "";
-    }
-};
 
 const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;

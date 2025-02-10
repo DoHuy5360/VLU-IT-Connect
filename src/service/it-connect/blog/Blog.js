@@ -1,4 +1,6 @@
 import axios from "axios";
+import { useTemplateStore } from "../../../stores/template";
+const store = useTemplateStore();
 
 export default {
     data() {
@@ -19,9 +21,8 @@ export default {
                     const metadataObj = JSON.parse(post.metadata);
                     if (metadataObj.Files && metadataObj.Files.length > 0) {
                         // Thêm base URL vào đường dẫn hình ảnh và thay thế dấu \\ bằng /
-                        const baseUrl = import.meta.env.VITE_API_BASE_URL || "https://localhost:7017";
                         const imagePath = metadataObj.Files[0].replace(/\\/g, "/");
-                        imageUrl = `${baseUrl}/${imagePath}`;
+                        imageUrl = `${store.app.baseURL}/${imagePath}`;
                     }
                 }
             } catch (error) {

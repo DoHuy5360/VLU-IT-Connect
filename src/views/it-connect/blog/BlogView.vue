@@ -9,8 +9,10 @@
                             <div class="featured-article-box d-flex flex-column gap-3" style="cursor: pointer">
                                 <img :src="featuredArticle.image" alt="Featured Article Image" class="rounded mb-3" style="width: 100%; object-fit: contain" />
                                 <div>
-                                    <h4 class="mb-3 clickable-text">{{ featuredArticle.title }}</h4>
-                                    <p class="text-muted mb-3">{{ truncateText(featuredArticle.details, 600) }}</p>
+                                    <div class="hover_underline">
+                                        <h4 class="mb-3 clickable-text">{{ featuredArticle.title }}</h4>
+                                        <p class="text-muted mb-3">{{ truncateText(featuredArticle.details, 600) }}</p>
+                                    </div>
                                     <div class="d-flex gap-2 text-muted">
                                         <strong>
                                             {{ featuredArticle.userName }}
@@ -30,8 +32,8 @@
                         <ul class="list-unstyled flex-grow-1">
                             <li v-for="(article, index) in paginatedArticles" :key="index" class="hover_underline p-2 mb-2 rounded" style="cursor: pointer">
                                 <RouterLink :to="`/blog/detail/${article.slug}`" class="text-black">
-                                    <h4 class="mb-2 clickable-text">{{ article.title }}</h4>
-                                    <p class="text-muted small mb-1">{{ truncateText(article.details, 200) }}</p>
+                                    <h4 class="mb-2 clickable-text">{{ truncateText(article.title, 50) }}</h4>
+                                    <p class="text-muted small mb-1">{{ truncateText(article.details, 100) }}</p>
                                     <div class="d-flex gap-2 text-muted">
                                         <strong>
                                             {{ article.userName }}
@@ -63,18 +65,22 @@
                 </div>
                 <div class="row" id="wrapVideo">
                     <div v-if="featuredArticle && featuredArticle.video !== null" class="col-auto col-sm-3">
-                        <video :src="featuredArticle.video" controls class="rounded w-100"></video>
-                        <div class="mt-2">
-                            <strong>{{ featuredArticle.title }}</strong>
-                            <div>{{ truncateText(featuredArticle.excerpt, 100) }}</div>
-                        </div>
+                        <video v-if="store.isMP4(featuredArticle.video)" :src="featuredArticle.video" controls class="rounded w-100 h-50"></video>
+                        <iframe v-else width="100%" height="200px" :src="featuredArticle.video" frameborder="0" allowfullscreen class="rounded h-50" title="Guiding clips"></iframe>
+                        <RouterLink :to="`/blog/detail/${featuredArticle.slug}`" class="hover_underline text-black">
+                            <div class="mt-2">
+                                <strong>{{ truncateText(featuredArticle.title, 50) }}</strong>
+                                <div>{{ truncateText(featuredArticle.excerpt, 50) }}</div>
+                            </div>
+                        </RouterLink>
                     </div>
                     <div v-for="(blog, index) in paginatedArticles.filter((blog) => blog.video !== null).slice(0, 3)" :key="index" class="col-auto col-sm-3">
-                        <iframe :src="blog.video" width="100%" height="" frameborder="0" allowfullscreen class="rounded"></iframe>
+                        <video v-if="store.isMP4(blog.video)" :src="blog.video" controls class="rounded w-100 h-50"></video>
+                        <iframe v-else width="100%" height="200px" :src="blog.video" frameborder="0" allowfullscreen class="rounded h-50" title="Guiding clips"></iframe>
                         <RouterLink :to="`/blog/detail/${blog.slug}`" class="hover_underline text-black">
                             <div class="mt-2">
-                                <strong>{{ blog.title }}</strong>
-                                <div>{{ truncateText(blog.excerpt, 100) }}</div>
+                                <strong>{{ truncateText(blog.title, 50) }}</strong>
+                                <div>{{ truncateText(blog.excerpt, 50) }}</div>
                             </div>
                         </RouterLink>
                     </div>
@@ -93,11 +99,9 @@ const store = useTemplateStore();
 
 import { RouterLink, useRoute, useRouter } from "vue-router";
 
-const router = useRouter();
 const route = useRoute();
 const category = route.query.category;
 
-const baseURL = "https://localhost:7017/";
 const featuredArticle = ref(null);
 const oldArticles = ref([]);
 const currentPage = ref(1); // Trang hiện tại
@@ -112,44 +116,6 @@ const paginatedArticles = computed(() => {
 
 const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-};
-
-const parseMetadata = (metadata) => {
-    try {
-        const metaObj = JSON.parse(metadata);
-
-        if (metaObj.Files?.length) {
-            let imagePath = metaObj.Files[0].replace(/\\/g, "/");
-            return baseURL + imagePath;
-        }
-        return "";
-    } catch (error) {
-        console.error("Error parsing metadata:", error);
-        return "";
-    }
-};
-
-const parseMetadataVideo = (metadata) => {
-    try {
-        const metaObj = JSON.parse(metadata);
-
-        let path = "";
-        switch (metaObj.Video?.type) {
-            case "file":
-                path = baseURL + metaObj.Video.file.replace(/\\/g, "/");
-                break;
-            case "link":
-                path = metaObj.Video.url;
-                break;
-            default:
-                console.log("Missing video type in response");
-                return null;
-        }
-        return path;
-    } catch (error) {
-        console.error("Error parsing metadata:", error);
-        return "";
-    }
 };
 
 const nextPage = () => {
@@ -175,7 +141,7 @@ function getDayFromDate(stringDate) {
 
 onMounted(async () => {
     try {
-        const response = await axios.get(`/api/posts${category === undefined ? "" : `?category=${category}`}`);
+        const response = await axios.get(`/api/posts?PageNumber=1&PageSize=9999${category === undefined ? "" : `&CategorySlug=${category}`}`);
         let posts = response.data?.data;
 
         if (posts.length > 0) {
@@ -184,8 +150,8 @@ onMounted(async () => {
                 slug: posts[0].slug,
                 title: posts[0].title,
                 details: posts[0].excerpt,
-                image: parseMetadata(posts[0].metadata),
-                video: parseMetadataVideo(posts[0].metadata),
+                image: store.parseMetadataImage(posts[0].metadata),
+                video: store.parseMetadataVideo(posts[0].metadata),
                 category: posts[0].category,
                 publishedAt: getDayFromDate(posts[0].publishedAt),
                 userName: posts[0].userName,
@@ -197,8 +163,8 @@ onMounted(async () => {
                 title: post.title,
                 slug: post.slug,
                 details: post.excerpt,
-                image: parseMetadata(post.metadata),
-                video: parseMetadataVideo(post.metadata),
+                image: store.parseMetadataImage(post.metadata),
+                video: store.parseMetadataVideo(post.metadata),
                 category: post.category,
                 publishedAt: getDayFromDate(post.publishedAt),
                 userName: post.userName,
@@ -232,5 +198,9 @@ onMounted(async () => {
             ]);
         }
     }
+    store.setHeroTitleName({
+        vn: "Bài viết",
+        en: "Blogs",
+    });
 });
 </script>

@@ -10,13 +10,14 @@
 
     <div class="content">
         <BaseBlock title="Danh sách bài viết" content-full>
-            <Dataset v-slot="{ ds }" :ds-data="posts" :ds-sortby="sortBy" :ds-search-in="['title', 'author']">
+            <Dataset v-slot="{ ds }" :ds-data="searchingPosts.length == 0 ? posts : searchingPosts" :ds-sortby="sortBy" :ds-search-in="['title', 'author', 'category', 'publishDate', 'createdAt']">
                 <div class="row" :data-page-count="ds.dsPagecount">
                     <div id="datasetLength" class="col-md-8 py-2">
                         <DatasetShow />
                     </div>
                     <div class="col-md-4 py-2">
-                        <DatasetSearch ds-search-placeholder="Search..." />
+                        <!-- <DatasetSearch ds-search-placeholder="Tìm kiếm..." /> -->
+                        <input type="text" @input="search" class="form-control" placeholder="Tìm kiếm..." />
                     </div>
                 </div>
                 <hr />
@@ -26,23 +27,28 @@
                             <table class="table table-striped mb-0">
                                 <thead>
                                     <tr>
-                                        <th scope="col">ID</th>
-                                        <th v-for="(th, index) in cols" :key="th.field" :class="['sort', th.sort]" @click="onSort($event, index)">{{ th.name }} <i class="gg-select float-end"></i></th>
+                                        <th scope="col">#</th>
+                                        <th v-for="(th, index) in cols" :key="th.field" :class="['sort', th.sort]" @click="onSort($event, index)">
+                                            <div class="d-flex gap-2" style="white-space: nowrap">{{ th.name }} <i class="gg-select float-end"></i></div>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <DatasetItem tag="tbody" class="fs-sm">
                                     <template #default="{ row, rowIndex }">
                                         <tr>
                                             <th scope="row">{{ rowIndex + 1 }}</th>
-                                            <td style="min-width: 150px">
+                                            <td style="">
                                                 <RouterLink :to="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer">{{
-                                                    truncateText(row.title, 50)
+                                                    truncateText(row.title, 30)
                                                 }}</RouterLink>
                                             </td>
+                                            <td>{{ row.category }}</td>
+                                            <td>{{ row.publishDate }}</td>
+                                            <td>{{ row.createdAt }}</td>
                                             <td>{{ row.author }}</td>
-                                            <td style="min-width: 150px">{{ row.isPublished ? "Có" : "Không" }}</td>
-                                            <td style="min-width: 150px">{{ isAllowComment(row.metadata) ? "Có" : "Không" }}</td>
-                                            <td style="min-width: 150px">
+                                            <td style="">{{ row.isPublished ? "Có" : "Không" }}</td>
+                                            <td style="">{{ isAllowComment(row.metadata) ? "Có" : "Không" }}</td>
+                                            <td style="">
                                                 <div class="d-flex gap-2 justify-content-center">
                                                     <RouterLink :to="`/administrator/blog/edit/${row.id}`" class="btn btn-sm btn-alt-warning">
                                                         <i class="fa fa-fw fa-pencil-alt"></i>
@@ -75,10 +81,39 @@ import { RouterLink, useRouter } from "vue-router";
 import axios from "axios";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
 import authRequest from "../accountmanager/service/axiosConfig";
+import { useTemplateStore } from "../../../stores/template";
+
+const store = useTemplateStore();
 
 const router = useRouter();
 const posts = ref([]);
 const loading = ref(true);
+const searchingPosts = ref([]);
+
+function normalizeString(str) {
+    // Chuyển đổi thành chữ thường và loại bỏ dấu
+    return str
+        .toLowerCase()
+        .normalize("NFD") // Chuyển đổi các ký tự có dấu thành ký tự không dấu cộng với dấu
+        .replace(/[\u0300-\u036f]/g, ""); // Loại bỏ các dấu
+}
+
+function containsSubstring(x, y) {
+    const sanitizedX = normalizeString(x);
+    const sanitizedY = normalizeString(y);
+
+    return sanitizedY.includes(sanitizedX);
+}
+function search(input) {
+    const searchValue = input.target.value;
+    if (searchValue === "") {
+        searchingPosts.value = [];
+    } else {
+        if (posts.value.length != 0) {
+            searchingPosts.value = posts.value.filter((post) => containsSubstring(searchValue, post.title));
+        }
+    }
+}
 
 const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
@@ -86,7 +121,6 @@ const truncateText = (text, maxLength) => {
 
 onMounted(async () => {
     try {
-        const token = localStorage.getItem("authToken");
         const response = await authRequest.get("/admin/posts?PageNumber=1&PageSize=99999");
         posts.value = response.data.data.$values.map((post) => ({
             id: post.id,
@@ -94,8 +128,10 @@ onMounted(async () => {
             slug: post.slug,
             title: post.title,
             isPublished: post.published,
-            publishDate: post.publishedAt,
+            publishDate: store.formatDate(post.publishedAt),
+            createdAt: store.formatDate(post.createdAt),
             metadata: post.metadata,
+            category: post.categoryName,
         }));
     } catch (error) {
         switch (error.code) {
@@ -162,6 +198,21 @@ const cols = reactive([
     {
         name: "Tiêu đề",
         field: "title",
+        sort: "",
+    },
+    {
+        name: "Thể loại",
+        field: "category",
+        sort: "",
+    },
+    {
+        name: "Ngày đăng",
+        field: "publishDate",
+        sort: "",
+    },
+    {
+        name: "Ngày tạo",
+        field: "createdAt",
         sort: "",
     },
     {

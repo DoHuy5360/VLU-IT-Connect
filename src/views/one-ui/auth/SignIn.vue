@@ -11,7 +11,7 @@
                     <BaseBlock title="" class="mb-0">
                         <div class="p-sm-3 px-lg-4 px-xxl-5 py-lg-5">
                             <div class="text-center mb-4">
-                                <img src="/assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" alt="VLU Logo" style="max-width: 60%; height: auto" />
+                                <img src="/assets/media/brand/30_years_vertical_version.png" alt="VLU Logo" style="max-width: 80%; height: auto" />
                             </div>
                             <p class="fw-medium text-muted text-center">Vui lòng đăng nhập</p>
                             <form @submit.prevent="onSubmit">

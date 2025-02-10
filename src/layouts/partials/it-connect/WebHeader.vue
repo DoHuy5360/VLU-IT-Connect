@@ -7,12 +7,17 @@
                         {{ store.isVietNamese() ? "Trang Chủ" : "Home" }}
                     </div>
                 </RouterLink>
-                <div class="text-white">
-                    {{
-                        store.isVietNamese()
-                            ? "Dịch vụ CNTT dành cho: Khách | Sinh viên | Cán bộ - Giảng viên - Nhân viên"
-                            : "Information Technology services for: Guest | Student | Staff - Lecture - Employee"
-                    }}
+                <div class="d-flex gap-2">
+                    <span class="text-white">
+                        {{ store.isVietNamese() ? "Dịch vụ CNTT dành cho:" : "Information Technology services for:" }}
+                    </span>
+                    <RouterLink to="/blog?category=danh-cho-khach" class="hover_underline text-white">{{ store.isVietNamese() ? "Khách" : "Guest" }}</RouterLink>
+                    <span class="text-white">|</span>
+                    <RouterLink to="/blog?category=danh-cho-sinh-vien" class="hover_underline text-white">{{ store.isVietNamese() ? "Sinh viên" : "Student" }}</RouterLink>
+                    <span class="text-white">|</span>
+                    <RouterLink to="/blog?category=danh-cho-nhan-vien" class="hover_underline text-white">{{
+                        store.isVietNamese() ? "Cán bộ - Giảng viên - Nhân viên" : "Staff - Lecture - Employee"
+                    }}</RouterLink>
                 </div>
                 <div class="position-relative">
                     <div @click="toggleLanguageChoice" style="cursor: pointer">
@@ -103,7 +108,7 @@
     <div class="bg-white py-2">
         <div class="container">
             <div class="row justify-content-between">
-                <img src="@/../assets/media/brand/vlu_logo_final_vlu_logo_ngang_eng.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" draggable="false" />
+                <img src="@/../assets/media/brand/30_years_vertical_version.png" class="col-sm-3 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" draggable="false" />
                 <div class="col d-flex gap-2 align-items-center justify-content-end d-sm-none">
                     <!-- Search icon -->
                     <span @click="toggleSearchBar">

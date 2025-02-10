@@ -47,7 +47,7 @@
                         <td style="white-space: nowrap">Video</td>
                         <td style="height: 100vh">
                             <video v-if="store.isMP4(post.videoUrl)" :src="post.videoUrl" controls class="rounded w-100"></video>
-                            <iframe v-else width="100%" height="100%" :src="post.videoUrl" frameborder="0" allowfullscreen class="rounded"></iframe>
+                            <iframe v-else width="100%" height="100%" :src="post.videoUrl" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
                         </td>
                     </tr>
                     <tr>

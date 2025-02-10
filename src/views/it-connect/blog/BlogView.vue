@@ -66,7 +66,7 @@
                 <div class="row" id="wrapVideo">
                     <div v-if="featuredArticle && featuredArticle.video !== null" class="col-auto col-sm-3">
                         <video v-if="store.isMP4(featuredArticle.video)" :src="featuredArticle.video" controls class="rounded w-100 h-50"></video>
-                        <iframe v-else width="100%" height="200px" :src="featuredArticle.video" frameborder="0" allowfullscreen class="rounded h-50"></iframe>
+                        <iframe v-else width="100%" height="200px" :src="featuredArticle.video" frameborder="0" allowfullscreen class="rounded h-50" title="Guiding clips"></iframe>
                         <RouterLink :to="`/blog/detail/${featuredArticle.slug}`" class="hover_underline text-black">
                             <div class="mt-2">
                                 <strong>{{ truncateText(featuredArticle.title, 50) }}</strong>
@@ -76,7 +76,7 @@
                     </div>
                     <div v-for="(blog, index) in paginatedArticles.filter((blog) => blog.video !== null).slice(0, 3)" :key="index" class="col-auto col-sm-3">
                         <video v-if="store.isMP4(blog.video)" :src="blog.video" controls class="rounded w-100 h-50"></video>
-                        <iframe v-else width="100%" height="200px" :src="blog.video" frameborder="0" allowfullscreen class="rounded h-50"></iframe>
+                        <iframe v-else width="100%" height="200px" :src="blog.video" frameborder="0" allowfullscreen class="rounded h-50" title="Guiding clips"></iframe>
                         <RouterLink :to="`/blog/detail/${blog.slug}`" class="hover_underline text-black">
                             <div class="mt-2">
                                 <strong>{{ truncateText(blog.title, 50) }}</strong>
@@ -198,5 +198,9 @@ onMounted(async () => {
             ]);
         }
     }
+    store.setHeroTitleName({
+        vn: "Bài viết",
+        en: "Blogs",
+    });
 });
 </script>

@@ -5,7 +5,7 @@
                 <div class="gy-2 p-sm-4">
                     <div v-if="blog.video !== null" class="col-auto col-sm">
                         <video v-if="store.isMP4(blog.video)" :src="blog.video" controls class="w-100"></video>
-                        <iframe v-else width="100%" height="200px" :src="blog.video" frameborder="0" allowfullscreen class="rounded"></iframe>
+                        <iframe v-else width="100%" height="200px" :src="blog.video" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
                         <RouterLink :to="`/blog/detail/${blog.slug}`" class="hover_underline text-black">
                             <strong>{{ blog.title }}</strong>
                             <div>
@@ -40,6 +40,11 @@ store.setBreadcrumb([
         path: `/videos?category=${category}`,
     },
 ]);
+
+store.setHeroTitleName({
+    vn: "Video và Clips",
+    en: "Video & Clips",
+});
 
 const blogs = ref([]);
 

@@ -26,7 +26,7 @@
                     <div class="container">
                         <div class="row justify-content-center bg-white rounded">
                             <RouterLink to="/support" class="hover_underline col-sm-4 p-3 text-black">
-                                <img src="@/../assets/media/other/browse knowledge.png" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
+                                <img src="@/../assets/media/other/browse_knowledge.png" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
                                 <div class="d-flex flex-column mt-2">
                                     <b>{{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}</b>
                                     <span style="">{{
@@ -37,7 +37,7 @@
                                 </div>
                             </RouterLink>
                             <div class="col-sm-4 p-3">
-                                <img src="@/../assets/media/other/submit a ticket.png" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
+                                <img src="@/../assets/media/other/submit_a_ticket.png" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
                                 <div class="d-flex flex-column mt-2">
                                     <b>{{ store.isVietNamese() ? "Trợ giúp" : "Help" }}</b>
                                     <span style="">{{
@@ -49,7 +49,7 @@
                             </div>
                             <div class="col-sm-4 p-3">
                                 <RouterLink to="/categories" class="hover_underline text-black">
-                                    <img src="@/../assets/media/other/request something.png" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
+                                    <img src="@/../assets/media/other/request_something.png" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
                                     <div class="d-flex flex-column mt-2">
                                         <b>{{ store.isVietNamese() ? "Kiến thức Công nghệ thông tin" : "Information Technology knowledge" }}</b>
                                         <span style="">{{
@@ -251,7 +251,7 @@
                 </div>
                 <div class="row" id="wrapVideo">
                     <div v-for="post in posts" :key="post.id" class="col-auto col-sm-4">
-                        <iframe width="100%" height="200px" :src="post.video" frameborder="0" allowfullscreen class="rounded"></iframe>
+                        <iframe width="100%" height="200px" :src="post.video" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
                         <RouterLink :to="`/blog/detail/${post.slug}`"></RouterLink>
                         <strong>{{ post.title }}</strong>
                         <div>{{ truncateText(post.excerpt, 100) }}</div>

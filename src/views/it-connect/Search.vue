@@ -25,7 +25,7 @@
                 <div v-if="searchResult.length" class="row" id="wrapVideo">
                     <div class="col-auto col-sm-3" v-for="blog in searchResult.slice(0, 3)" :key="blog.id">
                         <div v-if="blog.video !== null">
-                            <iframe :src="blog.video" width="100%" height="" frameborder="0" allowfullscreen class="rounded"></iframe>
+                            <iframe :src="blog.video" width="100%" height="" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
                             <RouterLink :to="`/blog/detail/${blog.slug}`" class="hover_underline text-black">
                                 <div class="mt-2">
                                     <strong>{{ blog.title }}</strong>
@@ -77,6 +77,11 @@ watch(
 );
 
 store.setBreadcrumb([{ name: "Kết quả tìm kiếm", path: `/search?q=${searchParams}` }]);
+
+store.setHeroTitleName({
+    vn: "Kết quả tìm kiếm",
+    en: "Search result",
+});
 
 const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;

@@ -161,7 +161,6 @@ const routes = [
                 path: "",
                 name: "HomePage",
                 component: Home,
-                meta: { breadcrumb: "Home" },
             },
         ],
     },
@@ -178,37 +177,16 @@ const routes = [
                 path: "categories",
                 name: "ListCategories",
                 component: Categories,
-                meta: {
-                    breadcrumb: "Categories",
-                    heroTitles: {
-                        website: ["Kiến thức CNTT", "Dành cho Sinh viên"],
-                        mobile: ["Kiến thức CNTT", "Dành cho Sinh viên"],
-                    },
-                },
             },
             {
                 path: "videos",
                 name: "ListVideos",
                 component: Videos,
-                meta: {
-                    breadcrumb: "Videos",
-                    heroTitles: {
-                        website: ["Video Clips Công Nghệ Thông Tin"],
-                        mobile: ["Video Clips Công Nghệ Thông Tin"],
-                    },
-                },
             },
             {
                 path: "search",
                 name: "ListResult",
                 component: Search,
-                meta: {
-                    breadcrumb: "Search",
-                    heroTitles: {
-                        website: [],
-                        mobile: ["Kết quả tìm kiếm"],
-                    },
-                },
             },
             {
                 path: "blog",
@@ -217,38 +195,17 @@ const routes = [
                         path: "",
                         name: "Blog",
                         component: Blog,
-                        meta: {
-                            breadcrumb: "Blog",
-                            heroTitles: {
-                                website: ["Kiến thức Công Nghệ Thông Tin", "Dành cho Sinh viên"],
-                                mobile: ["Kiến thức CNTT", "Dành cho Sinh viên"],
-                            },
-                        },
                     },
                     {
                         path: "detail/:postSlug",
                         name: "Detail",
                         component: Detail,
                         props: true,
-                        meta: {
-                            breadcrumb: "Blog Detail",
-                            heroTitles: {
-                                website: [],
-                                mobile: [],
-                            },
-                        },
                     },
                     {
                         path: "search",
                         name: "BlogSearch",
                         component: Search,
-                        meta: {
-                            breadcrumb: "Blog Search",
-                            heroTitles: {
-                                website: [],
-                                mobile: [],
-                            },
-                        },
                     },
                 ],
             },

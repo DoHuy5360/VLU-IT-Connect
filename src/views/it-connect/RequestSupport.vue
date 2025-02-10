@@ -85,4 +85,9 @@ store.setBreadcrumb([
         path: "/support",
     },
 ]);
+
+store.setHeroTitleName({
+    vn: "Hỗ trợ",
+    en: "Support",
+});
 </script>

@@ -27,7 +27,7 @@
                 <h4 class="mb-3">{{ previewBlogData?.title }}</h4>
                 <div class="text-muted mb-3" v-html="previewBlogData?.details"></div>
                 <div v-if="previewBlogData?.video !== null" class="" style="height: 100vh">
-                    <iframe :src="previewBlogData?.video" width="100%" height="100%" frameborder="0" allowfullscreen class="rounded"></iframe>
+                    <iframe :src="previewBlogData?.video" width="100%" height="100%" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
                 </div>
                 <br />
                 <strong>{{ previewBlogData?.author }}</strong>
@@ -124,7 +124,10 @@
 
                     <div v-if="state.videoType == 'link'">
                         <label class="form-label">Video link</label>
-                        <input v-model="state.videoUrl" class="form-control" />
+                        <input v-model="state.videoUrl" class="form-control" @blur="v$.videoUrl.$touch()" :class="{ 'is-invalid': v$.videoUrl.$errors.length }" />
+                        <div v-if="v$.videoUrl.$errors.length" class="invalid-feedback">
+                            <span v-if="v$.videoUrl.$errors[0].$validator === 'url'"> Không hợp lệ </span>
+                        </div>
                     </div>
 
                     <div v-if="state.videoType == 'file'">
@@ -185,6 +188,7 @@ const rules = {
     excerpt: { maxLength: maxLength(160) },
     categoryId: { required },
     image: { required, maxSize: maxSize(5 * 1024 * 1024) },
+    videoUrl: { url },
 };
 
 const v$ = useVuelidate(rules, state);
@@ -254,7 +258,7 @@ const submitForm = async () => {
     v$.value.$touch(); // Đánh dấu tất cả các trường
     if (v$.value.$invalid) {
         console.log("khong hop le");
-
+        console.log(v$.value);
         return;
     } else {
         console.log("hop le");

@@ -15,7 +15,7 @@
                         <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
                         <div class="text-muted mb-3" id="blogContent" v-html="featuredArticle?.details"></div>
                         <div v-if="featuredArticle?.video !== null" class="" style="height: 50vh">
-                            <iframe :src="featuredArticle?.video" width="100%" height="100%" frameborder="0" allowfullscreen class="rounded"></iframe>
+                            <iframe :src="featuredArticle?.video" width="100%" height="100%" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
 
                             <div style="text-align: center">
                                 <i>Video đính kèm</i>
@@ -127,6 +127,10 @@ const getPost = async () => {
         console.log(error);
         featuredArticle.value = null;
     } finally {
+        store.setHeroTitleName({
+            vn: "Nội dung",
+            en: "Content",
+        });
     }
 };
 

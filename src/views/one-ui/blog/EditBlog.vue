@@ -86,7 +86,7 @@
                             <div v-if="state.videoUrl !== null" class="row">
                                 <div class="col-4" style="">
                                     <video v-if="store.isMP4(state.videoUrl)" :src="state.videoUrl" controls class="rounded w-100"></video>
-                                    <iframe v-else width="100%" height="200px" :src="state.videoUrl" frameborder="0" allowfullscreen class="rounded"></iframe>
+                                    <iframe v-else width="100%" height="200px" :src="state.videoUrl" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
                                 </div>
                             </div>
                             <div v-else class="text-muted">Chưa có video</div>
@@ -97,8 +97,19 @@
                             <label class="form-check-label" for="upload-link">Không dùng video</label>
                         </div>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" id="upload-link" value="link" v-model="state.videoType" />
+                            <input
+                                type="radio"
+                                class="form-check-input"
+                                id="upload-link"
+                                value="link"
+                                v-model="state.videoType"
+                                @blur="v$.videoUrl.$touch()"
+                                :class="{ 'is-invalid': v$.videoUrl.$errors.length }"
+                            />
                             <label class="form-check-label" for="upload-link">Gắn đường dẫn video</label>
+                            <div v-if="v$.videoUrl.$errors.length" class="invalid-feedback">
+                                <span v-if="v$.videoUrl.$errors[0].$validator === 'url'"> Không hợp lệ </span>
+                            </div>
                         </div>
                         <div class="form-check">
                             <input type="radio" class="form-check-input" id="upload-file" value="file" v-model="state.videoType" />
@@ -152,7 +163,7 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import Swal from "sweetalert2";
 import { CustomUploadAdapter } from "./uploadAdapter";
 import useVuelidate from "@vuelidate/core";
-import { required, minLength, maxLength } from "@vuelidate/validators";
+import { required, minLength, maxLength, url } from "@vuelidate/validators";
 import authRequest from "../accountmanager/service/axiosConfig";
 import { useTemplateStore } from "../../../stores/template";
 
@@ -207,6 +218,7 @@ const rules = {
     excerpt: { maxLengt: maxLength(160) },
     categoryId: { required },
     image: { maxSize: maxSize(5 * 1024 * 1024) },
+    videoUrl: { url },
 };
 
 const v$ = useVuelidate(rules, state);

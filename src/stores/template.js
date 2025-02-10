@@ -17,6 +17,11 @@ export const useTemplateStore = defineStore({
             path: [],
         },
 
+        heroTitleName: {
+            vn: "",
+            en: "",
+        },
+
         // Default layout options
         layout: {
             header: true,
@@ -55,6 +60,9 @@ export const useTemplateStore = defineStore({
         },
         isVietNamese() {
             return this.app.language === "VN";
+        },
+        setHeroTitleName(name) {
+            this.heroTitleName = name;
         },
         setBreadcrumb(path) {
             this.breadcrumb.path = path;

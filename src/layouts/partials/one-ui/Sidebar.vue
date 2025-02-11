@@ -156,7 +156,7 @@ onMounted(() => {
 
                             <!-- Options -->
                             <div class="dropdown d-inline-block ms-1">
-                                <button
+                                <!-- <button
                                     type="button"
                                     class="btn btn-sm btn-alt-secondary"
                                     id="sidebar-themes-dropdown"
@@ -166,7 +166,7 @@ onMounted(() => {
                                     aria-expanded="false"
                                 >
                                     <i class="fa fa-brush"></i>
-                                </button>
+                                </button> -->
                                 <div class="dropdown-menu dropdown-menu-end fs-sm smini-hide border-0" aria-labelledby="sidebar-themes-dropdown">
                                     <!-- Color Themes -->
                                     <button type="button" class="dropdown-item d-flex align-items-center justify-content-between fw-medium" @click="store.setColorTheme({ theme: '' })">

@@ -1,173 +1,127 @@
 <template>
-  <BasePageHeading title="Quản Lý Nhóm Phân Quyền">
-    <template #extra>
-      <div class="d-flex gap-2 align-items-center">
-        <!-- Thanh tìm kiếm -->
-        <div class="">
-          <input
-            type="text"
-            class="form-control"
-            v-model="searchTerm"
-            placeholder="Tìm kiếm nhóm..."
-            @input="handleSearch"
-          />
-        </div>
-
-        <!-- Nút xóa đã chọn - Chỉ hiện khi có nhóm được chọn -->
-        <button
-          v-if="selectedGroups.length > 0"
-          type="button"
-          class="btn btn-danger"
-          @click="deleteSelected"
-        >
-          <i class="fa fa-trash opacity-50 me-1"></i>
-          Xóa đã chọn ({{ selectedGroups.length }})
-        </button>
-
-        <!-- Nút thêm mới -->
-        <button
-          type="button"
-          class="btn btn-success"
-          @click="$router.push('/administrator/accountmanager/create')"
-        >
-          <i class="fa fa-plus opacity-50 me-1"></i>
-          Thêm nhóm phân quyền
-        </button>
-
-        <button
-          type="button"
-          class="btn btn-alt-success"
-          @click="$router.push('/administrator/accountmanager/addaccount')"
-        >
-          <i class="fa fa-plus opacity-50 me-1"></i>
-          Thêm người dùng vào nhóm
-        </button>
-      </div>
-    </template>
-  </BasePageHeading>
-
-  <div class="content">
-    <BaseBlock title="" class="shadow-sm">
-      <!-- Thêm thông tin về số lượng đã chọn -->
-      <div v-if="selectedGroups.length > 0" class="alert alert-info mb-3">
-        Đã chọn {{ selectedGroups.length }} nhóm
-      </div>
-
-      <div v-if="loading" class="text-center my-4">
-        <i class="fa fa-spinner fa-spin"></i> Đang tải dữ liệu...
-      </div>
-
-      <div v-else-if="error" class="text-center my-4">
-        {{ error }}
-      </div>
-
-      <div v-else>
-        <table class="table table-bordered table-striped table-vcenter">
-          <thead>
-            <tr>
-              <th class="text-center" style="width: 50px">
-                <div class="form-check">
-                  <input
-                    type="checkbox"
-                    class="form-check-input"
-                    :checked="isAllSelected"
-                    @change="toggleSelectAll"
-                  />
+    <BasePageHeading title="Quản Lý Nhóm Phân Quyền">
+        <template #extra>
+            <div class="d-flex gap-2 align-items-center">
+                <!-- Thanh tìm kiếm -->
+                <div class="">
+                    <label hidden for="searchGroupRoleInput">Tìm kiếm</label>
+                    <input id="searchGroupRoleInput" type="text" class="form-control" v-model="searchTerm" placeholder="Tìm kiếm nhóm..." @input="handleSearch" />
                 </div>
-              </th>
-              <th>Tên Nhóm</th>
-              <th class="d-none d-md-table-cell">Mô Tả</th>
-              <th class="text-center">Quyền Hạn</th>
-              <th class="text-center">Số Lượng</th>
-              <th class="d-none d-md-table-cell">Ngày Tạo</th>
-              <th class="text-center">Thao Tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="group in groups" :key="group.id">
-              <td class="text-center">
-                <div class="form-check">
-                  <input
-                    type="checkbox"
-                    class="form-check-input"
-                    :checked="selectedGroups.includes(group.id)"
-                    @change="toggleGroupSelection(group.id)"
-                  />
-                </div>
-              </td>
-              <td>{{ group.name }}</td>
-              <td class="d-none d-md-table-cell">
-                {{ group.description || "-" }}
-              </td>
-              <td class="text-center">{{ group.permissionCount }}</td>
-              <td class="text-center">{{ group.accountCount }}</td>
-              <td class="d-none d-md-table-cell">
-                {{ formatDate(group.createdDate) }}
-              </td>
-              <td class="text-center">
-                <button
-                  class="btn btn-sm btn-alt-danger me-2"
-                  @click="
-                    $router.push(
-                      `/administrator/accountmanager/edit/${group.id}`
-                    )
-                  "
-                >
-                  <i class="fa fa-pencil"></i>
-                </button>
-                <button
-                  class="btn btn-sm btn-danger"
-                  @click="confirmDelete(group.id)"
-                >
-                  <i class="fa fa-trash"></i>
-                </button>
-              </td>
-            </tr>
-            <tr v-if="groups.length === 0">
-              <td colspan="7" class="text-center">Không có dữ liệu</td>
-            </tr>
-          </tbody>
-        </table>
 
-        <!-- Phân trang -->
-        <div class="d-flex justify-content-between align-items-center">
-          <div>Hiển thị {{ groups.length }} / {{ totalItems }} kết quả</div>
-          <nav aria-label="Page navigation">
-            <ul class="pagination">
-              <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                <a class="page-link" @click="changePage(currentPage - 1)"
-                  >Trước</a
-                >
-              </li>
-              <li
-                v-for="page in totalPages"
-                :key="page"
-                class="page-item"
-                :class="{ active: currentPage === page }"
-              >
-                <a class="page-link" @click="changePage(page)">{{ page }}</a>
-              </li>
-              <li
-                class="page-item"
-                :class="{ disabled: currentPage === totalPages }"
-              >
-                <a class="page-link" @click="changePage(currentPage + 1)"
-                  >Sau</a
-                >
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-    </BaseBlock>
-  </div>
+                <!-- Nút xóa đã chọn - Chỉ hiện khi có nhóm được chọn -->
+                <button v-if="selectedGroups.length > 0" type="button" class="btn btn-danger" @click="deleteSelected">
+                    <i class="fa fa-trash opacity-50 me-1"></i>
+                    Xóa đã chọn ({{ selectedGroups.length }})
+                </button>
+
+                <!-- Nút thêm mới -->
+                <button type="button" class="btn btn-success" @click="$router.push('/administrator/accountmanager/create')">
+                    <i class="fa fa-plus opacity-50 me-1"></i>
+                    Thêm nhóm phân quyền
+                </button>
+
+                <button type="button" class="btn btn-alt-success" @click="$router.push('/administrator/accountmanager/addaccount')">
+                    <i class="fa fa-plus opacity-50 me-1"></i>
+                    Thêm người dùng vào nhóm
+                </button>
+            </div>
+        </template>
+    </BasePageHeading>
+
+    <div class="content">
+        <BaseBlock title="" class="shadow-sm">
+            <!-- Thêm thông tin về số lượng đã chọn -->
+            <div v-if="selectedGroups.length > 0" class="alert alert-info mb-3">Đã chọn {{ selectedGroups.length }} nhóm</div>
+
+            <div v-if="loading" class="text-center my-4"><i class="fa fa-spinner fa-spin"></i> Đang tải dữ liệu...</div>
+
+            <div v-else-if="error" class="text-center my-4">
+                {{ error }}
+            </div>
+
+            <div v-else>
+                <table class="table table-bordered table-striped table-vcenter">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 50px">
+                                <div class="form-check">
+                                    <label hidden for="selectAllGroupRole">Chọn tất cả</label>
+                                    <input id="selectAllGroupRole" type="checkbox" class="form-check-input" :checked="isAllSelected" @change="toggleSelectAll" />
+                                </div>
+                            </th>
+                            <th>Tên Nhóm</th>
+                            <th class="d-none d-md-table-cell">Mô Tả</th>
+                            <th class="text-center">Quyền Hạn</th>
+                            <th class="text-center">Số Lượng</th>
+                            <th class="d-none d-md-table-cell">Ngày Tạo</th>
+                            <th class="text-center">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(group, index) in groups" :key="group.id">
+                            <td class="text-center">
+                                <div class="form-check">
+                                    <label hidden :for="`selectAllGroupRole-${index}`">{{ index }}</label>
+                                    <input
+                                        :for="`selectAllGroupRole-${index}`"
+                                        type="checkbox"
+                                        class="form-check-input"
+                                        :checked="selectedGroups.includes(group.id)"
+                                        @change="toggleGroupSelection(group.id)"
+                                    />
+                                </div>
+                            </td>
+                            <td>{{ group.name }}</td>
+                            <td class="d-none d-md-table-cell">
+                                {{ group.description || "-" }}
+                            </td>
+                            <td class="text-center">{{ group.permissionCount }}</td>
+                            <td class="text-center">{{ group.accountCount }}</td>
+                            <td class="d-none d-md-table-cell">
+                                {{ formatDate(group.createdDate) }}
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-alt-danger me-2" @click="$router.push(`/administrator/accountmanager/edit/${group.id}`)">
+                                    <i class="fa fa-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" @click="confirmDelete(group.id)">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr v-if="groups.length === 0">
+                            <td colspan="7" class="text-center">Không có dữ liệu</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Phân trang -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>Hiển thị {{ groups.length }} / {{ totalItems }} kết quả</div>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                                <a class="page-link" @click="changePage(currentPage - 1)">Trước</a>
+                            </li>
+                            <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
+                                <a class="page-link" @click="changePage(page)">{{ page }}</a>
+                            </li>
+                            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                                <a class="page-link" @click="changePage(currentPage + 1)">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </BaseBlock>
+    </div>
 </template>
 
 <script setup>
 // Log toàn cục để kiểm tra việc import và khởi tạo
 console.log("AccountManager Component Script Loaded", {
-  timestamp: new Date().toISOString(),
-  location: window.location.href,
+    timestamp: new Date().toISOString(),
+    location: window.location.href,
 });
 
 import { ref, computed, onMounted, watch, nextTick, onUpdated } from "vue";
@@ -189,337 +143,323 @@ const searchTerm = ref("");
 
 // Tính toán trạng thái "chọn tất cả"
 const isAllSelected = computed(() => {
-  return (
-    groups.value.length > 0 &&
-    selectedGroups.value.length === groups.value.length
-  );
+    return groups.value.length > 0 && selectedGroups.value.length === groups.value.length;
 });
 
 // Xử lý chọn/bỏ chọn một nhóm
 const toggleGroupSelection = (groupId) => {
-  console.log("Toggle Group Selection:", {
-    groupId,
-    currentSelectedGroups: [...selectedGroups.value],
-    isCurrentlySelected: selectedGroups.value.includes(groupId),
-  });
-
-  // Tạo một bản sao mới của mảng để đảm bảo reactivity
-  const updatedSelectedGroups = [...selectedGroups.value];
-  const index = updatedSelectedGroups.indexOf(groupId);
-
-  if (index === -1) {
-    updatedSelectedGroups.push(groupId);
-  } else {
-    updatedSelectedGroups.splice(index, 1);
-  }
-
-  // Sử dụng nextTick để đảm bảo cập nhật UI
-  nextTick(() => {
-    selectedGroups.value = updatedSelectedGroups;
-
-    console.log("After Toggle with nextTick:", {
-      selectedGroups: selectedGroups.value,
-      length: selectedGroups.value.length,
+    console.log("Toggle Group Selection:", {
+        groupId,
+        currentSelectedGroups: [...selectedGroups.value],
+        isCurrentlySelected: selectedGroups.value.includes(groupId),
     });
-  });
+
+    // Tạo một bản sao mới của mảng để đảm bảo reactivity
+    const updatedSelectedGroups = [...selectedGroups.value];
+    const index = updatedSelectedGroups.indexOf(groupId);
+
+    if (index === -1) {
+        updatedSelectedGroups.push(groupId);
+    } else {
+        updatedSelectedGroups.splice(index, 1);
+    }
+
+    // Sử dụng nextTick để đảm bảo cập nhật UI
+    nextTick(() => {
+        selectedGroups.value = updatedSelectedGroups;
+
+        console.log("After Toggle with nextTick:", {
+            selectedGroups: selectedGroups.value,
+            length: selectedGroups.value.length,
+        });
+    });
 };
 
 // Xử lý chọn/bỏ chọn tất cả
 const toggleSelectAll = () => {
-  if (isAllSelected.value) {
-    selectedGroups.value = [];
-  } else {
-    selectedGroups.value = groups.value.map((group) => group.id);
-  }
+    if (isAllSelected.value) {
+        selectedGroups.value = [];
+    } else {
+        selectedGroups.value = groups.value.map((group) => group.id);
+    }
 };
 
 // Load groups
 const loadGroups = async () => {
-  loading.value = true;
-  error.value = null;
-  try {
-    console.log("Loading groups...");
-    const response = await accountGroupService.getList(
-      currentPage.value,
-      pageSize.value
-    );
+    loading.value = true;
+    error.value = null;
+    try {
+        console.log("Loading groups...");
+        const response = await accountGroupService.getList(currentPage.value, pageSize.value);
 
-    console.log("API Response:", response);
+        console.log("API Response:", response);
 
-    if (response.success) {
-      groups.value = response.data.items || [];
-      totalItems.value = response.data.totalItems || 0;
-      totalPages.value = response.data.totalPages || 1;
-    } else {
-      throw new Error(response.message || "Failed to load groups");
+        if (response.success) {
+            groups.value = response.data.items || [];
+            totalItems.value = response.data.totalItems || 0;
+            totalPages.value = response.data.totalPages || 1;
+        } else {
+            throw new Error(response.message || "Failed to load groups");
+        }
+    } catch (err) {
+        console.error("Error loading groups:", err);
+        error.value = err.message || "Có lỗi xảy ra khi tải danh sách nhóm";
+        groups.value = [];
+        totalItems.value = 0;
+        totalPages.value = 1;
+    } finally {
+        loading.value = false;
     }
-  } catch (err) {
-    console.error("Error loading groups:", err);
-    error.value = err.message || "Có lỗi xảy ra khi tải danh sách nhóm";
-    groups.value = [];
-    totalItems.value = 0;
-    totalPages.value = 1;
-  } finally {
-    loading.value = false;
-  }
 };
 
 // Search groups by name
 const searchGroups = async (term) => {
-  if (!term.trim()) {
-    return loadGroups();
-  }
-  loading.value = true;
-  error.value = null;
-  try {
-    const response = await accountGroupService.getList(
-      currentPage.value,
-      pageSize.value,
-      term
-    );
-    if (response.success) {
-      groups.value = response.data.items || [];
-      totalItems.value = response.data.totalItems || 0;
-      totalPages.value = response.data.totalPages || 1;
-    } else {
-      error.value = "Không tìm thấy kết quả";
-      groups.value = [];
-      totalItems.value = 0;
-      totalPages.value = 1;
+    if (!term.trim()) {
+        return loadGroups();
     }
-  } catch (err) {
-    console.error("Search error:", err);
-    error.value = err.response?.data?.message || "Lỗi khi tìm kiếm nhóm";
-    groups.value = [];
-    totalItems.value = 0;
-    totalPages.value = 1;
-  } finally {
-    loading.value = false;
-  }
+    loading.value = true;
+    error.value = null;
+    try {
+        const response = await accountGroupService.getList(currentPage.value, pageSize.value, term);
+        if (response.success) {
+            groups.value = response.data.items || [];
+            totalItems.value = response.data.totalItems || 0;
+            totalPages.value = response.data.totalPages || 1;
+        } else {
+            error.value = "Không tìm thấy kết quả";
+            groups.value = [];
+            totalItems.value = 0;
+            totalPages.value = 1;
+        }
+    } catch (err) {
+        console.error("Search error:", err);
+        error.value = err.response?.data?.message || "Lỗi khi tìm kiếm nhóm";
+        groups.value = [];
+        totalItems.value = 0;
+        totalPages.value = 1;
+    } finally {
+        loading.value = false;
+    }
 };
 
 // Handle search input with debounce
 const handleSearch = debounce(() => {
-  if (searchTerm.value) {
-    searchGroups(searchTerm.value);
-  } else {
-    loadGroups();
-  }
+    if (searchTerm.value) {
+        searchGroups(searchTerm.value);
+    } else {
+        loadGroups();
+    }
 }, 300);
 
 const changePage = (page) => {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page;
-    loadGroups();
-  }
+    if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
+        loadGroups();
+    }
 };
 
 const confirmDelete = async (id) => {
-  if (!id) {
-    Swal.fire({
-      title: "Lỗi",
-      text: "Không tìm thấy ID nhóm",
-      icon: "error",
-    });
-    return;
-  }
-
-  try {
-    const result = await Swal.fire({
-      title: "Xác nhận xóa",
-      text: "Bạn có chắc muốn xóa nhóm này?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Xóa",
-      cancelButtonText: "Hủy",
-    });
-
-    if (result.isConfirmed) {
-      console.log("Deleting group with ID:", id); // Debug log
-      const response = await accountGroupService.deleteGroup(id);
-
-      if (response.success) {
+    if (!id) {
         Swal.fire({
-          title: "Thành công",
-          text: "Xóa nhóm thành công",
-          icon: "success",
+            title: "Lỗi",
+            text: "Không tìm thấy ID nhóm",
+            icon: "error",
         });
-        loadGroups(); // Refresh the list
-      } else {
-        throw new Error("Delete failed");
-      }
-    }
-  } catch (error) {
-    console.error("Delete error:", error); // Debug log
-    let errorMessage = "Đã có lỗi xảy ra khi xóa nhóm";
-
-    if (error.response?.status === 403) {
-      errorMessage = "Bạn không có quyền xóa nhóm";
-    } else if (error.response?.status === 404) {
-      errorMessage = "Không tìm thấy nhóm để xóa";
+        return;
     }
 
-    Swal.fire({
-      title: "Lỗi",
-      text: errorMessage,
-      icon: "error",
-    });
-  }
+    try {
+        const result = await Swal.fire({
+            title: "Xác nhận xóa",
+            text: "Bạn có chắc muốn xóa nhóm này?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Xóa",
+            cancelButtonText: "Hủy",
+        });
+
+        if (result.isConfirmed) {
+            console.log("Deleting group with ID:", id); // Debug log
+            const response = await accountGroupService.deleteGroup(id);
+
+            if (response.success) {
+                Swal.fire({
+                    title: "Thành công",
+                    text: "Xóa nhóm thành công",
+                    icon: "success",
+                });
+                loadGroups(); // Refresh the list
+            } else {
+                throw new Error("Delete failed");
+            }
+        }
+    } catch (error) {
+        console.error("Delete error:", error); // Debug log
+        let errorMessage = "Đã có lỗi xảy ra khi xóa nhóm";
+
+        if (error.response?.status === 403) {
+            errorMessage = "Bạn không có quyền xóa nhóm";
+        } else if (error.response?.status === 404) {
+            errorMessage = "Không tìm thấy nhóm để xóa";
+        }
+
+        Swal.fire({
+            title: "Lỗi",
+            text: errorMessage,
+            icon: "error",
+        });
+    }
 };
 
 const deleteSelected = async () => {
-  try {
-    console.log("Delete Selected Groups:", {
-      selectedGroups: selectedGroups.value,
-      count: selectedGroups.value.length,
-    });
-
-    const result = await Swal.fire({
-      title: "Xác nhận xóa",
-      text: `Bạn có chắc muốn xóa ${selectedGroups.value.length} nhóm đã chọn?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Xóa",
-      cancelButtonText: "Hủy",
-    });
-
-    if (result.isConfirmed) {
-      console.log("Deleting groups with IDs:", selectedGroups.value);
-      const response = await accountGroupService.deleteMultipleGroups(
-        selectedGroups.value
-      );
-
-      console.log("Delete Multiple Groups Response:", {
-        success: response.success,
-        message: response.message,
-        data: response.data,
-      });
-
-      if (response.success) {
-        Swal.fire({
-          title: "Thành công",
-          text: `Đã xóa ${selectedGroups.value.length} nhóm thành công`,
-          icon: "success",
+    try {
+        console.log("Delete Selected Groups:", {
+            selectedGroups: selectedGroups.value,
+            count: selectedGroups.value.length,
         });
-        selectedGroups.value = [];
-        loadGroups();
-      } else {
-        throw new Error(response.message || "Delete failed");
-      }
+
+        const result = await Swal.fire({
+            title: "Xác nhận xóa",
+            text: `Bạn có chắc muốn xóa ${selectedGroups.value.length} nhóm đã chọn?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Xóa",
+            cancelButtonText: "Hủy",
+        });
+
+        if (result.isConfirmed) {
+            console.log("Deleting groups with IDs:", selectedGroups.value);
+            const response = await accountGroupService.deleteMultipleGroups(selectedGroups.value);
+
+            console.log("Delete Multiple Groups Response:", {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            });
+
+            if (response.success) {
+                Swal.fire({
+                    title: "Thành công",
+                    text: `Đã xóa ${selectedGroups.value.length} nhóm thành công`,
+                    icon: "success",
+                });
+                selectedGroups.value = [];
+                loadGroups();
+            } else {
+                throw new Error(response.message || "Delete failed");
+            }
+        }
+    } catch (error) {
+        console.error("Delete multiple error:", error);
+        let errorMessage = "Đã có lỗi xảy ra khi xóa các nhóm";
+        Swal.fire({
+            title: "Lỗi",
+            text: errorMessage,
+            icon: "error",
+        });
     }
-  } catch (error) {
-    console.error("Delete multiple error:", error);
-    let errorMessage = "Đã có lỗi xảy ra khi xóa các nhóm";
-    Swal.fire({
-      title: "Lỗi",
-      text: errorMessage,
-      icon: "error",
-    });
-  }
 };
 
 const formatDate = (dateString) => {
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  return new Date(dateString).toLocaleDateString("vi-VN", options);
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString("vi-VN", options);
 };
 
 watch(
-  () => selectedGroups.value,
-  (newValue) => {
-    console.log("Selected Groups Changed:", {
-      length: newValue.length,
-      groups: newValue,
-    });
-  }
+    () => selectedGroups.value,
+    (newValue) => {
+        console.log("Selected Groups Changed:", {
+            length: newValue.length,
+            groups: newValue,
+        });
+    }
 );
 
 onUpdated(() => {
-  console.log("Component Updated:", {
-    selectedGroupsLength: selectedGroups.value.length,
-    selectedGroupsContent: [...selectedGroups.value],
-  });
-
-  // Log trực tiếp vào DOM để kiểm tra
-  nextTick(() => {
-    const deleteButton = document.querySelector(".btn-danger");
-    console.log("Delete Button DOM Check:", {
-      buttonExists: !!deleteButton,
-      buttonText: deleteButton ? deleteButton.textContent : null,
-      buttonDisplay: deleteButton
-        ? window.getComputedStyle(deleteButton).display
-        : null,
+    console.log("Component Updated:", {
+        selectedGroupsLength: selectedGroups.value.length,
+        selectedGroupsContent: [...selectedGroups.value],
     });
-  });
+
+    // Log trực tiếp vào DOM để kiểm tra
+    nextTick(() => {
+        const deleteButton = document.querySelector(".btn-danger");
+        console.log("Delete Button DOM Check:", {
+            buttonExists: !!deleteButton,
+            buttonText: deleteButton ? deleteButton.textContent : null,
+            buttonDisplay: deleteButton ? window.getComputedStyle(deleteButton).display : null,
+        });
+    });
 });
 
 onMounted(() => {
-  console.log("AccountManager Component Mounted:", {
-    selectedGroupsInitial: selectedGroups.value,
-    groups: groups.value,
-  });
-  loadGroups();
+    console.log("AccountManager Component Mounted:", {
+        selectedGroupsInitial: selectedGroups.value,
+        groups: groups.value,
+    });
+    loadGroups();
 });
 </script>
 
 <style scoped>
 .modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
 .modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 600px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
 }
 
 .modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .modal-header button {
-  border: none;
-  background: none;
-  font-size: 24px;
-  cursor: pointer;
+    border: none;
+    background: none;
+    font-size: 24px;
+    cursor: pointer;
 }
 
 .modal-body {
-  max-height: 400px;
-  overflow-y: auto;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .badge {
-  margin: 4px;
-  padding: 8px;
+    margin: 4px;
+    padding: 8px;
 }
 
 .pagination .page-link {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .table th {
-  white-space: nowrap;
+    white-space: nowrap;
 }
 
 .shadow-sm {
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 </style>

@@ -14,8 +14,8 @@
                 <form @submit.prevent="submitForm" class="w-full">
                     <!-- Title Field -->
                     <div>
-                        <label class="form-label">Tiêu đề</label>
-                        <input v-model="state.title" @input="generateSlug" @blur="v$.title.$touch" class="form-control" :class="{ 'is-invalid': v$.title.$errors.length }" />
+                        <label for="title" class="form-label">Tiêu đề</label>
+                        <input id="title" v-model="state.title" @input="generateSlug" @blur="v$.title.$touch" class="form-control" :class="{ 'is-invalid': v$.title.$errors.length }" />
                         <div v-if="v$.title.$errors.length" class="invalid-feedback">
                             <span v-if="v$.title.$errors[0].$validator === 'required'"> Hãy nhập tiêu đề </span>
                         </div>
@@ -23,7 +23,7 @@
 
                     <div>
                         <label class="form-label" for="slug">Slug</label>
-                        <input type="text" v-model="state.slug" @blur="v$.slug.$touch" class="form-control" :class="{ 'is-invalid': v$.slug.$errors.length }" />
+                        <input id="slug" type="text" v-model="state.slug" @blur="v$.slug.$touch" class="form-control" :class="{ 'is-invalid': v$.slug.$errors.length }" />
                         <div v-if="v$.slug.$errors.length" class="invalid-feedback">
                             <span v-if="v$.slug.$errors[0].$validator === 'required'"> Hãy nhập slug </span>
                         </div>
@@ -32,7 +32,7 @@
                     <!-- Category Field -->
                     <div class="mb-4">
                         <label class="form-label">Thể loại</label>
-                        <select v-model="state.categoryId" class="form-control" @blur="v$.categoryId.$touch" :class="{ 'is-invalid': v$.categoryId.$errors.length }">
+                        <select v-model="state.categoryId" class="form-control" @blur="v$.categoryId.$touch" :class="{ 'is-invalid': v$.categoryId.$errors.length }" title="Chọn thể loại bài viết">
                             <option v-for="category in categories" :key="category.id" :value="category.id">
                                 {{ `${repeatChar("-", category.NestDepth)} ${category.name}` }}
                             </option>
@@ -44,8 +44,8 @@
 
                     <!-- Excerpt -->
                     <div class="mb-4">
-                        <label class="form-label">Mô tả ngắn</label>
-                        <textarea v-model="state.excerpt" class="form-control" placeholder=""></textarea>
+                        <label for="excerpt" class="form-label">Mô tả ngắn</label>
+                        <textarea id="excerpt" v-model="state.excerpt" class="form-control" placeholder=""></textarea>
                     </div>
 
                     <!-- Blog Content -->
@@ -58,12 +58,12 @@
                     <div class="mb-4">
                         <div v-if="state.imageURL !== ''" class="row">
                             <div class="col-4">
-                                <img :src="state.imageURL" class="img-fluid w-100" style="" alt="" />
+                                <img :src="state.imageURL" class="img-fluid w-100" style="" alt="Ảnh bìa của bài viết" />
                             </div>
                         </div>
                         <div v-else>Bài viết này hiện chưa có ảnh bìa</div>
                         <br />
-                        <label class="form-label">Đổi hình ảnh</label>
+                        <label for="image-file" class="form-label">Đổi hình ảnh</label>
                         <input
                             @blur="v$.image.$touch"
                             :class="{ 'is-invalid': v$.image.$errors.length }"
@@ -131,7 +131,7 @@
                     <div class="my-4">
                         <!-- Visibility Switch -->
                         <div class="d-flex gap-2 align-items-center">
-                            <span class="text-muted">Công bố</span>
+                            <label for="visibility-switch" class="text-muted">Công bố</label>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="visibility-switch" v-model="state.published" />
                             </div>
@@ -139,7 +139,7 @@
 
                         <!-- Auto Comments Switch -->
                         <div class="d-flex gap-2 align-items-center">
-                            <span class="text-muted">Cho phép bình luận</span>
+                            <label for="auto-comments-switch" class="text-muted">Cho phép bình luận</label>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="auto-comments-switch" v-model="state.enableComments" />
                             </div>
@@ -234,13 +234,6 @@ const getPost = async () => {
     try {
         const id = route.params.id;
         if (!id) return console.error("ID không tồn tại trong route.");
-
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-            alert("Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn.");
-            router.push("/login");
-            return;
-        }
 
         const response = await authRequest.get(`/admin/posts/${id}`);
 
@@ -341,6 +334,7 @@ const submitForm = async () => {
         formData.append("VideoUrl", state.videoUrl);
         formData.append("Files", state.image);
         formData.append("VideoFile", state.video);
+        formData.append("VideoType", state.videoType);
 
         await authRequest.put(`/admin/posts/${route.params.id}`, formData, {
             headers: {

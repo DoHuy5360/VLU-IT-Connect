@@ -17,7 +17,8 @@
                     </div>
                     <div class="col-md-4 py-2">
                         <!-- <DatasetSearch ds-search-placeholder="Tìm kiếm..." /> -->
-                        <input type="text" @input="search" class="form-control" placeholder="Tìm kiếm..." />
+                        <label hidden for="searchBlogInput">Tìm kiếm bài viết</label>
+                        <input id="searchBlogInput" type="text" @input="search" class="form-control" placeholder="Tìm kiếm..." />
                     </div>
                 </div>
                 <hr />

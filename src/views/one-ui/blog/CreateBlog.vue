@@ -39,8 +39,8 @@
             <div class="space-y-5 pb-4">
                 <form @submit.prevent="submitForm" class="space-y-4">
                     <div>
-                        <label class="form-label">Tiêu đề</label>
-                        <input type="text" v-model="state.title" @input="generateSlug" @blur="v$.title.$touch" class="form-control" :class="{ 'is-invalid': v$.title.$errors.length }" />
+                        <label for="title" class="form-label">Tiêu đề</label>
+                        <input id="title" type="text" v-model="state.title" @input="generateSlug" @blur="v$.title.$touch" class="form-control" :class="{ 'is-invalid': v$.title.$errors.length }" />
                         <div v-if="v$.title.$errors.length" class="invalid-feedback">
                             <span v-if="v$.title.$errors[0].$validator === 'required'"> Hãy nhập tiêu đề </span>
                         </div>
@@ -51,7 +51,7 @@
 
                     <div>
                         <label class="form-label" for="slug">Slug</label>
-                        <input type="text" v-model="state.slug" @blur="v$.slug.$touch" class="form-control" :class="{ 'is-invalid': v$.slug.$errors.length }" />
+                        <input id="slug" type="text" v-model="state.slug" @blur="v$.slug.$touch" class="form-control" :class="{ 'is-invalid': v$.slug.$errors.length }" />
                         <div v-if="v$.slug.$errors.length" class="invalid-feedback">
                             <span v-if="v$.slug.$errors[0].$validator === 'required'"> Hãy nhập slug </span>
                         </div>
@@ -62,7 +62,7 @@
                     <!-- Category -->
                     <div>
                         <label class="form-label">Thể loại</label>
-                        <select v-model="state.categoryId" class="form-control" @blur="v$.categoryId.$touch" :class="{ 'is-invalid': v$.categoryId.$errors.length }">
+                        <select v-model="state.categoryId" class="form-control" @blur="v$.categoryId.$touch" :class="{ 'is-invalid': v$.categoryId.$errors.length }" title="Chọn thể loại bài viết">
                             <option value="">-- Chọn --</option>
                             <option v-for="category in categories" :key="category.id" :value="category.id">
                                 {{ `${repeatChar("-", category.NestDepth)} ${category.name}` }}
@@ -74,8 +74,8 @@
                     </div>
                     <!-- Excerpt -->
                     <div>
-                        <label class="form-label">Mô tả ngắn</label>
-                        <textarea v-model="state.excerpt" class="form-control" placeholder="" @blur="v$.excerpt.$touch" :class="{ 'is-invalid': v$.excerpt.$errors.length }"></textarea>
+                        <label for="excerpt" class="form-label">Mô tả ngắn</label>
+                        <textarea id="excerpt" v-model="state.excerpt" class="form-control" placeholder="" @blur="v$.excerpt.$touch" :class="{ 'is-invalid': v$.excerpt.$errors.length }"></textarea>
                         <div v-if="v$.excerpt.$errors.length" class="invalid-feedback">
                             <span v-if="v$.excerpt.$errors[0].$validator === 'maxLength'">Quá giới hạn ký tự cho phép </span>
                         </div>
@@ -89,7 +89,7 @@
 
                     <!-- Image -->
                     <div>
-                        <label for="pic-file" class="form-label">Ảnh</label>
+                        <label for="image-file" class="form-label">Ảnh</label>
                         <input
                             @blur="v$.image.$touch"
                             :class="{ 'is-invalid': v$.image.$errors.length }"
@@ -123,16 +123,16 @@
                     </div>
 
                     <div v-if="state.videoType == 'link'">
-                        <label class="form-label">Video link</label>
-                        <input v-model="state.videoUrl" class="form-control" @blur="v$.videoUrl.$touch()" :class="{ 'is-invalid': v$.videoUrl.$errors.length }" />
+                        <label for="videoLink" class="form-label">Video link</label>
+                        <input id="videoLink" v-model="state.videoUrl" class="form-control" @blur="v$.videoUrl.$touch()" :class="{ 'is-invalid': v$.videoUrl.$errors.length }" />
                         <div v-if="v$.videoUrl.$errors.length" class="invalid-feedback">
                             <span v-if="v$.videoUrl.$errors[0].$validator === 'url'"> Không hợp lệ </span>
                         </div>
                     </div>
 
                     <div v-if="state.videoType == 'file'">
-                        <label class="form-label">Video file</label>
-                        <input type="file" id="video-file" accept="video/*" @change="createVideoBlob" class="form-control" />
+                        <label for="videoFile" class="form-label">Video file</label>
+                        <input id="videoFile" type="file" accept="video/*" @change="createVideoBlob" class="form-control" />
                     </div>
 
                     <div style="user-select: none">
@@ -156,9 +156,7 @@
 <script setup>
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import SlugInput from "./components/SlugInput.vue";
 import Swal from "sweetalert2";
 import { CustomUploadAdapter } from "./uploadAdapter";
 import useVuelidate from "@vuelidate/core";

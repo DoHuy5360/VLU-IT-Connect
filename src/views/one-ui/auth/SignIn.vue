@@ -17,7 +17,9 @@
                             <form @submit.prevent="onSubmit">
                                 <div class="py-3">
                                     <div class="mb-4">
+                                        <label hidden for="email">email</label>
                                         <input
+                                            id="email"
                                             type="email"
                                             class="form-control form-control-alt form-control-lg"
                                             v-model="state.email"
@@ -31,7 +33,9 @@
                                         </div>
                                     </div>
                                     <div class="mb-4">
+                                        <label hidden for="password">password</label>
                                         <input
+                                            id="password"
                                             type="password"
                                             class="form-control form-control-alt form-control-lg"
                                             v-model="state.password"
@@ -71,80 +75,64 @@
         </div>
     </div>
 </template>
-<script>
+
+<script setup>
 import axios from "axios";
 import { reactive } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 
-// Thông báo phiên đăng nhập đã hết
+const state = reactive({
+    email: "",
+    password: "",
+    loginError: false,
+});
 
-export default {
-    setup() {
-        const state = reactive({
-            email: "",
-            password: "",
-            loginError: false, // Control for showing error message
+const rules = {
+    email: { required, email },
+    password: { required },
+};
+
+const v$ = useVuelidate(rules, state);
+
+const isLoading = reactive({
+    login: false,
+    microsoft: false,
+});
+
+const onSubmit = async () => {
+    v$.value.$touch();
+    if (v$.value.$invalid) {
+        return;
+    }
+    isLoading.login = true;
+    state.loginError = false;
+
+    try {
+        const response = await axios.post("/login", {
+            email: state.email,
+            password: state.password,
+            twoFactorCode: "string",
+            twoFactorRecoveryCode: "string",
         });
 
-        const rules = {
-            email: { required, email },
-            password: { required },
-        };
+        const { tokenType, accessToken } = response.data;
+        localStorage.setItem("authToken", `${tokenType} ${accessToken}`);
+        window.location.href = "/administrator";
+    } catch (error) {
+        console.error("Login failed:", error.response?.data || error.message);
+        state.loginError = true;
+    } finally {
+        isLoading.login = false;
+    }
+};
 
-        const v$ = useVuelidate(rules, state);
-
-        const isLoading = reactive({
-            login: false,
-            microsoft: false,
-        });
-
-        const onSubmit = async () => {
-            v$.value.$touch(); // Đánh dấu tất cả các trường
-            if (v$.value.$invalid) {
-                return;
-            }
-            isLoading.login = true;
-            state.loginError = false; // Reset error state before login attempt
-
-            try {
-                const response = await axios.post("/login", {
-                    email: state.email,
-                    password: state.password,
-                    twoFactorCode: "string",
-                    twoFactorRecoveryCode: "string",
-                });
-
-                // Save token to a shared state/store or localStorage
-                const { tokenType, accessToken } = response.data;
-                localStorage.setItem("authToken", `${tokenType} ${accessToken}`);
-
-                // Redirect after login success
-                window.location.href = "/administrator";
-            } catch (error) {
-                console.error("Login failed:", error.response?.data || error.message);
-                state.loginError = true; // Show error message
-            } finally {
-                isLoading.login = false;
-            }
-        };
-
-        const signInWithMicrosoft = async () => {
-            try {
-                console.log("Microsoft login clicked");
-            } catch (error) {
-                alert("Microsoft login failed.");
-                console.error("Microsoft login failed:", error.response?.data || error.message);
-            }
-        };
-
-        return {
-            state,
-            v$,
-            isLoading,
-            onSubmit,
-            signInWithMicrosoft,
-        };
-    },
+const signInWithMicrosoft = async () => {
+    try {
+        console.log("Microsoft login clicked");
+    } catch (error) {
+        alert("Microsoft login failed.");
+        console.error("Microsoft login failed:", error.response?.data || error.message);
+    }
 };
 </script>

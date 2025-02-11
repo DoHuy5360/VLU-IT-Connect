@@ -88,8 +88,16 @@
                 <div>2024 © P.CNTT</div>
                 <div class="d-none d-sm-flex gap-3">
                     <span>{{ store.isVietNamese() ? "Giới thiệu" : "Introduction" }}</span>
-                    <span>{{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}</span>
-                    <span>{{ store.isVietNamese() ? "Liên hệ" : "Contact" }}</span>
+                    <div >
+                <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-white " >
+                    {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
+                </RouterLink>
+            </div>
+                    <div >
+                <RouterLink to="tel:028 7109 9131" class="text-white" >
+                    {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
+                </RouterLink>
+            </div>
                 </div>
             </div>
         </div>

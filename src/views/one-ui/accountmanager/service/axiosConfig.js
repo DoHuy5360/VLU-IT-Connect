@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Tạo instance axios với base URL
 const authRequest = axios.create({
-    baseURL: "/api", // Sử dụng URL đầy đủ của BE
+    baseURL: import.meta.env.VITE_BASE_URL + "/api", // Sử dụng URL đầy đủ của BE
     timeout: 10000,
     headers: {
         "Content-Type": "application/json",
@@ -47,4 +47,24 @@ const handleAuthorizeFail = () => {
     console.log("Fail to authorize request");
 };
 
-export default authRequest;
+const guestRequest = axios.create({
+    baseURL: import.meta.env.VITE_BASE_URL + "/api", // Sử dụng URL đầy đủ của BE
+    timeout: 10000,
+    headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+    },
+    maxRedirects: 0,
+});
+
+const gateRequest = axios.create({
+    baseURL: import.meta.env.VITE_BASE_URL, // Sử dụng URL đầy đủ của BE
+    timeout: 10000,
+    headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+    },
+    maxRedirects: 0,
+});
+
+export { authRequest, guestRequest, gateRequest };

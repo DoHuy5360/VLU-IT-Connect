@@ -111,8 +111,8 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import Swal from "sweetalert2";
-import axios from "axios";
 import { useRouter } from "vue-router";
+import { authRequest } from "../accountmanager/service/axiosConfig";
 
 const router = useRouter();
 
@@ -128,10 +128,7 @@ const selectedUsers = ref([]);
 // Fetch Groups
 const fetchGroups = async () => {
     try {
-        const token = localStorage.getItem("authToken");
-        const response = await axios.get("/api/AccountGroup/list", {
-            headers: { Authorization: token },
-        });
+        const response = await authRequest.get("/AccountGroup/list");
         groups.value = response.data.data.$values.map((group) => ({
             value: group.Id,
             label: group.GroupName,
@@ -144,10 +141,7 @@ const fetchGroups = async () => {
 // Fetch Users
 const fetchUsers = async () => {
     try {
-        const token = localStorage.getItem("authToken");
-        const response = await axios.get("/api/UserManagement/users", {
-            headers: { Authorization: token },
-        });
+        const response = await authRequest.get("/UserManagement/users");
         users.value = response.data.data.$values.map((user) => ({
             id: user.Id,
             FullName: user.FullName,
@@ -207,13 +201,9 @@ const deleteUser = async (id) => {
         },
         buttonsStyling: false,
     }).then(async (result) => {
-        const token = localStorage.getItem("authToken");
         if (result.isConfirmed) {
             try {
-                const token = localStorage.getItem("authToken");
-                await axios.delete(`/api/UserManagement/users/${id}`, {
-                    headers: { Authorization: token },
-                });
+                await authRequest.delete(`/UserManagement/users/${id}`);
                 users.value = users.value.filter((user) => user.id !== id);
                 Swal.fire("Deleted!", "Tài khoản đã được xóa.", "success");
             } catch (error) {
@@ -242,12 +232,9 @@ const deleteMultiple = async () => {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const token = localStorage.getItem("authToken");
-
                 // Sử dụng DELETE method và truyền trực tiếp mảng ID
-                const response = await axios.delete("/api/UserManagement/users/delete-multiple", {
+                const response = await authRequest.delete("/UserManagement/users/delete-multiple", {
                     headers: {
-                        Authorization: ` ${token}`,
                         "Content-Type": "application/json",
                     },
                     data: selectedUsers.value, // Truyền trực tiếp mảng ID

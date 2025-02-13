@@ -21,10 +21,9 @@
 
 <script setup>
 import { useTemplateStore } from "@/stores/template";
-import axios from "axios";
 import { ref } from "vue";
 import { RouterLink, useRoute } from "vue-router";
-
+import { guestRequest } from "../one-ui/accountmanager/service/axiosConfig";
 const route = useRoute();
 const category = route.query.category;
 const store = useTemplateStore();
@@ -32,11 +31,17 @@ const categoryName = ref("");
 
 store.setBreadcrumb([
     {
-        name: "Video Clips hướng dẫn",
+        name: {
+            vn: "Video Clips hướng dẫn",
+            en: "Guide Video & Clips",
+        },
         path: "/videos",
     },
     {
-        name: categoryName,
+        name: {
+            vn: categoryName,
+            en: categoryName,
+        },
         path: `/videos?category=${category}`,
     },
 ]);
@@ -49,7 +54,7 @@ store.setHeroTitleName({
 const blogs = ref([]);
 
 async function getBlogs() {
-    const response = await axios.get(`/api/posts?HasVideo=true&${category === undefined ? "" : `CategorySlug=${category}`}`);
+    const response = await guestRequest.get(`/posts?HasVideo=true&${category === undefined ? "" : `CategorySlug=${category}`}`);
     let posts = response.data?.data;
 
     if (posts.length > 0) {

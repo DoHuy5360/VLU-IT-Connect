@@ -12,7 +12,7 @@
 import { ref } from "vue";
 import { useTemplateStore } from "@/stores/template";
 import CategoryBox from "@/views/it-connect/components/CategoryBox.vue";
-import axios from "axios";
+import { guestRequest } from "../one-ui/accountmanager/service/axiosConfig";
 
 const store = useTemplateStore();
 store.setBreadcrumb([
@@ -29,7 +29,7 @@ store.setHeroTitleName({
 
 const categories = ref([]);
 async function getCategoryAndPosts() {
-    const res = await axios.get("/api/posts/categories-with-posts?limit=4");
+    const res = await guestRequest.get("/posts/categories-with-posts?limit=4");
 
     categories.value = res.data;
 }

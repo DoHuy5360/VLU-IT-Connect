@@ -84,11 +84,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
-import axios from "axios";
+import { ref, watch, onMounted } from "vue";
 import { useTemplateStore } from "@/stores/template";
-
-const props = defineProps(["postSlug", "category"]);
+import { guestRequest } from "../../one-ui/accountmanager/service/axiosConfig";
+const props = defineProps(["postSlug"]);
 const store = useTemplateStore();
 const featuredArticle = ref({});
 const categories = ref({});
@@ -98,7 +97,7 @@ let categoryOfThisPost;
 
 const getPost = async () => {
     try {
-        const response = await axios.get(`/api/posts/by-slug/${props.postSlug}`);
+        const response = await guestRequest.get(`/posts/by-slug/${props.postSlug}`);
         const post = response.data.data[0];
         categoryOfThisPost = post.category;
 
@@ -116,9 +115,27 @@ const getPost = async () => {
                 video: store.parseMetadataVideo(post.metadata),
             };
             store.setBreadcrumb([
-                { name: "Kiến thức CNTT - Sinh viên", path: "/blog" },
-                { name: categoryOfThisPost.name, path: `/blog?category=${categoryOfThisPost.slug}` },
-                { name: featuredArticle.value?.title, path: `/blog/detail/${featuredArticle.value?.id}` },
+                {
+                    name: {
+                        vn: "Kiến thức CNTT - Sinh viên",
+                        en: "Information Technology - Student",
+                    },
+                    path: "/blog",
+                },
+                {
+                    name: {
+                        vn: categoryOfThisPost.name,
+                        en: categoryOfThisPost.name,
+                    },
+                    path: `/blog?category=${categoryOfThisPost.slug}`,
+                },
+                {
+                    name: {
+                        vn: featuredArticle.value?.title,
+                        en: featuredArticle.value?.title,
+                    },
+                    path: `/blog/detail/${featuredArticle.value?.id}`,
+                },
             ]);
         } else {
             featuredArticle.value = null;
@@ -136,7 +153,7 @@ const getPost = async () => {
 
 const getCategories = async () => {
     try {
-        const response = await axios.get("/api/posts/categories-with-posts");
+        const response = await guestRequest.get("/posts/categories-with-posts");
         categories.value = response.data;
     } catch (error) {
         console.error("Error fetching categories:", error.response?.data || error.message);
@@ -146,7 +163,7 @@ const getCategories = async () => {
 
 const getRelatedArticles = async () => {
     try {
-        const response = await axios.get(`/api/posts/categories-with-posts?categorySlug=${categoryOfThisPost.slug}&limit=5`);
+        const response = await guestRequest.get(`/posts/categories-with-posts?categorySlug=${categoryOfThisPost.slug}&limit=5`);
         let categoryAndPosts = response.data;
 
         for (let categoryIndex = 0; categoryIndex < categoryAndPosts.length; categoryIndex++) {
@@ -174,17 +191,22 @@ const truncateText = (text, maxLength) => {
 };
 
 // Watcher để theo dõi slug
-watch(() => props.postSlug, getPost);
+watch(
+    () => props.postSlug,
+    () => {
+        getPost();
+    }
+);
 
 // Lifecycle hook
 onMounted(async () => {
     await getPost();
     await getCategories();
     await getRelatedArticles();
-
-    const blogContent = document.getElementById("blogContent");
-    blogContent.querySelectorAll("img").forEach((img) => {
-        img.style.width = "100%";
-    });
 });
 </script>
+<style>
+#blogContent img {
+    max-width: 100%;
+}
+</style>

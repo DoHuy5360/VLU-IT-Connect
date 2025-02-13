@@ -47,8 +47,7 @@
 import { ref, watch } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import { useTemplateStore } from "@/stores/template";
-import axios from "axios";
-
+import { guestRequest } from "../one-ui/accountmanager/service/axiosConfig";
 const store = useTemplateStore();
 const route = useRoute();
 
@@ -57,7 +56,7 @@ const searchParams = route.query.q;
 const searchResult = ref([]);
 
 async function searchBlog(searchValue) {
-    const response = await axios.get(`/api/posts/search`, {
+    const response = await guestRequest.get(`/posts/search`, {
         params: { searchTerm: searchValue },
     });
     searchResult.value = response.data?.data.$values.map((blog) => ({

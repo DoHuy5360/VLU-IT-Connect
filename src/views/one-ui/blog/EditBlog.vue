@@ -164,7 +164,7 @@ import Swal from "sweetalert2";
 import { CustomUploadAdapter } from "./uploadAdapter";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength, maxLength, url } from "@vuelidate/validators";
-import authRequest from "../accountmanager/service/axiosConfig";
+import { authRequest } from "../accountmanager/service/axiosConfig";
 import { useTemplateStore } from "../../../stores/template";
 
 const store = useTemplateStore();

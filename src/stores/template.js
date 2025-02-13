@@ -96,7 +96,7 @@ export const useTemplateStore = defineStore({
 
                 if (metaObj.Files?.length) {
                     let imagePath = metaObj.Files[0].replace(/\\/g, "/");
-                    return this.app.baseURL + imagePath;
+                    return this.app.baseURL + "/" + imagePath;
                 }
                 return "";
             } catch (error) {
@@ -111,7 +111,7 @@ export const useTemplateStore = defineStore({
                 let path = "";
                 switch (metaObj.Video?.type) {
                     case "file":
-                        path = this.app.baseURL + metaObj.Video.file.replace(/\\/g, "/");
+                        path = this.app.baseURL + "/" + metaObj.Video.file.replace(/\\/g, "/");
                         break;
                     case "link":
                         path = metaObj.Video.url;

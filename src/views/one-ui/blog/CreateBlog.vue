@@ -25,7 +25,7 @@
                     <img :src="previewBlogData?.image" class="w-100 border border-new-pale-gray rounded mb-3" style="object-fit: contain" alt="Chưa chọn hình ảnh" />
                 </div>
                 <h4 class="mb-3">{{ previewBlogData?.title }}</h4>
-                <div class="text-muted mb-3" v-html="previewBlogData?.details"></div>
+                <div id="blogContent" class="text-muted mb-3" v-html="previewBlogData?.details"></div>
                 <div v-if="previewBlogData?.video !== null" class="" style="height: 100vh">
                     <iframe :src="previewBlogData?.video" width="100%" height="100%" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
                 </div>
@@ -161,7 +161,7 @@ import Swal from "sweetalert2";
 import { CustomUploadAdapter } from "./uploadAdapter";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength, maxLength, url } from "@vuelidate/validators";
-import authRequest from "../accountmanager/service/axiosConfig";
+import { authRequest } from "../accountmanager/service/axiosConfig";
 
 const state = reactive({
     title: "",
@@ -361,3 +361,8 @@ function CustomUploadAdapterPlugin(editor) {
 
 const editor = ClassicEditor;
 </script>
+<style>
+#blogContent img {
+    max-width: 100%;
+}
+</style>

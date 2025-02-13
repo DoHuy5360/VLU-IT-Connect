@@ -65,11 +65,10 @@
 
 <script setup>
 import { ref, onMounted, toRefs } from "vue";
-import axios from "axios";
 import { useToast } from "vue-toastification";
 import { useRouter } from "vue-router";
 import { defineProps } from "vue";
-import authRequest from "../accountmanager/service/axiosConfig";
+import { authRequest } from "../accountmanager/service/axiosConfig";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength, maxLength } from "@vuelidate/validators";
 import { reactive } from "vue";

@@ -81,7 +81,7 @@ import Swal from "sweetalert2";
 import { RouterLink, useRouter } from "vue-router";
 import axios from "axios";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
-import authRequest from "../accountmanager/service/axiosConfig";
+import { authRequest } from "../accountmanager/service/axiosConfig";
 import { useTemplateStore } from "../../../stores/template";
 
 const store = useTemplateStore();
@@ -178,12 +178,7 @@ const swalConfirm = async (id) => {
     if (confirmation.isConfirmed) {
         try {
             loading.value = true;
-            const token = localStorage.getItem("authToken");
-            await axios.delete(`/api/admin/posts/${id}`, {
-                headers: {
-                    Authorization: token,
-                },
-            });
+            await authRequest.delete(`/admin/posts/${id}`);
             posts.value = posts.value.filter((user) => user.id !== id);
             Swal.fire("Đã xóa!", `Bài viết với ID: ${id} đã được xóa.`, "success");
         } catch (error) {

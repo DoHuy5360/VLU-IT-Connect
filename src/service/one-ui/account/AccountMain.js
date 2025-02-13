@@ -1,6 +1,6 @@
 import { ref, computed, onMounted } from "vue";
 import Swal from "sweetalert2";
-import axios from "axios";
+import { authRequest } from "../../../views/one-ui/accountmanager/service/axiosConfig";
 
 const users = ref([]);
 const searchTerm = ref("");
@@ -19,12 +19,7 @@ const groups = [
 // Fetch users on mount
 onMounted(async () => {
     try {
-        const token = localStorage.getItem("authToken");
-        const response = await axios.get("/api/UserManagement/users", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const response = await authRequest.get("/UserManagement/users");
         users.value = response.data.data.$values.map((user) => ({
             id: user.id,
             name: user.fullName,

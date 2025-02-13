@@ -108,7 +108,11 @@
     <div class="bg-white py-2">
         <div class="container">
             <div class="row justify-content-between">
-                <img src="@/../assets/media/brand/30_years_vertical_version.png" class="col-sm-3 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" draggable="false" />
+                <div class="col-sm-3 col-5">
+                    <RouterLink to="/">
+                        <img src="@/../assets/media/brand/30_years_vertical_version.png" class="image-responsive w-100" style="object-fit: contain" alt="Van Lang Logo" draggable="false" />
+                    </RouterLink>
+                </div>
                 <div class="col d-flex gap-2 align-items-center justify-content-end d-sm-none">
                     <!-- Search icon -->
                     <span @click="toggleSearchBar">

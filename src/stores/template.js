@@ -82,6 +82,9 @@ export const useTemplateStore = defineStore({
 
             return `${day}/${month}/${year}`;
         },
+        truncateText(text, numberOfLimitLetter) {
+            return text.length > numberOfLimitLetter ? `${text.slice(0, numberOfLimitLetter)}...` : text;
+        },
         isMP4(source) {
             console.log(source);
             if (source) {

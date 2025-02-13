@@ -29,7 +29,7 @@
                             <RouterLink :to="`/blog/detail/${blog.slug}`" class="hover_underline text-black">
                                 <div class="mt-2">
                                     <strong>{{ blog.title }}</strong>
-                                    <div>{{ truncateText(blog.excerpt) }}</div>
+                                    <div>{{ store.truncateText(blog.excerpt) }}</div>
                                 </div>
                             </RouterLink>
                         </div>
@@ -81,8 +81,4 @@ store.setHeroTitleName({
     vn: "Kết quả tìm kiếm",
     en: "Search result",
 });
-
-const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-};
 </script>

@@ -9,7 +9,7 @@
                         <RouterLink :to="`/blog/detail/${blog.slug}`" class="hover_underline text-black">
                             <strong>{{ blog.title }}</strong>
                             <div>
-                                {{ truncateText(blog.excerpt, 100) }}
+                                {{ store.truncateText(blog.excerpt, 100) }}
                             </div>
                         </RouterLink>
                     </div>
@@ -70,8 +70,4 @@ async function getBlogs() {
     }
 }
 getBlogs();
-
-const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-};
 </script>

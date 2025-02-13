@@ -40,7 +40,7 @@
                                             <th scope="row">{{ rowIndex + 1 }}</th>
                                             <td style="">
                                                 <RouterLink :to="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer">{{
-                                                    truncateText(row.title, 30)
+                                                    store.truncateText(row.title, 30)
                                                 }}</RouterLink>
                                             </td>
                                             <td>{{ row.category }}</td>
@@ -115,10 +115,6 @@ function search(input) {
         }
     }
 }
-
-const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-};
 
 onMounted(async () => {
     try {

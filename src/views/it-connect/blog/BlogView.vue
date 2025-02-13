@@ -11,7 +11,7 @@
                                 <div>
                                     <div class="hover_underline">
                                         <h4 class="mb-3 clickable-text">{{ featuredArticle.title }}</h4>
-                                        <p class="text-muted mb-3">{{ truncateText(featuredArticle.details, 600) }}</p>
+                                        <p class="text-muted mb-3">{{ store.truncateText(featuredArticle.details, 600) }}</p>
                                     </div>
                                     <div class="d-flex gap-2 text-muted">
                                         <strong>
@@ -33,8 +33,8 @@
                         <ul class="list-unstyled flex-grow-1">
                             <li v-for="(article, index) in paginatedArticles" :key="index" class="hover_underline p-2 mb-2 rounded" style="cursor: pointer">
                                 <RouterLink :to="`/blog/detail/${article.slug}`" class="text-black">
-                                    <h4 class="mb-2 clickable-text">{{ truncateText(article.title, 50) }}</h4>
-                                    <p class="text-muted small mb-1">{{ truncateText(article.details, 100) }}</p>
+                                    <h4 class="mb-2 clickable-text">{{ store.truncateText(article.title, 50) }}</h4>
+                                    <p class="text-muted small mb-1">{{ store.truncateText(article.details, 100) }}</p>
                                     <div class="d-flex gap-2 text-muted">
                                         <strong>
                                             {{ article.userName }}
@@ -70,8 +70,8 @@
                         <iframe v-else width="100%" height="200px" :src="featuredArticle.video" frameborder="0" allowfullscreen class="rounded h-50" title="Guiding clips"></iframe>
                         <RouterLink :to="`/blog/detail/${featuredArticle.slug}`" class="hover_underline text-black">
                             <div class="mt-2">
-                                <strong>{{ truncateText(featuredArticle.title, 50) }}</strong>
-                                <div>{{ truncateText(featuredArticle.excerpt, 50) }}</div>
+                                <strong>{{ store.truncateText(featuredArticle.title, 50) }}</strong>
+                                <div>{{ store.truncateText(featuredArticle.excerpt, 50) }}</div>
                             </div>
                         </RouterLink>
                     </div>
@@ -80,8 +80,8 @@
                         <iframe v-else width="100%" height="200px" :src="blog.video" frameborder="0" allowfullscreen class="rounded h-50" title="Guiding clips"></iframe>
                         <RouterLink :to="`/blog/detail/${blog.slug}`" class="hover_underline text-black">
                             <div class="mt-2">
-                                <strong>{{ truncateText(blog.title, 50) }}</strong>
-                                <div>{{ truncateText(blog.excerpt, 50) }}</div>
+                                <strong>{{ store.truncateText(blog.title, 50) }}</strong>
+                                <div>{{ store.truncateText(blog.excerpt, 50) }}</div>
                             </div>
                         </RouterLink>
                     </div>
@@ -113,10 +113,6 @@ const paginatedArticles = computed(() => {
     const start = (currentPage.value - 1) * articlesPerPage;
     return oldArticles.value.slice(start, start + articlesPerPage);
 });
-
-const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-};
 
 const nextPage = () => {
     if (currentPage.value < totalPages.value) {

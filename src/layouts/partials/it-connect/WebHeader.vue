@@ -147,9 +147,9 @@
                     <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-black" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
                     </RouterLink>
-                    <RouterLink to="tel:028 7109 9131" class="text-black" style="cursor: pointer">
+                    <a href="tel:028 7109 9131" class="text-black" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
-                    </RouterLink>
+                    </a>
                 </div>
             </div>
         </div>

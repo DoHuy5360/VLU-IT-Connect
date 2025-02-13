@@ -10,7 +10,17 @@
                             <span class="text-primary clickable-text">{{ featuredArticle?.category?.name }}</span>
                         </div>
                         <div class="d-flex justify-content-start">
-                            <img :src="featuredArticle?.image" alt="Blog Article Image" class="w-100 border border-new-pale-gray rounded mb-3" style="object-fit: contain" />
+                            <img
+                                :src="featuredArticle?.image"
+                                alt="Blog Article Image"
+                                class="w-100 rounded mb-3"
+                                style="object-fit: contain"
+                                @error="
+                                    () => {
+                                        featuredArticle.image = '/../assets/media/brand/30_years_vertical_version.png';
+                                    }
+                                "
+                            />
                         </div>
                         <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
                         <div class="text-muted mb-3" id="blogContent" v-html="featuredArticle?.details"></div>
@@ -56,14 +66,24 @@
                             <div v-for="(article, index) in relatedArticles" :key="index">
                                 <RouterLink :to="`/blog/detail/${article.slug}`" class="hover_underline row py-2 text-black" style="cursor: pointer">
                                     <div class="col-4 d-flex">
-                                        <img :src="article.image" alt="Related Post Image" class="rounded border w-100 h-100" style="object-fit: contain" />
+                                        <img
+                                            :src="article.image"
+                                            alt="Related Post Image"
+                                            class="rounded border w-100 h-100"
+                                            style="object-fit: contain"
+                                            @error="
+                                                () => {
+                                                    article.image = '/../assets/media/brand/logo-khong-chu.png';
+                                                }
+                                            "
+                                        />
                                     </div>
                                     <div class="col-8">
                                         <h6 class="mb-1 clickable-text text-truncate" :title="article.title">
-                                            {{ truncateText(article.title, 30) }}
+                                            {{ store.truncateText(article.title, 30) }}
                                         </h6>
                                         <p class="text-muted small mb-1">
-                                            {{ truncateText(article.excerpt, 60) }}
+                                            {{ store.truncateText(article.excerpt, 60) }}
                                         </p>
                                         <div class="text-muted small">
                                             <strong>{{ article.author }}</strong>
@@ -184,10 +204,6 @@ const getRelatedArticles = async () => {
     } catch (error) {
         console.error("Error fetching related articles:", error);
     }
-};
-
-const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };
 
 // Watcher để theo dõi slug

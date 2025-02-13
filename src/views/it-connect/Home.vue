@@ -263,7 +263,7 @@
                         <iframe width="100%" height="200px" :src="post.video" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
                         <RouterLink :to="`/blog/detail/${post.slug}`" :title="post.title" class="text-black hover_underline">
                             <strong>{{ post.title }}</strong>
-                            <div>{{ truncateText(post.excerpt, 100) }}</div>
+                            <div>{{ store.truncateText(post.excerpt, 100) }}</div>
                         </RouterLink>
                     </div>
                 </div>
@@ -292,10 +292,6 @@ function onSearch() {
         searchInput.value.focus();
     }
 }
-
-const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-};
 const posts = ref([]);
 async function getBlogsHasVideo() {
     const response = await guestRequest.get(`/posts?PageNumber=1&PageSize=3&HasVideo=true`);

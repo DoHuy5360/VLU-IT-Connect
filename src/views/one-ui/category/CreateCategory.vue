@@ -71,9 +71,8 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
 import { useRouter } from "vue-router";
-import authRequest from "../accountmanager/service/axiosConfig";
+import { authRequest } from "../accountmanager/service/axiosConfig";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength, maxLength } from "@vuelidate/validators";
 import { reactive } from "vue";

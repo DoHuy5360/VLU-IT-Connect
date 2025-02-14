@@ -44,6 +44,7 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useToast } from "vue-toastification";
+import { authRequest } from "../../../one-ui/accountmanager/service/axiosConfig";
 
 export default {
     name: "CategoryRow",
@@ -87,11 +88,7 @@ export default {
 
             if (result.isConfirmed) {
                 try {
-                    const token = localStorage.getItem("authToken");
-                    console.log(`🚀 Deleting category: ${this.category.code}`);
-
-                    const response = await axios.delete("/api/Categories/deletecategory", {
-                        headers: { Authorization: token },
+                    const response = await authRequest.delete("/Categories/deletecategory", {
                         params: { cateCode: this.category.code }, // Truyền cateCode trong params
                     });
 

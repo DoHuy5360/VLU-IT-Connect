@@ -3,7 +3,7 @@
         <div class="bg-white px-4 rounded rounded-lg border border-new-pale-gray">
             <!-- Featured Article -->
             <div class="row gy-2 align-items-stretch">
-                <div class="col-lg-8 h-120 d-flex flex-column" v-if="featuredArticle">
+                <div v-if="featuredArticle" class="col-lg-8 h-120 d-flex flex-column">
                     <div class="rounded py-4 flex-grow-1">
                         <RouterLink :to="`/blog/detail/${featuredArticle.slug}`" class="text-black">
                             <div class="featured-article-box d-flex flex-column gap-3" style="cursor: pointer">
@@ -11,7 +11,7 @@
                                 <div>
                                     <div class="hover_underline">
                                         <h4 class="mb-3 clickable-text">{{ featuredArticle.title }}</h4>
-                                        <p class="text-muted mb-3">{{ truncateText(featuredArticle.details, 600) }}</p>
+                                        <p class="text-muted mb-3">{{ store.truncateText(featuredArticle.details, 600) }}</p>
                                     </div>
                                     <div class="d-flex gap-2 text-muted">
                                         <strong>
@@ -26,14 +26,15 @@
                         </RouterLink>
                     </div>
                 </div>
+                <div v-else style="height: 100vh; display: grid; place-items: center">{{ store.isVietNamese() ? "Bài viết không tồn tại" : "Not found" }}</div>
                 <!-- Old Articles with Pagination -->
                 <div class="col-lg-4 d-flex flex-column" v-if="oldArticles.length">
                     <div class="rounded d-flex flex-column py-4 flex-grow-1">
                         <ul class="list-unstyled flex-grow-1">
                             <li v-for="(article, index) in paginatedArticles" :key="index" class="hover_underline p-2 mb-2 rounded" style="cursor: pointer">
                                 <RouterLink :to="`/blog/detail/${article.slug}`" class="text-black">
-                                    <h4 class="mb-2 clickable-text">{{ truncateText(article.title, 50) }}</h4>
-                                    <p class="text-muted small mb-1">{{ truncateText(article.details, 100) }}</p>
+                                    <h4 class="mb-2 clickable-text">{{ store.truncateText(article.title, 50) }}</h4>
+                                    <p class="text-muted small mb-1">{{ store.truncateText(article.details, 100) }}</p>
                                     <div class="d-flex gap-2 text-muted">
                                         <strong>
                                             {{ article.userName }}
@@ -69,8 +70,8 @@
                         <iframe v-else width="100%" height="200px" :src="featuredArticle.video" frameborder="0" allowfullscreen class="rounded h-50" title="Guiding clips"></iframe>
                         <RouterLink :to="`/blog/detail/${featuredArticle.slug}`" class="hover_underline text-black">
                             <div class="mt-2">
-                                <strong>{{ truncateText(featuredArticle.title, 50) }}</strong>
-                                <div>{{ truncateText(featuredArticle.excerpt, 50) }}</div>
+                                <strong>{{ store.truncateText(featuredArticle.title, 50) }}</strong>
+                                <div>{{ store.truncateText(featuredArticle.excerpt, 50) }}</div>
                             </div>
                         </RouterLink>
                     </div>
@@ -79,8 +80,8 @@
                         <iframe v-else width="100%" height="200px" :src="blog.video" frameborder="0" allowfullscreen class="rounded h-50" title="Guiding clips"></iframe>
                         <RouterLink :to="`/blog/detail/${blog.slug}`" class="hover_underline text-black">
                             <div class="mt-2">
-                                <strong>{{ truncateText(blog.title, 50) }}</strong>
-                                <div>{{ truncateText(blog.excerpt, 50) }}</div>
+                                <strong>{{ store.truncateText(blog.title, 50) }}</strong>
+                                <div>{{ store.truncateText(blog.excerpt, 50) }}</div>
                             </div>
                         </RouterLink>
                     </div>
@@ -91,10 +92,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import axios from "axios";
+import { ref, computed, onMounted, watch } from "vue";
 import { useTemplateStore } from "@/stores/template";
-
+import { guestRequest } from "../../one-ui/accountmanager/service/axiosConfig";
 const store = useTemplateStore();
 
 import { RouterLink, useRoute, useRouter } from "vue-router";
@@ -114,10 +114,6 @@ const paginatedArticles = computed(() => {
     return oldArticles.value.slice(start, start + articlesPerPage);
 });
 
-const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-};
-
 const nextPage = () => {
     if (currentPage.value < totalPages.value) {
         currentPage.value++;
@@ -130,6 +126,14 @@ const prevPage = () => {
     }
 };
 
+watch(
+    () => route.query.category,
+    (newCategory) => {
+        console.log(newCategory);
+        getBlogs(newCategory);
+    }
+);
+
 function getDayFromDate(stringDate) {
     const date = new Date(stringDate);
     const day = String(date.getDate()).padStart(2, "0");
@@ -139,10 +143,13 @@ function getDayFromDate(stringDate) {
     return `${day}/${month}/${year}`;
 }
 
-onMounted(async () => {
+async function getBlogs(category) {
     try {
-        const response = await axios.get(`/api/posts?PageNumber=1&PageSize=9999${category === undefined ? "" : `&CategorySlug=${category}`}`);
+        const response = await guestRequest.get(`/posts?PageNumber=1&PageSize=9999${category === undefined ? "" : `&CategorySlug=${category}`}`);
         let posts = response.data?.data;
+
+        featuredArticle.value = null;
+        oldArticles.value = [];
 
         if (posts.length > 0) {
             featuredArticle.value = {
@@ -177,23 +184,35 @@ onMounted(async () => {
         if (category === undefined) {
             store.setBreadcrumb([
                 {
-                    name: "Kiến thức CNTT - Sinh viên",
+                    name: {
+                        vn: "Kiến thức CNTT - Sinh viên",
+                        en: "Information Knowledge - Student",
+                    },
                     path: "/categories",
                 },
                 {
-                    name: "Bài viết",
+                    name: {
+                        vn: "Bài viết",
+                        en: "Blogs",
+                    },
                     path: "/blog",
                 },
             ]);
         } else {
             store.setBreadcrumb([
                 {
-                    name: "Kiến thức CNTT - Sinh viên",
+                    name: {
+                        vn: "Kiến thức CNTT - Sinh viên",
+                        en: "Information Knowledge - Student",
+                    },
                     path: "/categories",
                 },
                 {
-                    name: featuredArticle.value.category.name,
-                    path: `/blog?category=${featuredArticle.value.category.slug}`,
+                    name: {
+                        vn: featuredArticle.value?.category?.name,
+                        en: featuredArticle.value?.category?.name,
+                    },
+                    path: `/blog?category=${featuredArticle.value?.category?.slug}`,
                 },
             ]);
         }
@@ -202,5 +221,6 @@ onMounted(async () => {
         vn: "Bài viết",
         en: "Blogs",
     });
-});
+}
+getBlogs(category);
 </script>

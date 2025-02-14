@@ -79,7 +79,7 @@ import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { useTemplateStore } from "../../../stores/template";
-import authRequest from "../accountmanager/service/axiosConfig";
+import { authRequest } from "../accountmanager/service/axiosConfig";
 import { reactive } from "vue";
 
 const store = useTemplateStore();

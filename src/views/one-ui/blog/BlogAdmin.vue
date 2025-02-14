@@ -40,7 +40,7 @@
                                             <th scope="row">{{ rowIndex + 1 }}</th>
                                             <td style="">
                                                 <RouterLink :to="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer">{{
-                                                    truncateText(row.title, 30)
+                                                    store.truncateText(row.title, 30)
                                                 }}</RouterLink>
                                             </td>
                                             <td>{{ row.category }}</td>
@@ -81,7 +81,7 @@ import Swal from "sweetalert2";
 import { RouterLink, useRouter } from "vue-router";
 import axios from "axios";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
-import authRequest from "../accountmanager/service/axiosConfig";
+import { authRequest } from "../accountmanager/service/axiosConfig";
 import { useTemplateStore } from "../../../stores/template";
 
 const store = useTemplateStore();
@@ -115,10 +115,6 @@ function search(input) {
         }
     }
 }
-
-const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-};
 
 onMounted(async () => {
     try {
@@ -178,12 +174,7 @@ const swalConfirm = async (id) => {
     if (confirmation.isConfirmed) {
         try {
             loading.value = true;
-            const token = localStorage.getItem("authToken");
-            await axios.delete(`/api/admin/posts/${id}`, {
-                headers: {
-                    Authorization: token,
-                },
-            });
+            await authRequest.delete(`/admin/posts/${id}`);
             posts.value = posts.value.filter((user) => user.id !== id);
             Swal.fire("Đã xóa!", `Bài viết với ID: ${id} đã được xóa.`, "success");
         } catch (error) {

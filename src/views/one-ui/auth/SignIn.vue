@@ -77,10 +77,13 @@
 </template>
 
 <script setup>
-import axios from "axios";
 import { reactive } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
+import { useRouter } from "vue-router";
+import { gateRequest } from "../accountmanager/service/axiosConfig";
+
+const router = useRouter();
 
 const state = reactive({
     email: "",
@@ -109,7 +112,7 @@ const onSubmit = async () => {
     state.loginError = false;
 
     try {
-        const response = await axios.post("/login", {
+        const response = await gateRequest.post("/login", {
             email: state.email,
             password: state.password,
             twoFactorCode: "string",
@@ -118,7 +121,7 @@ const onSubmit = async () => {
 
         const { tokenType, accessToken } = response.data;
         localStorage.setItem("authToken", `${tokenType} ${accessToken}`);
-        window.location.href = "/administrator";
+        router.push({ name: "index" });
     } catch (error) {
         console.error("Login failed:", error.response?.data || error.message);
         state.loginError = true;

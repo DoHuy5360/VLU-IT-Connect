@@ -24,7 +24,7 @@
             <div class="col-md-4">
                 <select class="form-select" v-model="selectedGroup" @change="onFilterGroup" title="Lọc tài khoản">
                     <option value="">Tất cả nhóm tài khoản</option>
-                    <option v-for="group in groups" :key="group.value" :value="group.value">
+                    <option v-for="group in groups" :key="group.value" :value="group.label">
                         {{ group.label }}
                     </option>
                 </select>
@@ -111,8 +111,8 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import Swal from "sweetalert2";
-import axios from "axios";
 import { useRouter } from "vue-router";
+import { authRequest } from "../accountmanager/service/axiosConfig";
 
 const router = useRouter();
 
@@ -128,10 +128,7 @@ const selectedUsers = ref([]);
 // Fetch Groups
 const fetchGroups = async () => {
     try {
-        const token = localStorage.getItem("authToken");
-        const response = await axios.get("/api/AccountGroup/list", {
-            headers: { Authorization: token },
-        });
+        const response = await authRequest.get("/AccountGroup/list");
         groups.value = response.data.data.$values.map((group) => ({
             value: group.Id,
             label: group.GroupName,
@@ -144,10 +141,7 @@ const fetchGroups = async () => {
 // Fetch Users
 const fetchUsers = async () => {
     try {
-        const token = localStorage.getItem("authToken");
-        const response = await axios.get("/api/UserManagement/users", {
-            headers: { Authorization: token },
-        });
+        const response = await authRequest.get("/UserManagement/users");
         users.value = response.data.data.$values.map((user) => ({
             id: user.Id,
             FullName: user.FullName,
@@ -170,12 +164,7 @@ onMounted(() => {
 
 // Computed Properties
 const filteredUsers = computed(() => {
-    return users.value
-        .filter((user) => !selectedGroup.value || user.Role === selectedGroup.value)
-        .filter((user) => {
-            const keyword = searchTerm.value.trim().toLowerCase();
-            return !keyword || user.FullName.toLowerCase().includes(keyword) || user.Email.toLowerCase().includes(keyword) || user.Role.toLowerCase().includes(keyword);
-        });
+    return users.value.filter((user) => !selectedGroup.value || user.Role === selectedGroup.value);
 });
 
 const totalPages = computed(() => Math.ceil(filteredUsers.value.length / itemsPerPage));
@@ -191,7 +180,9 @@ const changePage = (page) => {
 };
 
 const onSearch = () => (currentPage.value = 1);
-const onFilterGroup = () => (currentPage.value = 1);
+const onFilterGroup = () => {
+    currentPage.value = 1;
+};
 
 const deleteUser = async (id) => {
     Swal.fire({
@@ -207,13 +198,9 @@ const deleteUser = async (id) => {
         },
         buttonsStyling: false,
     }).then(async (result) => {
-        const token = localStorage.getItem("authToken");
         if (result.isConfirmed) {
             try {
-                const token = localStorage.getItem("authToken");
-                await axios.delete(`/api/UserManagement/users/${id}`, {
-                    headers: { Authorization: token },
-                });
+                await authRequest.delete(`/UserManagement/users/${id}`);
                 users.value = users.value.filter((user) => user.id !== id);
                 Swal.fire("Deleted!", "Tài khoản đã được xóa.", "success");
             } catch (error) {
@@ -242,12 +229,9 @@ const deleteMultiple = async () => {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const token = localStorage.getItem("authToken");
-
                 // Sử dụng DELETE method và truyền trực tiếp mảng ID
-                const response = await axios.delete("/api/UserManagement/users/delete-multiple", {
+                const response = await authRequest.delete("/UserManagement/users/delete-multiple", {
                     headers: {
-                        Authorization: ` ${token}`,
                         "Content-Type": "application/json",
                     },
                     data: selectedUsers.value, // Truyền trực tiếp mảng ID

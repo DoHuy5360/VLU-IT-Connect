@@ -10,7 +10,6 @@
                 <div class="row">
                     <div class="col">
                         <label for="searchInputHeroVer" class="text-white hero-title">{{ store.isVietNamese() ? store.heroTitleName.vn : store.heroTitleName.en }}</label>
-                      
                     </div>
                     <div class="col-4 d-none d-sm-block">
                         <div class="search-container">

@@ -49,6 +49,7 @@ import CategoryRow from "@/views/one-ui/category/compononts/CategoryRow.vue";
 import BasePageHeading from "@/components/BasePageHeading.vue";
 import BaseBlock from "@/components/BaseBlock.vue";
 import Swal from "sweetalert2";
+import { authRequest } from "../../one-ui/accountmanager/service/axiosConfig";
 
 export default {
     name: "SimpleCategoryTable",
@@ -71,14 +72,12 @@ export default {
     methods: {
         async getCategories() {
             try {
-                const token = localStorage.getItem("authToken");
                 const params = {
                     indexPage: this.currentPage || 1,
                     limitRange: 20,
                 };
 
-                const response = await axios.get("/api/Categories/getallcategories", {
-                    headers: { Authorization: token },
+                const response = await authRequest.get("/Categories/getallcategories", {
                     params: params,
                 });
 

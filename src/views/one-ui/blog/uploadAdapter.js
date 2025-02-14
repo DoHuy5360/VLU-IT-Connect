@@ -1,5 +1,5 @@
-import axios from "axios";
 import { useTemplateStore } from "../../../stores/template";
+import { authRequest } from "../accountmanager/service/axiosConfig";
 
 const store = useTemplateStore();
 
@@ -13,17 +13,16 @@ export class CustomUploadAdapter {
             const data = new FormData();
             this.loader.file.then((file) => {
                 data.append("image", file);
-                const token = localStorage.getItem("authToken");
-                axios
-                    .post("/api/admin/posts/upload-image-content", data, {
+                authRequest
+                    .post("/admin/posts/upload-image-content", data, {
                         headers: {
-                            Authorization: token,
+                            "Content-Type": "multipart/form-data",
                         },
                     })
                     .then((response) => response.data)
                     .then((result) => {
                         resolve({
-                            default: store.app.baseURL + result.url, // URL ảnh sau khi upload
+                            default: store.app.baseURL + "/" + result.url, // URL ảnh sau khi upload
                         });
                     })
                     .catch((error) => {

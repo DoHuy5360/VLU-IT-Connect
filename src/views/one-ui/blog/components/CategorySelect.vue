@@ -21,7 +21,7 @@ const token = localStorage.getItem("authToken");
 
 onMounted(() => {
     axios
-        .get("/api/Categories/getallcategories", {
+        .get("/Categories/getallcategories", {
             headers: { Authorization: `Bearer ${token}` },
             params: {
                 cateName: "",

@@ -25,11 +25,13 @@
                 <div v-if="searchResult.length" class="row" id="wrapVideo">
                     <div class="col-auto col-sm-3" v-for="blog in searchResult.slice(0, 3)" :key="blog.id">
                         <div v-if="blog.video !== null">
-                            <iframe :src="blog.video" width="100%" height="" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
+                            <video v-if="store.isMP4(blog.video)" height="150px" :src="blog.video" controls class="rounded w-100" title="Guiding clips"></video>
+                            <iframe v-else width="100%" height="150px" :src="blog.video" frameborder="0" allowfullscreen class="rounded h-50" title="Guiding clips"></iframe>
+
                             <RouterLink :to="`/blog/detail/${blog.slug}`" class="hover_underline text-black">
                                 <div class="mt-2">
                                     <strong>{{ blog.title }}</strong>
-                                    <div>{{ truncateText(blog.excerpt) }}</div>
+                                    <div>{{ store.truncateText(blog.excerpt, 100) }}</div>
                                 </div>
                             </RouterLink>
                         </div>
@@ -47,8 +49,7 @@
 import { ref, watch } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import { useTemplateStore } from "@/stores/template";
-import axios from "axios";
-
+import { guestRequest } from "../one-ui/accountmanager/service/axiosConfig";
 const store = useTemplateStore();
 const route = useRoute();
 
@@ -57,7 +58,7 @@ const searchParams = route.query.q;
 const searchResult = ref([]);
 
 async function searchBlog(searchValue) {
-    const response = await axios.get(`/api/posts/search`, {
+    const response = await guestRequest.get(`/posts/search`, {
         params: { searchTerm: searchValue },
     });
     searchResult.value = response.data?.data.$values.map((blog) => ({
@@ -76,14 +77,18 @@ watch(
     }
 );
 
-store.setBreadcrumb([{ name: "Kết quả tìm kiếm", path: `/search?q=${searchParams}` }]);
+store.setBreadcrumb([
+    {
+        name: {
+            vn: "Kết quả tìm kiếm",
+            en: "Search result",
+        },
+        path: `/search?q=${searchParams}`,
+    },
+]);
 
 store.setHeroTitleName({
     vn: "Kết quả tìm kiếm",
     en: "Search result",
 });
-
-const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-};
 </script>

@@ -1,7 +1,7 @@
 <template>
     <BasePageHeading title="Tạo Bài Viết" subtitle="">
         <template #extra>
-            <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/blog')">
+            <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/blog')" :style="`display: ${isPreviewMode ? 'none' : ''}`">
                 <i class="fa fa-arrow-left opacity-50 me-1"></i>
                 Quay lại
             </button>
@@ -15,23 +15,34 @@
                 Quay lại
             </button>
         </div>
-        <div class="bg-white rounded mb-4">
-            <div class="p-4">
-                <div class="d-flex gap-3 text-muted mb-3">
-                    <strong>{{ getDayFromDate(new Date()) }}</strong>
-                    <span class="text-primary clickable-text">{{ previewBlogData?.categoryName }}</span>
-                </div>
-                <div class="d-flex justify-content-start">
-                    <img :src="previewBlogData?.image" class="w-100 border border-new-pale-gray rounded mb-3" style="object-fit: contain" alt="Chưa chọn hình ảnh" />
-                </div>
-                <h4 class="mb-3">{{ previewBlogData?.title }}</h4>
-                <div class="text-muted mb-3" v-html="previewBlogData?.details"></div>
-                <div v-if="previewBlogData?.video !== null" class="" style="height: 100vh">
-                    <iframe :src="previewBlogData?.video" width="100%" height="100%" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
-                </div>
-                <br />
-                <strong>{{ previewBlogData?.author }}</strong>
+        <h3>Xem trước giao diện bài viết ở màn hình tìm kiếm</h3>
+        <div class="bg-white rounded p-4 mb-4" style="">
+            <strong class="" style="font-size: 1.2rem">{{ previewBlogData?.title }}</strong>
+            <div class="text-muted">{{ previewBlogData?.excerpt }}</div>
+        </div>
+        <hr />
+        <h3>Xem trước giao diện ở màn hình xem chi tiết bài viết</h3>
+        <div class="bg-white rounded mb-4 p-4">
+            <div class="d-flex gap-3 text-muted mb-3">
+                <strong>{{ getDayFromDate(new Date()) }}</strong>
+                <span class="text-primary clickable-text">{{ previewBlogData?.categoryName }}</span>
             </div>
+            <div class="d-flex justify-content-start">
+                <img :src="previewBlogData?.image" class="w-100 rounded mb-3" style="object-fit: contain" alt="Ảnh bìa" />
+            </div>
+            <h4 class="mb-3">{{ previewBlogData?.title }}</h4>
+            <div id="blogContent" class="text-muted mb-3" v-html="previewBlogData?.details"></div>
+            <div v-if="previewBlogData?.video !== null" class="" style="height: 100vh">
+                <iframe :src="previewBlogData?.video" width="100%" height="100%" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
+            </div>
+            <br />
+            <strong>{{ previewBlogData?.author }}</strong>
+        </div>
+        <div class="mb-4">
+            <button type="button" class="btn btn-alt-primary" @click="switchToPreviewMode(false)">
+                <i class="fa fa-arrow-left opacity-50 me-1"></i>
+                Quay lại
+            </button>
         </div>
     </div>
     <div class="content" :style="`display: ${isPreviewMode ? 'none' : ''}`">
@@ -145,8 +156,11 @@
                             <input class="form-check-input" type="checkbox" v-model="state.published" id="publish" />
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-success">Hoàn tất</button>
-                    <button type="button" class="btn btn-alt-secondary ms-2" @click="navigateToSimulation">Xem trước</button>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="button" class="btn btn-alt-primary" @click="$router.push('/administrator/blog')"><i class="fa fa-arrow-left opacity-50 me-1"></i>Quay lại</button>
+                        <button type="submit" class="btn btn-success">Hoàn tất</button>
+                        <button type="button" class="btn btn-alt-secondary" @click="navigateToSimulation">Xem trước</button>
+                    </div>
                 </form>
             </div>
         </BaseBlock>
@@ -161,7 +175,7 @@ import Swal from "sweetalert2";
 import { CustomUploadAdapter } from "./uploadAdapter";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength, maxLength, url } from "@vuelidate/validators";
-import authRequest from "../accountmanager/service/axiosConfig";
+import { authRequest } from "../accountmanager/service/axiosConfig";
 
 const state = reactive({
     title: "",
@@ -185,7 +199,7 @@ const rules = {
     slug: { required, maxLength: maxLength(200) },
     excerpt: { maxLength: maxLength(160) },
     categoryId: { required },
-    image: { required, maxSize: maxSize(5 * 1024 * 1024) },
+    image: { maxSize: maxSize(5 * 1024 * 1024) },
     videoUrl: { url },
 };
 
@@ -332,10 +346,11 @@ const navigateToSimulation = () => {
     previewBlogData.value = {
         title: state.title.trim(),
         details: state.contentHtml,
-        categoryName: selectedCategory.length != 0 ? selectedCategory[0].name : "Chưa chọn thể loại bài viết",
-        image: previewImageUrl.value,
+        categoryName: selectedCategory.length != 0 ? selectedCategory[0].name : "[Tên thể loại sẽ hiển thị ở đây]",
+        image: previewImageUrl.value || "/../assets/media/brand/30_years_vertical_version.png",
         video: state.videoType !== "none" ? (state.videoType === "link" ? state.videoUrl : previewVideoUrl.value) : null,
-        author: "<Tên tác giả>",
+        author: "[Tên tác giả sẽ hiển thị ở đây]",
+        excerpt: state.excerpt,
     };
     switchToPreviewMode(true);
 };
@@ -361,3 +376,8 @@ function CustomUploadAdapterPlugin(editor) {
 
 const editor = ClassicEditor;
 </script>
+<style>
+#blogContent img {
+    max-width: 100%;
+}
+</style>

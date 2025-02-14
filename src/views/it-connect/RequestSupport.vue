@@ -81,7 +81,10 @@ const store = useTemplateStore();
 
 store.setBreadcrumb([
     {
-        name: "Hỗ trợ",
+        name: {
+            vn: "Hỗ trợ",
+            en: "Support",
+        },
         path: "/support",
     },
 ]);

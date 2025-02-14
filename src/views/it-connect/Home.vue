@@ -261,9 +261,10 @@
                 <div class="row" id="wrapVideo">
                     <div v-for="post in posts" :key="post.id" class="col-auto col-sm-4">
                         <iframe width="100%" height="200px" :src="post.video" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
-                        <RouterLink :to="`/blog/detail/${post.slug}`" :title="post.title"></RouterLink>
-                        <strong>{{ post.title }}</strong>
-                        <div>{{ truncateText(post.excerpt, 100) }}</div>
+                        <RouterLink :to="`/blog/detail/${post.slug}`" :title="post.title" class="text-black hover_underline">
+                            <strong>{{ post.title }}</strong>
+                            <div>{{ store.truncateText(post.excerpt, 100) }}</div>
+                        </RouterLink>
                     </div>
                 </div>
             </div>
@@ -272,10 +273,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { useTemplateStore } from "../../stores/template";
-import axios from "axios";
+
+import { guestRequest } from "../one-ui/accountmanager/service/axiosConfig";
 
 const store = useTemplateStore();
 const router = useRouter();
@@ -290,13 +292,9 @@ function onSearch() {
         searchInput.value.focus();
     }
 }
-
-const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-};
 const posts = ref([]);
 async function getBlogsHasVideo() {
-    const response = await axios.get(`/api/posts?PageNumber=1&PageSize=3&HasVideo=true`);
+    const response = await guestRequest.get(`/posts?PageNumber=1&PageSize=3&HasVideo=true`);
     posts.value = response.data?.data.map((post) => ({
         title: post.title,
         excerpt: post.excerpt,
@@ -308,7 +306,7 @@ getBlogsHasVideo();
 
 const news = ref([]);
 async function getBlogsAsNews() {
-    const response = await axios.get(`/api/posts?PageNumber=1&PageSize=5`);
+    const response = await guestRequest.get(`/posts?PageNumber=1&PageSize=5`);
     news.value = response.data?.data.map((post) => ({
         title: post.title,
         slug: post.slug,

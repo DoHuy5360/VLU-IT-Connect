@@ -82,6 +82,9 @@ export const useTemplateStore = defineStore({
 
             return `${day}/${month}/${year}`;
         },
+        truncateText(text, numberOfLimitLetter) {
+            return text.length > numberOfLimitLetter ? `${text.slice(0, numberOfLimitLetter)}...` : text;
+        },
         isMP4(source) {
             console.log(source);
             if (source) {
@@ -96,7 +99,7 @@ export const useTemplateStore = defineStore({
 
                 if (metaObj.Files?.length) {
                     let imagePath = metaObj.Files[0].replace(/\\/g, "/");
-                    return this.app.baseURL + imagePath;
+                    return this.app.baseURL + "/" + imagePath;
                 }
                 return "";
             } catch (error) {
@@ -111,7 +114,7 @@ export const useTemplateStore = defineStore({
                 let path = "";
                 switch (metaObj.Video?.type) {
                     case "file":
-                        path = this.app.baseURL + metaObj.Video.file.replace(/\\/g, "/");
+                        path = this.app.baseURL + "/" + metaObj.Video.file.replace(/\\/g, "/");
                         break;
                     case "link":
                         path = metaObj.Video.url;

@@ -45,7 +45,7 @@
                     </tr>
                     <tr>
                         <td style="white-space: nowrap">Video</td>
-                        <td style="height: 100vh">
+                        <td :style="`height: ${post.videoUrl ? '100vh' : ''}`">
                             <video v-if="store.isMP4(post.videoUrl)" :src="post.videoUrl" controls class="rounded w-100"></video>
                             <iframe v-else width="100%" height="100%" :src="post.videoUrl" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
                         </td>
@@ -111,6 +111,7 @@ onMounted(async () => {
         post.title = response.data.title;
         post.slug = response.data.slug;
         post.excerpt = response.data.excerpt;
+        post.contentHtml = response.data.contentHtml;
         post.published = response.data.published;
         post.publishedAt = getDayFromDate(response.data.publishedAt);
         post.category = response.data.category;

@@ -3,11 +3,11 @@
         <div class="bg-white px-4 rounded rounded-lg border border-new-pale-gray">
             <!-- Featured Article -->
             <div class="row gy-2 align-items-stretch">
-                <div v-if="featuredArticle" class="col-lg-8 h-120 d-flex flex-column">
+                <div v-if="featuredArticle" class="col-lg-6 h-120 d-flex flex-column">
                     <div class="rounded py-4 flex-grow-1">
                         <RouterLink :to="`/blog/detail/${featuredArticle.slug}`" class="text-black">
                             <div class="featured-article-box d-flex flex-column gap-3" style="cursor: pointer">
-                                <img :src="featuredArticle.image" alt="Featured Article Image" class="rounded mb-3" style="width: 100%; object-fit: contain" />
+                                <img :src="featuredArticle.image" alt="Featured Article Image" class="rounded" style="width: 100%; object-fit: contain" />
                                 <div>
                                     <div class="hover_underline">
                                         <h4 class="mb-3 clickable-text">{{ featuredArticle.title }}</h4>
@@ -28,7 +28,7 @@
                 </div>
                 <div v-else style="height: 100vh; display: grid; place-items: center">{{ store.isVietNamese() ? "Bài viết không tồn tại" : "Not found" }}</div>
                 <!-- Old Articles with Pagination -->
-                <div class="col-lg-4 d-flex flex-column" v-if="oldArticles.length">
+                <div class="col-lg-6 d-flex flex-column" v-if="oldArticles.length">
                     <div class="rounded d-flex flex-column py-4 flex-grow-1">
                         <ul class="list-unstyled flex-grow-1">
                             <li v-for="(article, index) in paginatedArticles" :key="index" class="hover_underline p-2 mb-2 rounded" style="cursor: pointer">
@@ -218,8 +218,8 @@ async function getBlogs(category) {
         }
     }
     store.setHeroTitleName({
-        vn: "Bài viết",
-        en: "Blogs",
+        vn: "Kiến thức Công Nghệ Thông Tin<br>Dành cho Sinh viên",
+        en: "Information Knowledge<br>For Student",
     });
 }
 getBlogs(category);

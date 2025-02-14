@@ -3,7 +3,7 @@
         <div class="row my-4 gy-4">
             <div v-for="category in data.paginated" :key="category.id" class="col-sm-4 col">
                 <div class="rounded-2 border border-new-gray py-2 px-4 h-100 bg-white">
-                    <div class="category-name py-3" style="font-weight: bold">{{ category.categoryName }}</div>
+                    <div class="category-name py-3" style="font-weight: bold">{{ store.truncateText(category.categoryName, 40) }}</div>
                     <div v-if="category.posts.length > 0">
                         <div class="d-flex flex-column gap-2">
                             <div v-for="(blog, index) in category.posts" :key="index" class="d-flex gap-2">
@@ -54,8 +54,8 @@ store.setBreadcrumb([
 ]);
 
 store.setHeroTitleName({
-    vn: "Thể loại",
-    en: "Categories",
+    vn: "Kiến thức Công Nghệ Thông Tin<br>Dành cho Sinh viên",
+    en: "Information Knowledge<br>For Student",
 });
 
 async function getCategoryAndPosts() {

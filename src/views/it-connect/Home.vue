@@ -3,18 +3,19 @@
         <div class="w-100 bg-new-gray" style="display: flex; flex-direction: column; background-repeat: no-repeat" id="heroLandscape">
             <div class="w-100 h-100" id="heroOverlay" style="display: grid; place-items: center">
                 <div class="d-none d-sm-flex flex-column align-items-center" id="search">
-                    <label for="searchInput" class="text-white mb-3" style="font-weight: 600; font-size: xx-large">
+                    <label for="searchInput" class="text-white mb-3" style="font-weight: 600; font-size: 2rem">
                         {{ store.isVietNamese() ? "Bạn cần giúp đỡ vấn đề gì?" : "What can I assist you?" }}
                     </label>
-                    <div class="bg-white rounded-pill px-2 py-1 d-flex align-items-center">
+                    <div class="bg-white rounded-pill px-2 py-1 d-flex align-items-center" style="height: fit-content; width: 450px; height: 40px">
                         <input
                             id="searchInput"
                             type="text"
-                            style="outline: none; border: none; width: 400px"
+                            style="outline: none; border: none"
                             autofocus
                             @keypress.enter="onSearch"
                             v-model="searchQuery"
                             ref="searchInput"
+                            class="w-100"
                             :placeholder="store.isVietNamese() ? 'Tìm kiếm...' : 'Search...'"
                         />
                         <svg style="cursor: pointer; user-select: none" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" @click="onSearch">
@@ -34,8 +35,19 @@
                 <div class="position-absolute w-100" id="threeRepresentItems" style="opacity: 0.9">
                     <div class="container">
                         <div class="row justify-content-center bg-white rounded">
-                            <RouterLink to="/support" class="hover_underline col-sm-4 p-3 text-black">
+                            <RouterLink to="/categories" class="hover_underline col-sm-4 p-3 text-black">
                                 <img src="@/../assets/media/other/browse_knowledge.png" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
+                                <div class="d-flex flex-column mt-2">
+                                    <b>{{ store.isVietNamese() ? "Kiến thức Công nghệ thông tin" : "Information Technology knowledge" }}</b>
+                                    <span style="">{{
+                                        store.isVietNamese()
+                                            ? "Tìm kiếm thông tin để khắc phục sự cố hoặc tìm hiểu cách thực hiện những gì bạn cần."
+                                            : "Find information to troubleshoot problems or learn how to do what you need."
+                                    }}</span>
+                                </div>
+                            </RouterLink>
+                            <div class="col-sm-4 p-3">
+                                <img src="@/../assets/media/other/submit_a_ticket.png" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
                                 <div class="d-flex flex-column mt-2">
                                     <b>{{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}</b>
                                     <span style="">{{
@@ -44,27 +56,16 @@
                                             : "Quick support according to available Information Technology service categories."
                                     }}</span>
                                 </div>
-                            </RouterLink>
-                            <div class="col-sm-4 p-3">
-                                <img src="@/../assets/media/other/submit_a_ticket.png" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
-                                <div class="d-flex flex-column mt-2">
-                                    <b>{{ store.isVietNamese() ? "Trợ giúp" : "Help" }}</b>
-                                    <span style="">{{
-                                        store.isVietNamese()
-                                            ? "Bạn không tìm thấy những thông tin cần thiết trên đây? Hãy liên hệ với bộ phận Hỗ trợ dịch vụ CNTT."
-                                            : "Didn't find the necessary information above? Contact IT Service Support."
-                                    }}</span>
-                                </div>
                             </div>
                             <div class="col-sm-4 p-3">
-                                <RouterLink to="/categories" class="hover_underline text-black">
+                                <RouterLink to="/support" class="hover_underline text-black">
                                     <img src="@/../assets/media/other/request_something.png" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
                                     <div class="d-flex flex-column mt-2">
-                                        <b>{{ store.isVietNamese() ? "Kiến thức Công nghệ thông tin" : "Information Technology knowledge" }}</b>
+                                        <b>{{ store.isVietNamese() ? "Trợ giúp" : "Help" }}</b>
                                         <span style="">{{
                                             store.isVietNamese()
-                                                ? "Tìm kiếm thông tin để khắc phục sự cố hoặc tìm hiểu cách thực hiện những gì bạn cần."
-                                                : "Find information to troubleshoot problems or learn how to do what you need."
+                                                ? "Bạn không tìm thấy những thông tin cần thiết trên đây? Hãy liên hệ với bộ phận Hỗ trợ dịch vụ CNTT."
+                                                : "Didn't find the necessary information above? Contact IT Service Support."
                                         }}</span>
                                     </div>
                                 </RouterLink>
@@ -78,7 +79,7 @@
             <div class="container py-2">
                 <div class="row gap-4" id="wrapQuestionAndNotification">
                     <div class="col col-sm-12 col-lg-7 rounded p-3 bg-white shadow-sm">
-                        <h4 class="mb-3" style="font-weight: bold" id="frequentlyQuestions">{{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently questions" }}</h4>
+                        <h4 class="mb-4" style="font-weight: bold" id="frequentlyQuestions">{{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently questions" }}</h4>
                         <div class="d-flex flex-column gap-3">
                             <div class="d-flex gap-2">
                                 <div style="width: 24px">
@@ -94,7 +95,7 @@
                                     </svg>
                                 </div>
                                 <RouterLink to="/blog/detail/how-to-access-to-the-van-lang-wifi" class="text-black hover_underline">
-                                    <b class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Truy cập Wifi Văn Lang như thế nào?" : "How to access to the Văn Lang Wifi" }}</b>
+                                    <div class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Truy cập Wifi Văn Lang như thế nào?" : "How to access to the Văn Lang Wifi" }}</div>
                                 </RouterLink>
                             </div>
                             <div class="d-flex gap-2">
@@ -111,7 +112,7 @@
                                     </svg>
                                 </div>
                                 <RouterLink to="/blog/detail/how-to-use-my-email" class="text-black hover_underline">
-                                    <b class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Địa chỉ email của em là gì và sử dụng như thế nào?" : "How to use my email" }}</b>
+                                    <div class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Địa chỉ email của em là gì và sử dụng như thế nào?" : "How to use my email" }}</div>
                                 </RouterLink>
                             </div>
                             <div class="d-flex gap-2">
@@ -128,9 +129,13 @@
                                     </svg>
                                 </div>
                                 <RouterLink to="/blog/detail/what-accounts-are-included-in-student-it-services-accounts" class="text-black hover_underline">
-                                    <b class="hover_underline" style="cursor: pointer">{{
-                                        store.isVietNamese() ? "Tài khoản các dịch vụ CNTT của sinh viên bao gồm những tài khoản nào?" : "What accounts are included in student IT services accounts"
-                                    }}</b>
+                                    <div class="hover_underline" style="cursor: pointer">
+                                        {{
+                                            store.isVietNamese()
+                                                ? "Tài khoản các dịch vụ CNTT của sinh viên bao gồm những tài khoản nào?"
+                                                : "What accounts are included in student IT services accounts"
+                                        }}
+                                    </div>
                                 </RouterLink>
                             </div>
                             <div class="d-flex gap-2">
@@ -147,9 +152,9 @@
                                     </svg>
                                 </div>
                                 <RouterLink to="/blog/detail/how-to-change-the-it-services-password" class="text-black hover_underline">
-                                    <b class="hover_underline" style="cursor: pointer">{{
-                                        store.isVietNamese() ? "Em muốn thay đổi mật khẩu các dịch vụ CNTT thì làm như thế nào?" : "How to change the IT services's password"
-                                    }}</b>
+                                    <div class="hover_underline" style="cursor: pointer">
+                                        {{ store.isVietNamese() ? "Em muốn thay đổi mật khẩu các dịch vụ CNTT thì làm như thế nào?" : "How to change the IT services's password" }}
+                                    </div>
                                 </RouterLink>
                             </div>
                             <div class="d-flex gap-2">
@@ -166,7 +171,7 @@
                                     </svg>
                                 </div>
                                 <RouterLink to="/blog/detail/how-to-use-microsoft-teams" class="text-black hover_underline">
-                                    <b class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Sử dụng Microsoft Teams như thế nào?" : "How to use Microsoft Teams" }}</b>
+                                    <div class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Sử dụng Microsoft Teams như thế nào?" : "How to use Microsoft Teams" }}</div>
                                 </RouterLink>
                             </div>
                             <div class="d-flex gap-2">
@@ -183,7 +188,7 @@
                                     </svg>
                                 </div>
                                 <RouterLink to="/blog/detail/how-to-login-to-elearning" class="text-black hover_underline">
-                                    <b class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Đăng nhập vào trang Elearning như thế nào?" : "How to login to Elearning" }}</b>
+                                    <div class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Đăng nhập vào trang Elearning như thế nào?" : "How to login to Elearning" }}</div>
                                 </RouterLink>
                             </div>
                             <div class="d-flex gap-2">
@@ -200,9 +205,9 @@
                                     </svg>
                                 </div>
                                 <RouterLink to="/blog/detail/how-to-find-courses-on-elearning" class="text-black hover_underline">
-                                    <b class="hover_underline" style="cursor: pointer">{{
-                                        store.isVietNamese() ? "Làm thế nào để tìm được lớp học trên Elearning?" : "How to find courses on Elearning"
-                                    }}</b>
+                                    <div class="hover_underline" style="cursor: pointer">
+                                        {{ store.isVietNamese() ? "Làm thế nào để tìm được lớp học trên Elearning?" : "How to find courses on Elearning" }}
+                                    </div>
                                 </RouterLink>
                             </div>
                             <div class="d-flex gap-2">
@@ -219,31 +224,31 @@
                                     </svg>
                                 </div>
                                 <RouterLink to="/blog/detail/i-cant-enroll-to-my-elearning-course-help" class="text-black hover_underline">
-                                    <b class="hover_underline" style="cursor: pointer">{{
-                                        store.isVietNamese() ? "Em không ghi danh được vào lớp học trên trang E-learning thì phải làm sao?" : "I can't enroll to my Elearning course, HELP!!!"
-                                    }}</b>
+                                    <div class="hover_underline" style="cursor: pointer">
+                                        {{ store.isVietNamese() ? "Em không ghi danh được vào lớp học trên trang E-learning thì phải làm sao?" : "I can't enroll to my Elearning course, HELP!!!" }}
+                                    </div>
                                 </RouterLink>
                             </div>
                         </div>
                     </div>
                     <div class="col col-sm-12 col-lg rounded p-3 bg-white shadow-sm">
-                        <h4 class="mb-3" style="font-weight: bold">{{ store.isVietNamese() ? "Thông báo" : "News" }}</h4>
+                        <h4 class="mb-4" style="font-weight: bold">{{ store.isVietNamese() ? "Thông báo" : "News" }}</h4>
                         <div class="d-flex flex-column gap-2">
-                            <div v-for="post in news" :key="post.id" class="">
-                                <div class="d-flex gap-2 align-items-center">
-                                    <div style="width: 24px">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <div v-for="post in news" :key="post.id" class="background_gradient_pink rounded rounded-pill">
+                                <div class="d-flex gap-1 align-items-center py-1 px-2">
+                                    <div style="width: 12px">
+                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path
                                                 fill-rule="evenodd"
                                                 clip-rule="evenodd"
-                                                d="M7.15128 3.15998C7.61991 2.67975 8.3797 2.67975 8.84833 3.15998L16.8483 11.358C17.317 11.8382 17.317 12.6168 16.8483 13.0971L9.29278 20.8396C8.82415 21.3199 8.06435 21.3199 7.59572 20.8396C7.12709 20.3594 7.12709 19.5808 7.59572 19.1006L14.3028 12.2275L7.15128 4.89904C6.68265 4.41881 6.68265 3.64021 7.15128 3.15998Z"
+                                                d="M3.57564 1.57999C3.80995 1.33987 4.18985 1.33987 4.42417 1.57999L8.42417 5.679C8.65848 5.91911 8.65848 6.30841 8.42417 6.54853L4.64639 10.4198C4.41207 10.6599 4.03218 10.6599 3.79786 10.4198C3.56355 10.1797 3.56355 9.7904 3.79786 9.55028L7.15138 6.11376L3.57564 2.44952C3.34132 2.2094 3.34132 1.8201 3.57564 1.57999Z"
                                                 fill="#252F4A"
                                             />
                                         </svg>
                                     </div>
                                     <RouterLink :to="`/blog/detail/${post.slug}`" class="hover_underline w-100 text-black" style="cursor: pointer">
                                         <!-- {{ store.isVietNamese() ? "Nâng cấp hệ thống Wifi và dịch vụ CNTT" : "Update Wifi system and IT services" }} -->
-                                        <strong>{{ post.title }}</strong>
+                                        <div>{{ store.truncateText(post.title, 50) }}</div>
                                     </RouterLink>
                                 </div>
                             </div>
@@ -251,9 +256,9 @@
                     </div>
                 </div>
             </div>
-            <div class="container py-2 bg-white rounded mb-3 shadow-sm">
+            <div class="container py-3 bg-white rounded mb-3 shadow-sm">
                 <div class="d-flex justify-content-between">
-                    <h4 class="mb-3" style="font-weight: bold">{{ store.isVietNamese() ? "Clip hướng dẫn sử dụng" : "Guiding clips" }}</h4>
+                    <h4 class="" style="font-weight: bold">{{ store.isVietNamese() ? "Clip hướng dẫn sử dụng" : "Guiding clips" }}</h4>
                     <RouterLink to="/videos" class="text-primary hover_underline">
                         <b>{{ store.isVietNamese() ? "Xem tất cả" : "View all" }}</b>
                     </RouterLink>
@@ -316,7 +321,7 @@ getBlogsAsNews();
 </script>
 
 <style lang="css" scoped>
-.background_gradient {
+.background_gradient_pink {
     background: linear-gradient(to right, #ffebe9, #ffffff);
 }
 /* màn hình nhỏ */

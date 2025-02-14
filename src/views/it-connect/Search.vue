@@ -1,12 +1,15 @@
 <template>
     <div class="container py-3">
         <div class="rounded-3 p-3 border-new-gray border bg-white">
-            <div v-if="searchResult.length" class="d-flex flex-column gap-3">
-                <div v-for="blog in searchResult" :key="blog.id" class="">
+            <div v-if="data.origin.length" class="d-flex flex-column gap-3">
+                <div v-for="blog in data.paginated" :key="blog.id" class="">
                     <RouterLink :to="`/blog/detail/${blog.slug}`" target="_blank" class="text-black hover_underline" style="cursor: pointer">
                         <strong class="" style="font-size: 1.2rem">{{ blog.title }}</strong>
                         <div class="text-muted">{{ blog.excerpt }}</div>
                     </RouterLink>
+                </div>
+                <div>
+                    <Pagination v-model="data" />
                 </div>
             </div>
             <div v-else>
@@ -22,8 +25,8 @@
                         <b>{{ store.isVietNamese() ? "Xem tất cả" : "View all" }}</b>
                     </RouterLink>
                 </div>
-                <div v-if="searchResult.length" class="row" id="wrapVideo">
-                    <div class="col-auto col-sm-3" v-for="blog in searchResult.slice(0, 3)" :key="blog.id">
+                <div v-if="data.origin.length" class="row" id="wrapVideo">
+                    <div class="col-auto col-sm-3" v-for="blog in data.paginated.slice(0, 3)" :key="blog.id">
                         <div v-if="blog.video !== null">
                             <video v-if="store.isMP4(blog.video)" height="150px" :src="blog.video" controls class="rounded w-100" title="Guiding clips"></video>
                             <iframe v-else width="100%" height="150px" :src="blog.video" frameborder="0" allowfullscreen class="rounded h-50" title="Guiding clips"></iframe>
@@ -46,22 +49,27 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, reactive } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import { useTemplateStore } from "@/stores/template";
 import { guestRequest } from "../one-ui/accountmanager/service/axiosConfig";
+import Pagination from "../../components/custom/Pagination.vue";
 const store = useTemplateStore();
 const route = useRoute();
 
-const searchParams = route.query.q;
+const data = reactive({
+    origin: [],
+    paginated: [],
+    size: 5,
+});
 
-const searchResult = ref([]);
+const searchParams = route.query.q;
 
 async function searchBlog(searchValue) {
     const response = await guestRequest.get(`/posts/search`, {
         params: { searchTerm: searchValue },
     });
-    searchResult.value = response.data?.data.$values.map((blog) => ({
+    data.origin = response.data?.data.$values.map((blog) => ({
         slug: blog.slug,
         title: blog.title,
         excerpt: blog.excerpt,

@@ -1,4 +1,5 @@
 <template>
+    <!-- Top header bar -->
     <div class="bg-secondary d-none d-sm-block">
         <div class="container">
             <div class="d-flex gap-4 justify-content-end align-items-center">
@@ -105,6 +106,7 @@
             </div>
         </div>
     </div>
+    <!-- Header menu -->
     <div class="bg-white py-2">
         <div class="container">
             <div class="row justify-content-between">
@@ -154,6 +156,7 @@
             </div>
         </div>
     </div>
+    <!-- Search bar for mobile view -->
     <div ref="searchBar" class="container my-2 d-none">
         <div class="bg-white rounded-pill px-2 py-1 d-flex align-items-center border border-grey">
             <input

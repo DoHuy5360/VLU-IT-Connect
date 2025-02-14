@@ -9,7 +9,7 @@ export const useTemplateStore = defineStore({
             name: "IT-Connect",
             version: "1.0",
             copyright: new Date().getFullYear(),
-            language: "VN",
+            language: localStorage.getItem("it-connect:language") || "VN",
             baseURL: import.meta.env.VITE_BASE_URL,
         },
 
@@ -57,6 +57,7 @@ export const useTemplateStore = defineStore({
     actions: {
         setLanguage(language) {
             this.app.language = language;
+            localStorage.setItem("it-connect:language", language);
         },
         isVietNamese() {
             return this.app.language === "VN";

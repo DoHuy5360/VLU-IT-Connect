@@ -10,7 +10,17 @@
                             <span class="text-primary clickable-text">{{ featuredArticle?.category?.name }}</span>
                         </div>
                         <div class="d-flex justify-content-start">
-                            <img :src="featuredArticle?.image" alt="Blog Article Image" class="w-100 border border-new-pale-gray rounded mb-3" style="object-fit: contain" />
+                            <img
+                                :src="featuredArticle?.image"
+                                alt="Blog Article Image"
+                                class="w-100 rounded mb-3"
+                                style="object-fit: contain"
+                                @error="
+                                    () => {
+                                        featuredArticle.image = '/../assets/media/brand/30_years_vertical_version.png';
+                                    }
+                                "
+                            />
                         </div>
                         <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
                         <div class="text-muted mb-3" id="blogContent" v-html="featuredArticle?.details"></div>
@@ -56,14 +66,24 @@
                             <div v-for="(article, index) in relatedArticles" :key="index">
                                 <RouterLink :to="`/blog/detail/${article.slug}`" class="hover_underline row py-2 text-black" style="cursor: pointer">
                                     <div class="col-4 d-flex">
-                                        <img :src="article.image" alt="Related Post Image" class="rounded border w-100 h-100" style="object-fit: contain" />
+                                        <img
+                                            :src="article.image"
+                                            alt="Related Post Image"
+                                            class="rounded border w-100 h-100"
+                                            style="object-fit: contain"
+                                            @error="
+                                                () => {
+                                                    article.image = '/../assets/media/brand/logo-khong-chu.png';
+                                                }
+                                            "
+                                        />
                                     </div>
                                     <div class="col-8">
                                         <h6 class="mb-1 clickable-text text-truncate" :title="article.title">
-                                            {{ truncateText(article.title, 30) }}
+                                            {{ store.truncateText(article.title, 30) }}
                                         </h6>
                                         <p class="text-muted small mb-1">
-                                            {{ truncateText(article.excerpt, 60) }}
+                                            {{ store.truncateText(article.excerpt, 60) }}
                                         </p>
                                         <div class="text-muted small">
                                             <strong>{{ article.author }}</strong>
@@ -84,11 +104,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
-import axios from "axios";
+import { ref, watch, onMounted } from "vue";
 import { useTemplateStore } from "@/stores/template";
-
-const props = defineProps(["postSlug", "category"]);
+import { guestRequest } from "../../one-ui/accountmanager/service/axiosConfig";
+const props = defineProps(["postSlug"]);
 const store = useTemplateStore();
 const featuredArticle = ref({});
 const categories = ref({});
@@ -98,7 +117,7 @@ let categoryOfThisPost;
 
 const getPost = async () => {
     try {
-        const response = await axios.get(`/api/posts/by-slug/${props.postSlug}`);
+        const response = await guestRequest.get(`/posts/by-slug/${props.postSlug}`);
         const post = response.data.data[0];
         categoryOfThisPost = post.category;
 
@@ -116,9 +135,27 @@ const getPost = async () => {
                 video: store.parseMetadataVideo(post.metadata),
             };
             store.setBreadcrumb([
-                { name: "Kiến thức CNTT - Sinh viên", path: "/blog" },
-                { name: categoryOfThisPost.name, path: `/blog?category=${categoryOfThisPost.slug}` },
-                { name: featuredArticle.value?.title, path: `/blog/detail/${featuredArticle.value?.id}` },
+                {
+                    name: {
+                        vn: "Kiến thức CNTT - Sinh viên",
+                        en: "Information Technology - Student",
+                    },
+                    path: "/blog",
+                },
+                {
+                    name: {
+                        vn: categoryOfThisPost.name,
+                        en: categoryOfThisPost.name,
+                    },
+                    path: `/blog?category=${categoryOfThisPost.slug}`,
+                },
+                {
+                    name: {
+                        vn: featuredArticle.value?.title,
+                        en: featuredArticle.value?.title,
+                    },
+                    path: `/blog/detail/${featuredArticle.value?.id}`,
+                },
             ]);
         } else {
             featuredArticle.value = null;
@@ -136,7 +173,7 @@ const getPost = async () => {
 
 const getCategories = async () => {
     try {
-        const response = await axios.get("/api/posts/categories-with-posts");
+        const response = await guestRequest.get("/posts/categories-with-posts");
         categories.value = response.data;
     } catch (error) {
         console.error("Error fetching categories:", error.response?.data || error.message);
@@ -146,7 +183,7 @@ const getCategories = async () => {
 
 const getRelatedArticles = async () => {
     try {
-        const response = await axios.get(`/api/posts/categories-with-posts?categorySlug=${categoryOfThisPost.slug}&limit=5`);
+        const response = await guestRequest.get(`/posts/categories-with-posts?categorySlug=${categoryOfThisPost.slug}&limit=5`);
         let categoryAndPosts = response.data;
 
         for (let categoryIndex = 0; categoryIndex < categoryAndPosts.length; categoryIndex++) {
@@ -169,22 +206,23 @@ const getRelatedArticles = async () => {
     }
 };
 
-const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
-};
-
 // Watcher để theo dõi slug
-watch(() => props.postSlug, getPost);
+watch(
+    () => props.postSlug,
+    () => {
+        getPost();
+    }
+);
 
 // Lifecycle hook
 onMounted(async () => {
     await getPost();
     await getCategories();
     await getRelatedArticles();
-
-    const blogContent = document.getElementById("blogContent");
-    blogContent.querySelectorAll("img").forEach((img) => {
-        img.style.width = "100%";
-    });
 });
 </script>
+<style>
+#blogContent img {
+    max-width: 100%;
+}
+</style>

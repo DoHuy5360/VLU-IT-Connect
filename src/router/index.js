@@ -214,7 +214,7 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory("/FE/"),
     linkActiveClass: "active",
     scrollBehavior() {
         return { left: 0, top: 0 };

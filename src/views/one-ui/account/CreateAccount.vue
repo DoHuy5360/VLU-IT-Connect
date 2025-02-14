@@ -57,7 +57,7 @@
 import { ref, onMounted } from "vue";
 import { useToast } from "vue-toastification";
 import { useRouter } from "vue-router";
-import authRequest from "../accountmanager/service/axiosConfig";
+import { authRequest } from "../accountmanager/service/axiosConfig";
 
 const router = useRouter();
 const toast = useToast();

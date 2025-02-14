@@ -6,71 +6,40 @@
             </h4>
             <div class="d-flex flex-column" id="wrapCampusAddress">
                 <div>
-                    <div class="d-sm-inline" style="font-weight: 500; text-decoration: underline"
-                        >{{ store.isVietNamese() ? "Cơ sở chính: " : "Main campus: " }}</div
-                    >
+                    <div class="d-sm-inline" style="font-weight: 500; text-decoration: underline">{{ store.isVietNamese() ? "Cơ sở chính: " : "Main campus: " }}</div>
                     <span style="font-weight: lighter">
-                        {{ store.isVietNamese() ? "Phòng B.01, Tòa nhà A, 69/68 Đặng Thùy Trâm, P.13, Q.Bình Thạnh, Tp.HCM" : "Room B.01, Toa nha A, 69/68 Dang Thuy Tram, P.13, Q.Binh Thanh, Tp.HCM" }}
-                        </span
-                    >
+                        {{
+                            store.isVietNamese() ? "Phòng B.01, Tòa nhà A, 69/68 Đặng Thùy Trâm, P.13, Q.Bình Thạnh, Tp.HCM" : "Room B.01, Toa nha A, 69/68 Dang Thuy Tram, P.13, Q.Binh Thanh, Tp.HCM"
+                        }}
+                    </span>
                 </div>
                 <div>
-                    <div class="d-sm-inline" style="font-weight: 500; text-decoration: underline"
-                        >{{ store.isVietNamese() ? "Cơ sở 1: " : "Campus 1: " }}</div
-                    >
+                    <div class="d-sm-inline" style="font-weight: 500; text-decoration: underline">{{ store.isVietNamese() ? "Cơ sở 1: " : "Campus 1: " }}</div>
                     <span style="font-weight: lighter">
                         {{ store.isVietNamese() ? "Phòng 4.11, 45 Nguyễn Khắc nhu, P.Cô Giang, Q.1, Tp.HCM" : "Room 4.11, 45 Nguyen Khac nhu, P.Co Giang, Q.1, Tp.HCM" }}
                     </span>
                 </div>
                 <div>
-                    <div class="d-sm-inline" style="font-weight: 500; text-decoration: underline"
-                        >{{ store.isVietNamese() ? "Cơ sở 2: " : "Campus 2: " }}</div
-                    >
+                    <div class="d-sm-inline" style="font-weight: 500; text-decoration: underline">{{ store.isVietNamese() ? "Cơ sở 2: " : "Campus 2: " }}</div>
                     <span style="font-weight: lighter">
                         {{ store.isVietNamese() ? "Phòng C.02, 233A Phan Văn Trị, P.11, Q.Bình Thạnh, Tp.HCM" : "Room C.02, 233A Phan Van Tri, P.11, Q.Binh Thanh, Tp.HCM" }}
                     </span>
                 </div>
                 <div class="d-flex gap-1 mt-2">
-                    <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M21.971 18.33C21.971 18.69 21.891 19.06 21.721 19.42C21.551 19.78 21.331 20.12 21.041 20.44C20.551 20.98 20.011 21.37 19.401 21.62C18.801 21.87 18.151 22 17.451 22C16.431 22 15.341 21.76 14.191 21.27C13.041 20.78 11.891 20.12 10.751 19.29C9.60098 18.45 8.51098 17.52 7.47098 16.49C6.44098 15.45 5.51098 14.36 4.68098 13.22C3.86098 12.08 3.20098 10.94 2.72098 9.81C2.24098 8.67 2.00098 7.58 2.00098 6.54C2.00098 5.86 2.12098 5.21 2.36098 4.61C2.60098 4 2.98098 3.44 3.51098 2.94C4.15098 2.31 4.85098 2 5.59098 2C5.87098 2 6.15098 2.06 6.40098 2.18C6.66098 2.3 6.89098 2.48 7.07098 2.74L9.39098 6.01C9.57098 6.26 9.70098 6.49 9.79098 6.71C9.88098 6.92 9.93098 7.13 9.93098 7.32C9.93098 7.56 9.86098 7.8 9.72098 8.03C9.59098 8.26 9.40098 8.5 9.16098 8.74L8.40098 9.53C8.29098 9.64 8.24098 9.77 8.24098 9.93C8.24098 10.01 8.25098 10.08 8.27098 10.16C8.30098 10.24 8.33098 10.3 8.35098 10.36C8.53098 10.69 8.84098 11.12 9.28098 11.64C9.73098 12.16 10.211 12.69 10.731 13.22C11.271 13.75 11.791 14.24 12.321 14.69C12.841 15.13 13.271 15.43 13.611 15.61C13.661 15.63 13.721 15.66 13.791 15.69C13.871 15.72 13.951 15.73 14.041 15.73C14.211 15.73 14.341 15.67 14.451 15.56L15.211 14.81C15.461 14.56 15.701 14.37 15.931 14.25C16.161 14.11 16.391 14.04 16.641 14.04C16.831 14.04 17.031 14.08 17.251 14.17C17.471 14.26 17.701 14.39 17.951 14.56L21.261 16.91C21.521 17.09 21.701 17.3 21.811 17.55C21.911 17.8 21.971 18.05 21.971 18.33Z"
                             stroke="#ffffff"
                             stroke-width="1.5"
                             stroke-miterlimit="10"
                         />
-                        <path
-                            d="M18.501 9C18.501 8.4 18.031 7.48 17.331 6.73C16.691 6.04 15.841 5.5 15.001 5.5"
-                            stroke="#ffffff"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-                        <path
-                            d="M22.001 9C22.001 5.13 18.871 2 15.001 2"
-                            stroke="#ffffff"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
+                        <path d="M18.501 9C18.501 8.4 18.031 7.48 17.331 6.73C16.691 6.04 15.841 5.5 15.001 5.5" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M22.001 9C22.001 5.13 18.871 2 15.001 2" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <span style="font-weight: 100"
-                        >028. 71099131 - Ext: 220, 2221</span
-                    >
+                    <span style="font-weight: 100">028. 71099131 - Ext: 220, 2221</span>
                 </div>
                 <div class="d-flex gap-1 mt-2">
-                    <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M18.0945 14.0081C18.091 14.0045 18.0876 14.001 18.0841 13.9975C18.0826 13.996 18.0807 13.9941 18.0789 13.9925L16.8469 12.7605C16.5006 12.414 16.0402 12.2234 15.5504 12.2234C15.0637 12.2234 14.6056 12.4118 14.26 12.7543C14.2575 12.7566 14.2552 12.7591 14.2526 12.7615L13.5979 13.4164L10.5825 10.4009L11.2371 9.74611C11.2396 9.74376 11.242 9.74124 11.2443 9.73889C11.9531 9.02353 11.9513 7.86488 11.2383 7.15187L10.0081 5.92155C10.0058 5.9192 10.0036 5.91702 10.0014 5.91484C9.65514 5.56924 9.19508 5.37891 8.70597 5.37891C8.21838 5.37891 7.75982 5.56807 7.41406 5.91132C7.40936 5.91602 7.40466 5.92072 7.40012 5.92558L6.83515 6.49039C6.5379 6.78764 6.30979 7.01575 6.3009 7.02481C5.42843 7.89711 5.2245 9.28772 5.72669 10.9405C6.18659 12.4543 7.19854 14.0467 8.57589 15.4242C10.4987 17.347 12.8536 18.5414 14.7213 18.5414C15.6449 18.5414 16.4246 18.2502 16.9728 17.7019C16.9842 17.6906 17.2996 17.3752 17.674 17.0008L18.0841 16.5907C18.0847 16.5901 18.0854 16.5894 18.0863 16.5885C18.7907 15.8817 18.7974 14.7355 18.1054 14.0202C18.1019 14.016 18.098 14.0118 18.0945 14.0081ZM17.1772 15.6745C17.1733 15.6783 17.1695 15.6822 17.1656 15.6862L16.7626 16.0892C16.3945 16.4573 16.0837 16.7681 16.0637 16.7879C15.7555 17.0961 15.3039 17.2524 14.7213 17.2524C13.2061 17.2524 11.1518 16.177 9.48747 14.5128C8.25698 13.2823 7.35951 11.8806 6.96003 10.5657C6.60789 9.40706 6.69987 8.44865 7.21281 7.93571L7.74656 7.40196L8.32043 6.82809C8.32261 6.82591 8.32462 6.8239 8.32664 6.82172C8.42886 6.72252 8.56313 6.66797 8.70597 6.66797C8.84948 6.66797 8.9846 6.72319 9.08715 6.82356C9.08849 6.82507 9.09 6.82658 9.09168 6.82809L10.3267 8.06328C10.539 8.2756 10.539 8.62103 10.3267 8.83336C10.3264 8.83369 10.326 8.8342 10.3255 8.83453V8.8347L9.21505 9.94518C8.96345 10.1969 8.96345 10.605 9.21505 10.8568L13.1422 14.7837C13.263 14.9047 13.427 14.9725 13.5979 14.9725C13.7689 14.9725 13.9329 14.9045 14.0537 14.7837L15.1572 13.6799C15.1612 13.6762 15.165 13.6722 15.1689 13.6684C15.2715 13.5678 15.4067 13.5124 15.5504 13.5124C15.6958 13.5124 15.8324 13.5692 15.9353 13.6719L17.1671 14.9035L17.1698 14.9064C17.1712 14.9077 17.1725 14.9091 17.1737 14.9104C17.3831 15.1211 17.3841 15.4623 17.1772 15.6745Z"
                             fill="#F9F9F9"
@@ -80,16 +49,16 @@
                             fill="#F9F9F9"
                         />
                     </svg>
-    
+
                     <span style="font-weight: 100">p.cntt@vanlanguni.edu.vn</span>
                 </div>
             </div>
             <div class="d-flex mt-5" id="webAuthor">
-                <div>2024 © P.CNTT</div>
+                <div>{{ store.app.copyright }} © P.CNTT</div>
                 <div class="d-none d-sm-flex gap-3">
                     <span>{{ store.isVietNamese() ? "Giới thiệu" : "Introduction" }}</span>
-                    <span>{{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}</span>
-                    <span>{{ store.isVietNamese() ? "Liên hệ" : "Contact" }}</span>
+                    <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-white">{{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}</RouterLink>
+                    <a href="tel:028 7109 9131" class="text-white">{{ store.isVietNamese() ? "Liên hệ" : "Contact" }}</a>
                 </div>
             </div>
         </div>
@@ -97,8 +66,8 @@
 </template>
 
 <script setup>
-import { useTemplateStore } from '../../../stores/template';
-const store = useTemplateStore()
+import { useTemplateStore } from "../../../stores/template";
+const store = useTemplateStore();
 </script>
 
 <style lang="css" scoped>
@@ -106,7 +75,7 @@ const store = useTemplateStore()
     #webAuthor {
         justify-content: center;
     }
-    #wrapCampusAddress{
+    #wrapCampusAddress {
         gap: 8px;
     }
 }

@@ -58,7 +58,17 @@
                     <div class="mb-4">
                         <div v-if="state.imageURL !== ''" class="row">
                             <div class="col-4">
-                                <img :src="state.imageURL" class="img-fluid w-100" style="" alt="Ảnh bìa của bài viết" />
+                                <img
+                                    :src="state.imageURL"
+                                    class="img-fluid w-100"
+                                    style=""
+                                    alt="Ảnh bìa của bài viết"
+                                    @error="
+                                        () => {
+                                            state.imageURL = '/../assets/media/brand/30_years_vertical_version.png';
+                                        }
+                                    "
+                                />
                             </div>
                         </div>
                         <div v-else>Bài viết này hiện chưa có ảnh bìa</div>

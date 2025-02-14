@@ -24,7 +24,7 @@
             <div class="col-md-4">
                 <select class="form-select" v-model="selectedGroup" @change="onFilterGroup" title="Lọc tài khoản">
                     <option value="">Tất cả nhóm tài khoản</option>
-                    <option v-for="group in groups" :key="group.value" :value="group.value">
+                    <option v-for="group in groups" :key="group.value" :value="group.label">
                         {{ group.label }}
                     </option>
                 </select>
@@ -164,12 +164,7 @@ onMounted(() => {
 
 // Computed Properties
 const filteredUsers = computed(() => {
-    return users.value
-        .filter((user) => !selectedGroup.value || user.Role === selectedGroup.value)
-        .filter((user) => {
-            const keyword = searchTerm.value.trim().toLowerCase();
-            return !keyword || user.FullName.toLowerCase().includes(keyword) || user.Email.toLowerCase().includes(keyword) || user.Role.toLowerCase().includes(keyword);
-        });
+    return users.value.filter((user) => !selectedGroup.value || user.Role === selectedGroup.value);
 });
 
 const totalPages = computed(() => Math.ceil(filteredUsers.value.length / itemsPerPage));
@@ -185,7 +180,9 @@ const changePage = (page) => {
 };
 
 const onSearch = () => (currentPage.value = 1);
-const onFilterGroup = () => (currentPage.value = 1);
+const onFilterGroup = () => {
+    currentPage.value = 1;
+};
 
 const deleteUser = async (id) => {
     Swal.fire({

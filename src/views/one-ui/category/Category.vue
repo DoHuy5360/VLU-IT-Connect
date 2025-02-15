@@ -44,7 +44,6 @@
     </div>
 </template>
 <script>
-import axios from "axios";
 import CategoryRow from "@/views/one-ui/category/compononts/CategoryRow.vue";
 import BasePageHeading from "@/components/BasePageHeading.vue";
 import BaseBlock from "@/components/BaseBlock.vue";

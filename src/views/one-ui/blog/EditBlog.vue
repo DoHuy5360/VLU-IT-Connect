@@ -223,9 +223,9 @@ const maxSize = (size) => (value) => {
     return !value || value.size <= size;
 };
 const rules = {
-    title: { required, maxLengt: maxLength(225) },
-    slug: { required, maxLengt: maxLength(200) },
-    excerpt: { maxLengt: maxLength(160) },
+    title: { required, maxLength: maxLength(225) },
+    slug: { required, maxLength: maxLength(200) },
+    excerpt: { maxLength: maxLength(160) },
     categoryId: { required },
     image: { maxSize: maxSize(5 * 1024 * 1024) },
     videoUrl: { url },

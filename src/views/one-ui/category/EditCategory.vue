@@ -12,12 +12,20 @@
                     <!-- Parent Category Dropdown -->
                     <div class="mb-4">
                         <label class="form-label" for="parentCategory">Thể loại cha</label>
-                        <select class="form-select" id="parentCategory" v-model="formData.parentId" title="Chọn thể loại cha">
-                            <option value="">-- Không có thể loại cha --</option>
+                        <select
+                            class="form-select"
+                            id="parentCategory"
+                            v-model="formData.parentId"
+                            @blur="v$.parentId.$touch"
+                            :class="{ 'is-invalid': v$.parentId.$errors.length }"
+                            title="Chọn thể loại cha"
+                        >
+                            <option value="">Gốc</option>
                             <option v-for="category in categories" :key="category.Id" :value="category.Id">
                                 {{ `${repeatChar("-", category.NestDepth)} ${category.Name}` }}
                             </option>
                         </select>
+                        <span v-if="v$.parentId.$errors.some((e) => e.$validator === 'checkSelectedItSelf')" class="invalid-feedback"> Hãy chọn thể loại cha khác </span>
                     </div>
 
                     <!-- Category Name -->
@@ -72,20 +80,7 @@ import { authRequest } from "../accountmanager/service/axiosConfig";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength, maxLength } from "@vuelidate/validators";
 import { reactive } from "vue";
-
-const rules = {
-    name: { required, maxLengt: maxLength(225) },
-    description: { required, maxLengt: maxLength(160) },
-    parentId: {},
-};
-
-// Nhận props
-const props = defineProps({
-    code: {
-        type: String,
-        required: true,
-    },
-});
+import { computed } from "vue";
 
 // Khai báo biến trạng thái
 const categories = ref([]);
@@ -102,6 +97,24 @@ const formData = reactive({
     children: [],
     createdAt: "",
     updatedAt: "",
+});
+
+function checkSelectedItSelf() {
+    return formData.parentId !== formData.id;
+}
+
+const rules = computed(() => ({
+    name: { required, maxLength: maxLength(225) },
+    description: { required, maxLength: maxLength(160) },
+    parentId: { checkSelectedItSelf: checkSelectedItSelf }, // Gọi như một hàm
+}));
+
+// Nhận props
+const props = defineProps({
+    code: {
+        type: String,
+        required: true,
+    },
 });
 
 const v$ = useVuelidate(rules, formData);
@@ -201,7 +214,6 @@ const updateCategory = async () => {
     v$.value.$touch(); // Đánh dấu tất cả các trường
     if (v$.value.$invalid) {
         console.log("khong hop le");
-
         return;
     } else {
         console.log("hop le");
@@ -233,7 +245,7 @@ const updateCategory = async () => {
 
 // Gọi hàm khi component được mount
 onMounted(async () => {
-    await getCategories();
     await getCategoryByCode();
+    await getCategories();
 });
 </script>

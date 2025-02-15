@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import NProgress from "nprogress/nprogress.js";
+import De from "../views/De.vue";
 
 // Import components
 const WelcomeAdmin = () => import("@/views/one-ui/WelcomeAdmin.vue");
@@ -35,6 +36,16 @@ const ContentLayout = () => import("@/layouts/variations/it-connect/ContentLayou
 
 // Routes
 const routes = [
+    {
+        path: "/de",
+        component: AdminLayout,
+        children: [
+            {
+                path: "",
+                component: De,
+            },
+        ],
+    },
     {
         path: "/auth",
         component: LayoutSimple,

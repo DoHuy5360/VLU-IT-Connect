@@ -140,16 +140,16 @@
                     </label>
                 </div>
                 <div class="col d-none d-sm-flex gap-4 justify-content-end align-items-center text-end menu" style="font-weight: bold">
-                    <RouterLink to="/blog?category=cac-cau-hoi-thuong-gap" class="text-black" style="cursor: pointer; color: black">
+                    <RouterLink to="/blog?category=cac-cau-hoi-thuong-gap" class="text-black hover_underline" style="cursor: pointer; color: black">
                         {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
                     </RouterLink>
-                    <RouterLink to="/support" class="text-black" style="cursor: pointer">
+                    <RouterLink to="/support" class="text-black hover_underline" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
                     </RouterLink>
-                    <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-black" style="cursor: pointer">
+                    <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-black hover_underline" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
                     </RouterLink>
-                    <a href="tel:028 7109 9131" class="text-black" style="cursor: pointer">
+                    <a href="tel:028 7109 9131" class="text-black hover_underline" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
                     </a>
                 </div>
@@ -258,22 +258,22 @@
                 <li class="p-2" style="font-weight: 600">{{ store.isVietNamese() ? "Cán bộ - Giảng viên - Nhân viên" : "Staff - Lecture - Employee" }}</li>
             </ul>
             <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
-                <RouterLink to="/blog?category=cac-cau-hoi-thuong-gap" class="text-black">
+                <RouterLink to="/blog?category=cac-cau-hoi-thuong-gap" class="text-black hover_underline">
                     {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
                 </RouterLink>
             </div>
             <div class="bg-white text-secondary px-3 py-2 border border-b">
-                <RouterLink to="/support" class="text-black" style="font-weight: bold">
+                <RouterLink to="/support" class="text-black hover_underline" style="font-weight: bold">
                     {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
                 </RouterLink>
             </div>
             <div class="bg-white text-secondary px-3 py-2 border border-b">
-                <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-black" style="font-weight: bold">
+                <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-black hover_underline" style="font-weight: bold">
                     {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
                 </RouterLink>
             </div>
             <div class="bg-white text-secondary px-3 py-2 border border-b">
-                <RouterLink to="tel:028 7109 9131" class="text-black" style="font-weight: bold">
+                <RouterLink to="tel:028 7109 9131" class="text-black hover_underline" style="font-weight: bold">
                     {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
                 </RouterLink>
             </div>

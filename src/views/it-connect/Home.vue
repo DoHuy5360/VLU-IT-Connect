@@ -94,7 +94,7 @@
                                         />
                                     </svg>
                                 </div>
-                                <RouterLink to="/blog/detail/how-to-access-to-the-van-lang-wifi" class="text-black hover_underline">
+                                <RouterLink to="/blog/detail/truy-cap-wifi-van-lang-nhu-the-nao" class="text-black hover_underline">
                                     <div class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Truy cập Wifi Văn Lang như thế nào?" : "How to access to the Văn Lang Wifi" }}</div>
                                 </RouterLink>
                             </div>
@@ -111,7 +111,7 @@
                                         />
                                     </svg>
                                 </div>
-                                <RouterLink to="/blog/detail/how-to-use-my-email" class="text-black hover_underline">
+                                <RouterLink to="/blog/detail/dia-chi-email-cua-em-la-gi-va-su-dung-nhu-the-nao" class="text-black hover_underline">
                                     <div class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Địa chỉ email của em là gì và sử dụng như thế nào?" : "How to use my email" }}</div>
                                 </RouterLink>
                             </div>
@@ -128,7 +128,7 @@
                                         />
                                     </svg>
                                 </div>
-                                <RouterLink to="/blog/detail/what-accounts-are-included-in-student-it-services-accounts" class="text-black hover_underline">
+                                <RouterLink to="/blog/detail/tai-khoan-cac-dich-vu-cntt-cua-sinh-vien-bao-gom-nhung-tai-khoan-nao" class="text-black hover_underline">
                                     <div class="hover_underline" style="cursor: pointer">
                                         {{
                                             store.isVietNamese()
@@ -151,7 +151,7 @@
                                         />
                                     </svg>
                                 </div>
-                                <RouterLink to="/blog/detail/how-to-change-the-it-services-password" class="text-black hover_underline">
+                                <RouterLink to="/blog/detail/em-muon-thay-doi-mat-khau-cac-dich-vu-cntt-thi-lam-nhu-the-nao" class="text-black hover_underline">
                                     <div class="hover_underline" style="cursor: pointer">
                                         {{ store.isVietNamese() ? "Em muốn thay đổi mật khẩu các dịch vụ CNTT thì làm như thế nào?" : "How to change the IT services's password" }}
                                     </div>
@@ -170,7 +170,7 @@
                                         />
                                     </svg>
                                 </div>
-                                <RouterLink to="/blog/detail/how-to-use-microsoft-teams" class="text-black hover_underline">
+                                <RouterLink to="/blog/detail/su-dung-microsoft-teams-nhu-the-nao" class="text-black hover_underline">
                                     <div class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Sử dụng Microsoft Teams như thế nào?" : "How to use Microsoft Teams" }}</div>
                                 </RouterLink>
                             </div>
@@ -187,7 +187,7 @@
                                         />
                                     </svg>
                                 </div>
-                                <RouterLink to="/blog/detail/how-to-login-to-elearning" class="text-black hover_underline">
+                                <RouterLink to="/blog/detail/dang-nhap-vao-trang-elearning-nhu-the-nao" class="text-black hover_underline">
                                     <div class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Đăng nhập vào trang Elearning như thế nào?" : "How to login to Elearning" }}</div>
                                 </RouterLink>
                             </div>
@@ -204,7 +204,7 @@
                                         />
                                     </svg>
                                 </div>
-                                <RouterLink to="/blog/detail/how-to-find-courses-on-elearning" class="text-black hover_underline">
+                                <RouterLink to="/blog/detail/lam-the-nao-de-tim-duoc-lop-hoc-tren-elearning" class="text-black hover_underline">
                                     <div class="hover_underline" style="cursor: pointer">
                                         {{ store.isVietNamese() ? "Làm thế nào để tìm được lớp học trên Elearning?" : "How to find courses on Elearning" }}
                                     </div>
@@ -223,7 +223,7 @@
                                         />
                                     </svg>
                                 </div>
-                                <RouterLink to="/blog/detail/i-cant-enroll-to-my-elearning-course-help" class="text-black hover_underline">
+                                <RouterLink to="/blog/detail/em-khong-ghi-danh-duoc-vao-lop-hoc-tren-trang-e-learning-thi-phai-lam-sao" class="text-black hover_underline">
                                     <div class="hover_underline" style="cursor: pointer">
                                         {{ store.isVietNamese() ? "Em không ghi danh được vào lớp học trên trang E-learning thì phải làm sao?" : "I can't enroll to my Elearning course, HELP!!!" }}
                                     </div>
@@ -248,7 +248,7 @@
                                     </div>
                                     <RouterLink :to="`/blog/detail/${post.slug}`" class="hover_underline w-100 text-black" style="cursor: pointer">
                                         <!-- {{ store.isVietNamese() ? "Nâng cấp hệ thống Wifi và dịch vụ CNTT" : "Update Wifi system and IT services" }} -->
-                                        <div>{{ store.truncateText(post.title, 50) }}</div>
+                                        <div>{{ store.truncateText(post.title, 40) }}</div>
                                     </RouterLink>
                                 </div>
                             </div>
@@ -265,7 +265,18 @@
                 </div>
                 <div class="row" id="wrapVideo">
                     <div v-for="post in posts" :key="post.id" class="col-auto col-sm-4">
-                        <iframe width="100%" height="200px" :src="post.video" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
+                        <video
+                            v-if="store.isMP4(post.video)"
+                            width="100%"
+                            height="150px"
+                            :src="post.video"
+                            frameborder="0"
+                            controls
+                            allowfullscreen
+                            class="rounded w-100"
+                            title="Guiding clips"
+                        ></video>
+                        <iframe v-else width="100%" height="150px" :src="post.video" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
                         <RouterLink :to="`/blog/detail/${post.slug}`" :title="post.title" class="text-black hover_underline">
                             <strong>{{ post.title }}</strong>
                             <div>{{ store.truncateText(post.excerpt, 100) }}</div>

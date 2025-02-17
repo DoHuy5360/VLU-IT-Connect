@@ -91,7 +91,6 @@ export const useTemplateStore = defineStore({
             return text.length > numberOfLimitLetter ? `${text.slice(0, numberOfLimitLetter)}...` : text;
         },
         isMP4(source) {
-            console.log(source);
             if (source) {
                 return source.endsWith(".mp4");
             } else {

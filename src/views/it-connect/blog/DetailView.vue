@@ -78,12 +78,12 @@
                         </RouterLink>
                         <ul v-if="categories.length" class="list-unstyled" style="overflow-y: scroll; height: 250px">
                             <li v-for="(category, index) in categories" :key="index" class="hover_underline mb-1" style="cursor: pointer; padding-right: 1rem">
-                                <RouterLink :to="`/blog?category=${category.slug}`" class="text-black d-flex justify-content-between">
+                                <RouterLink :to="`/blog?category=${category.Slug}`" class="text-black d-flex justify-content-between">
                                     <span>
-                                        {{ store.truncateText(category.categoryName, 35) }}
+                                        {{ store.truncateText(category.Name, 30) }}
                                     </span>
                                     <strong>
-                                        {{ category.posts.length }}
+                                        {{ category.AmountOfPosts }}
                                     </strong>
                                 </RouterLink>
                             </li>
@@ -142,7 +142,7 @@ import { guestRequest } from "../../one-ui/accountmanager/service/axiosConfig";
 const props = defineProps(["postSlug"]);
 const store = useTemplateStore();
 const featuredArticle = ref({});
-const categories = ref({});
+const categories = ref([]);
 const relatedArticles = ref([]);
 let currentPostId;
 let categoryOfThisPost;
@@ -203,13 +203,37 @@ const getPost = async () => {
     }
 };
 
+function spreadCategory(categoryJsonTree) {
+    for (let index = 0; index < categoryJsonTree.length; index++) {
+        const category = categoryJsonTree[index];
+        if (category.Children.values.$values.length === 0) {
+            categories.value.push({
+                Id: category.Id,
+                Name: category.Name,
+                Slug: category.Slug,
+                NestDepth: category.NestDepth,
+                AmountOfPosts: category.AmountOfPosts,
+            });
+        } else {
+            categories.value.push({
+                Id: category.Id,
+                Name: category.Name,
+                Slug: category.Slug,
+                NestDepth: category.NestDepth,
+                AmountOfPosts: category.AmountOfPosts,
+            });
+            spreadCategory(category.Children.values.$values);
+        }
+    }
+}
+
 const getCategories = async () => {
     try {
-        const response = await guestRequest.get("/posts/categories-with-posts");
-        categories.value = response.data;
+        const response = await guestRequest.get("/posts/getallcategories");
+        spreadCategory(response.data.data.categories.values.$values);
     } catch (error) {
         console.error("Error fetching categories:", error.response?.data || error.message);
-        categories.value = null;
+        // categories.value = null;
     }
 };
 

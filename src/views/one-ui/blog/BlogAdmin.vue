@@ -40,7 +40,7 @@
                                             <th scope="row">{{ rowIndex + 1 }}</th>
                                             <td style="">
                                                 <RouterLink :to="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer">{{
-                                                    store.truncateText(row.title, 30)
+                                                    store.truncateText(row.title, 50)
                                                 }}</RouterLink>
                                             </td>
                                             <td>{{ row.category }}</td>

@@ -9,7 +9,11 @@
             <div class="container">
                 <div class="row">
                     <div class="col">
-                        <label for="searchInputHeroVer" class="text-white hero-title" v-html="store.isVietNamese() ? store.heroTitleName.vn : store.heroTitleName.en"></label>
+                        <label
+                            for="searchInputHeroVer"
+                            class="text-white fs-2 fs-md-2 fs-lg-3 fw-semibold decrease_spacing"
+                            v-html="store.isVietNamese() ? store.heroTitleName.vn : store.heroTitleName.en"
+                        ></label>
                     </div>
                     <div class="col-4 d-none d-sm-block">
                         <div class="search-container">
@@ -58,6 +62,9 @@ function onSearch() {
 </script>
 
 <style scoped>
+.decrease_spacing {
+    letter-spacing: -1px;
+}
 .hero-image {
     width: 100%;
     height: 200px;
@@ -79,11 +86,6 @@ function onSearch() {
 
 .hero-content {
     transform: translateY(-50%);
-}
-
-.hero-title {
-    font-size: 2rem;
-    font-weight: bold;
 }
 
 .search-container {

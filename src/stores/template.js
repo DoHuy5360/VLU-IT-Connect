@@ -11,6 +11,7 @@ export const useTemplateStore = defineStore({
             copyright: new Date().getFullYear(),
             language: localStorage.getItem("it-connect:language") || "VN",
             baseURL: import.meta.env.VITE_BASE_URL,
+            assetURL: import.meta.env.BASE_URL,
         },
 
         breadcrumb: {
@@ -67,6 +68,9 @@ export const useTemplateStore = defineStore({
         },
         setBreadcrumb(path) {
             this.breadcrumb.path = path;
+        },
+        getBrandAsset(path) {
+            return this.app.assetURL + "/assets/media/brand" + path;
         },
         // Sets the layout, useful for setting different layouts (under layouts/variations/)
         setLayout(payload) {

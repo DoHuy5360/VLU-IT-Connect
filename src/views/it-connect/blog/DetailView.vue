@@ -49,7 +49,7 @@
                                 style="object-fit: contain"
                                 @error="
                                     () => {
-                                        featuredArticle.image = '/../assets/media/brand/30_years_vertical_version.png';
+                                        featuredArticle.image = store.getBrandAsset('/30_years_vertical_version.png');
                                     }
                                 "
                             />
@@ -105,7 +105,7 @@
                                             style="object-fit: contain"
                                             @error="
                                                 () => {
-                                                    article.image = '/../assets/media/brand/logo-khong-chu.png';
+                                                    article.image = store.getBrandAsset('/logo-khong-chu.png');
                                                 }
                                             "
                                         />

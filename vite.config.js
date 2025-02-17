@@ -3,7 +3,7 @@ import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
     plugins: [vue()],
-    base: "/FE/",
+    base: "/FE",
     resolve: {
         alias: {
             "@": "/src", // Alias for the backend API

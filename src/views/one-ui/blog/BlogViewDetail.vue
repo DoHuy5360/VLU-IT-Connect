@@ -17,7 +17,18 @@
                 <tbody>
                     <tr>
                         <td style="white-space: nowrap">Ảnh bìa</td>
-                        <td><img :src="post.imageUrl" alt="" class="w-25" /></td>
+                        <td>
+                            <img
+                                :src="post.imageUrl"
+                                alt="Ảnh bìa bài viết"
+                                class="w-25"
+                                @error="
+                                    () => {
+                                        post.imageUrl = store.getBrandAsset('/logo-khong-chu.png');
+                                    }
+                                "
+                            />
+                        </td>
                     </tr>
                     <tr>
                         <td style="white-space: nowrap">Tác giả</td>

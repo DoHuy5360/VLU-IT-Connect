@@ -65,7 +65,7 @@
                                     alt="Ảnh bìa của bài viết"
                                     @error="
                                         () => {
-                                            state.imageURL = '/../assets/media/brand/30_years_vertical_version.png';
+                                            state.imageURL = store.getBrandAsset('/30_years_vertical_version.png');
                                         }
                                     "
                                 />

@@ -206,23 +206,25 @@ const getPost = async () => {
 function spreadCategory(categoryJsonTree) {
     for (let index = 0; index < categoryJsonTree.length; index++) {
         const category = categoryJsonTree[index];
-        if (category.Children.values.$values.length === 0) {
-            categories.value.push({
-                Id: category.Id,
-                Name: category.Name,
-                Slug: category.Slug,
-                NestDepth: category.NestDepth,
-                AmountOfPosts: category.AmountOfPosts,
-            });
-        } else {
-            categories.value.push({
-                Id: category.Id,
-                Name: category.Name,
-                Slug: category.Slug,
-                NestDepth: category.NestDepth,
-                AmountOfPosts: category.AmountOfPosts,
-            });
-            spreadCategory(category.Children.values.$values);
+        if (category.AmountOfPosts !== 0) {
+            if (category.Children.values.$values.length === 0) {
+                categories.value.push({
+                    Id: category.Id,
+                    Name: category.Name,
+                    Slug: category.Slug,
+                    NestDepth: category.NestDepth,
+                    AmountOfPosts: category.AmountOfPosts,
+                });
+            } else {
+                categories.value.push({
+                    Id: category.Id,
+                    Name: category.Name,
+                    Slug: category.Slug,
+                    NestDepth: category.NestDepth,
+                    AmountOfPosts: category.AmountOfPosts,
+                });
+                spreadCategory(category.Children.values.$values);
+            }
         }
     }
 }

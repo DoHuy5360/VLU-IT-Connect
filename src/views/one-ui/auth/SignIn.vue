@@ -1,5 +1,8 @@
 <template>
-    <div class="hero-static d-flex align-items-center" style="position: relative; min-height: 100vh; background: url('/assets/media/brand/sign.png') no-repeat center center; background-size: cover">
+    <div
+        class="hero-static d-flex align-items-center"
+        :style="`position: relative; min-height: 100vh; background: url(${store.getBrandAsset('/sign.png')}) no-repeat center center; background-size: cover`"
+    >
         <!-- Dark Overlay -->
         <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1"></div>
 
@@ -11,7 +14,7 @@
                     <BaseBlock title="" class="mb-0">
                         <div class="p-sm-3 px-lg-4 px-xxl-5 py-lg-5">
                             <div class="text-center mb-4">
-                                <img src="/assets/media/brand/30_years_vertical_version.png" alt="VLU Logo" style="max-width: 80%; height: auto" />
+                                <img :src="store.getBrandAsset('/30_years_vertical_version.png')" alt="VLU Logo" style="max-width: 80%; height: auto" />
                             </div>
                             <p class="fw-medium text-muted text-center">Vui lòng đăng nhập</p>
                             <form @submit.prevent="onSubmit">
@@ -82,6 +85,9 @@ import useVuelidate from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import { useRouter } from "vue-router";
 import { gateRequest } from "../accountmanager/service/axiosConfig";
+import { useTemplateStore } from "@/stores/template";
+
+const store = useTemplateStore();
 
 const router = useRouter();
 

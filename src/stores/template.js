@@ -72,6 +72,9 @@ export const useTemplateStore = defineStore({
         getBrandAsset(path) {
             return this.app.assetURL + "/assets/media/brand" + path;
         },
+        getOtherAsset(path) {
+            return this.app.assetURL + "/assets/media/other" + path;
+        },
         // Sets the layout, useful for setting different layouts (under layouts/variations/)
         setLayout(payload) {
             this.layout.header = payload.header;

@@ -112,7 +112,7 @@
             <div class="row justify-content-between">
                 <div class="col-sm-3 col-5">
                     <RouterLink to="/">
-                        <img src="@/../assets/media/brand/30_years_vertical_version.png" class="image-responsive w-100" style="object-fit: contain" alt="Van Lang Logo" draggable="false" />
+                        <img :src="store.getBrandAsset('/30_years_vertical_version.png')" class="image-responsive w-100" style="object-fit: contain" alt="Van Lang Logo" draggable="false" />
                     </RouterLink>
                 </div>
                 <div class="col d-flex gap-2 align-items-center justify-content-end d-sm-none">
@@ -184,7 +184,7 @@
     <div class="d-sm-none position-absolute bg-white w-100 z-2 h-100" style="top: 0; left: 100%; transition: 300ms linear" ref="headerAsSidebar">
         <div class="d-flex justify-content-between p-3">
             <div>
-                <img src="@/../assets/media/brand/30_years_vertical_version.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
+                <img :src="store.getBrandAsset('/30_years_vertical_version.png')" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
             </div>
             <div @click="toggleHeaderInMobileView" style="width: 24px">
                 <!-- Close header sidebar icon -->

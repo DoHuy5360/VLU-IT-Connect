@@ -40,8 +40,8 @@ const store = useTemplateStore();
 let category = route.query.category;
 
 store.setHeroTitleName({
-    vn: "Video và Clips",
-    en: "Video & Clips",
+    vn: "Video Clips Công Nghệ Thông Tin",
+    en: "Video Clips of Information Technology",
 });
 
 watch(

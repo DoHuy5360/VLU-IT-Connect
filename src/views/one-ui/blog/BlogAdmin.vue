@@ -40,7 +40,7 @@
                                             <th scope="row">{{ rowIndex + 1 }}</th>
                                             <td style="">
                                                 <RouterLink :to="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer">{{
-                                                    store.truncateText(row.title, 30)
+                                                    store.truncateText(row.title, 50)
                                                 }}</RouterLink>
                                             </td>
                                             <td>{{ row.category }}</td>
@@ -79,7 +79,6 @@
 import { ref, computed, onMounted, reactive } from "vue";
 import Swal from "sweetalert2";
 import { RouterLink, useRouter } from "vue-router";
-import axios from "axios";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
 import { authRequest } from "../accountmanager/service/axiosConfig";
 import { useTemplateStore } from "../../../stores/template";

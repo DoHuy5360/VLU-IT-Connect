@@ -3,7 +3,7 @@ import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
     plugins: [vue()],
-    base: "/FE/",
+    base: "/FE",
     resolve: {
         alias: {
             "@": "/src", // Alias for the backend API
@@ -12,12 +12,12 @@ export default defineConfig({
     server: {
         // proxy: {
         //     "/api": {
-        //         target: "https://localhost:7017/", // Backend URL
+        //         target: "http://172.16.3.52/api/", // Backend URL
         //         changeOrigin: true,
         //         secure: false, // Disable SSL verification for local development
         //     },
         //     "/login": {
-        //         target: "https://localhost:7017/", // Backend URL
+        //         target: "http://172.16.3.52/api/", // Backend URL
         //         changeOrigin: true,
         //         secure: false, // Disable SSL verification for local development
         //     },

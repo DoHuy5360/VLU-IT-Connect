@@ -1,6 +1,6 @@
 <template>
     <div class="bg-new-pale-gray py-2">
-        <div class="container d-flex gap-2 align-items-center">
+        <div class="container d-flex flex-wrap gap-2 align-items-center">
             <RouterLink to="/">
                 <!-- Home icon -->
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -11,8 +11,8 @@
                 </svg>
             </RouterLink>
             <div v-if="store.breadcrumb.path.length != 0">
-                <div class="breadcrumb d-flex gap-2 align-items-center">
-                    <div v-for="(crumb, index) in store.breadcrumb.path" :key="index" class="breadcrumb d-flex gap-2 align-items-center">
+                <div class="d-flex flex-wrap gap-2 align-items-start">
+                    <div v-for="(crumb, index) in store.breadcrumb.path" :key="index" class="breadcrumb d-flex flex-nowrap gap-2 align-items-center">
                         <div>
                             <!-- Greater icon -->
                             <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -25,7 +25,7 @@
                             </svg>
                         </div>
                         <div style="transform: translateY(1px)">
-                            <div v-if="crumb.disabled">{{ store.isVietNamese() ? crumb.name.vn : crumb.name.en }}</div>
+                            <a href="javascript:void(0)" v-if="crumb.disabled">{{ store.isVietNamese() ? crumb.name.vn : crumb.name.en }}</a>
                             <RouterLink v-else :to="crumb.path" style="font-size: 1rem" class="text-black hover_underline">{{ store.isVietNamese() ? crumb.name.vn : crumb.name.en }}</RouterLink>
                         </div>
                     </div>

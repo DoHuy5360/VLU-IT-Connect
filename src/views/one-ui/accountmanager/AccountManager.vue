@@ -29,7 +29,7 @@
     </BasePageHeading>
 
     <div class="content">
-        <BaseBlock title="" class="shadow-sm">
+        <BaseBlock title="Danh sách nhóm quyền" class="shadow-sm">
             <!-- Thêm thông tin về số lượng đã chọn -->
             <div v-if="selectedGroups.length > 0" class="alert alert-info mb-3">Đã chọn {{ selectedGroups.length }} nhóm</div>
 

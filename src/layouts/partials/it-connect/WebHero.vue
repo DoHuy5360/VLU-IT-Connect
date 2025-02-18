@@ -1,15 +1,19 @@
 <template>
     <div class="position-relative w-100">
         <div class="position-relative overflow-hidden">
-            <img src="@/../assets/media/brand/hero.png" class="hero-image" alt="Hero Image" />
-            <img src="@/../assets/media/brand/hero-partial-right.png" class="hero-decoration-right" alt="Hero Decoration Right" />
-            <img src="@/../assets/media/brand/hero-partial-left.png" class="hero-decoration-left" alt="Hero Decoration Left" />
+            <img :src="store.getBrandAsset('/hero.png')" class="hero-image" alt="Hero Image" />
+            <img :src="store.getBrandAsset('/hero-partial-right.png')" class="hero-decoration-right" alt="Hero Decoration Right" />
+            <img :src="store.getBrandAsset('/hero-partial-left.png')" class="hero-decoration-left" alt="Hero Decoration Left" />
         </div>
         <div class="position-absolute w-100 top-50 hero-content">
             <div class="container">
                 <div class="row">
                     <div class="col">
-                        <label for="searchInputHeroVer" class="text-white hero-title">{{ store.isVietNamese() ? store.heroTitleName.vn : store.heroTitleName.en }}</label>
+                        <label
+                            for="searchInputHeroVer"
+                            class="text-white fs-2 fs-md-2 fs-lg-3 fw-semibold decrease_spacing"
+                            v-html="store.isVietNamese() ? store.heroTitleName.vn : store.heroTitleName.en"
+                        ></label>
                     </div>
                     <div class="col-4 d-none d-sm-block">
                         <div class="search-container">
@@ -58,6 +62,9 @@ function onSearch() {
 </script>
 
 <style scoped>
+.decrease_spacing {
+    letter-spacing: -1px;
+}
 .hero-image {
     width: 100%;
     height: 200px;
@@ -79,11 +86,6 @@ function onSearch() {
 
 .hero-content {
     transform: translateY(-50%);
-}
-
-.hero-title {
-    font-size: 2rem;
-    font-weight: bold;
 }
 
 .search-container {

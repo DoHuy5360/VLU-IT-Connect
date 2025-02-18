@@ -1,4 +1,5 @@
 <template>
+    <!-- Top header bar -->
     <div class="bg-secondary d-none d-sm-block">
         <div class="container">
             <div class="d-flex gap-4 justify-content-end align-items-center">
@@ -105,12 +106,13 @@
             </div>
         </div>
     </div>
+    <!-- Header menu -->
     <div class="bg-white py-2">
         <div class="container">
             <div class="row justify-content-between">
                 <div class="col-sm-3 col-5">
                     <RouterLink to="/">
-                        <img src="@/../assets/media/brand/30_years_vertical_version.png" class="image-responsive w-100" style="object-fit: contain" alt="Van Lang Logo" draggable="false" />
+                        <img :src="store.getBrandAsset('/30_years_vertical_version.png')" class="image-responsive w-100" style="object-fit: contain" alt="Van Lang Logo" draggable="false" />
                     </RouterLink>
                 </div>
                 <div class="col d-flex gap-2 align-items-center justify-content-end d-sm-none">
@@ -138,22 +140,23 @@
                     </label>
                 </div>
                 <div class="col d-none d-sm-flex gap-4 justify-content-end align-items-center text-end menu" style="font-weight: bold">
-                    <RouterLink to="/blog?category=cac-cau-hoi-thuong-gap" class="text-black" style="cursor: pointer; color: black">
+                    <RouterLink to="/blog?category=cac-cau-hoi-thuong-gap" class="text-black hover_underline" style="cursor: pointer; color: black">
                         {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
                     </RouterLink>
-                    <RouterLink to="/support" class="text-black" style="cursor: pointer">
+                    <RouterLink to="/support" class="text-black hover_underline" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
                     </RouterLink>
-                    <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-black" style="cursor: pointer">
+                    <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-black hover_underline" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
                     </RouterLink>
-                    <a href="tel:028 7109 9131" class="text-black" style="cursor: pointer">
+                    <a href="tel:028 7109 9131" class="text-black hover_underline" style="cursor: pointer">
                         {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
                     </a>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Search bar for mobile view -->
     <div ref="searchBar" class="container my-2 d-none">
         <div class="bg-white rounded-pill px-2 py-1 d-flex align-items-center border border-grey">
             <input
@@ -181,7 +184,7 @@
     <div class="d-sm-none position-absolute bg-white w-100 z-2 h-100" style="top: 0; left: 100%; transition: 300ms linear" ref="headerAsSidebar">
         <div class="d-flex justify-content-between p-3">
             <div>
-                <img src="@/../assets/media/brand/30_years_vertical_version.png" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
+                <img :src="store.getBrandAsset('/30_years_vertical_version.png')" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
             </div>
             <div @click="toggleHeaderInMobileView" style="width: 24px">
                 <!-- Close header sidebar icon -->
@@ -255,22 +258,22 @@
                 <li class="p-2" style="font-weight: 600">{{ store.isVietNamese() ? "Cán bộ - Giảng viên - Nhân viên" : "Staff - Lecture - Employee" }}</li>
             </ul>
             <div class="bg-white text-secondary px-3 py-2 border border-b" style="font-weight: bold">
-                <RouterLink to="/blog?category=cac-cau-hoi-thuong-gap" class="text-black">
+                <RouterLink to="/blog?category=cac-cau-hoi-thuong-gap" class="text-black hover_underline">
                     {{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently asked questions" }}
                 </RouterLink>
             </div>
             <div class="bg-white text-secondary px-3 py-2 border border-b">
-                <RouterLink to="/support" class="text-black" style="font-weight: bold">
+                <RouterLink to="/support" class="text-black hover_underline" style="font-weight: bold">
                     {{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}
                 </RouterLink>
             </div>
             <div class="bg-white text-secondary px-3 py-2 border border-b">
-                <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-black" style="font-weight: bold">
+                <RouterLink to="/blog?category=quy-dinh-chinh-sach" class="text-black hover_underline" style="font-weight: bold">
                     {{ store.isVietNamese() ? "Quy định - Chính sách" : "Regulation - Policy" }}
                 </RouterLink>
             </div>
             <div class="bg-white text-secondary px-3 py-2 border border-b">
-                <RouterLink to="tel:028 7109 9131" class="text-black" style="font-weight: bold">
+                <RouterLink to="tel:028 7109 9131" class="text-black hover_underline" style="font-weight: bold">
                     {{ store.isVietNamese() ? "Liên hệ" : "Contact" }}
                 </RouterLink>
             </div>

@@ -20,5 +20,6 @@
 * {
     scroll-behavior: smooth;
     scroll-padding-top: 3rem;
+    scrollbar-width: thin; /* Gán chiều rộng cho scrollbar */
 }
 </style>

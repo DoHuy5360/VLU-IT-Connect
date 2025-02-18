@@ -9,8 +9,9 @@ export const useTemplateStore = defineStore({
             name: "IT-Connect",
             version: "1.0",
             copyright: new Date().getFullYear(),
-            language: "VN",
+            language: localStorage.getItem("it-connect:language") || "VN",
             baseURL: import.meta.env.VITE_BASE_URL,
+            assetURL: import.meta.env.BASE_URL,
         },
 
         breadcrumb: {
@@ -57,6 +58,7 @@ export const useTemplateStore = defineStore({
     actions: {
         setLanguage(language) {
             this.app.language = language;
+            localStorage.setItem("it-connect:language", language);
         },
         isVietNamese() {
             return this.app.language === "VN";
@@ -66,6 +68,12 @@ export const useTemplateStore = defineStore({
         },
         setBreadcrumb(path) {
             this.breadcrumb.path = path;
+        },
+        getBrandAsset(path) {
+            return this.app.assetURL + "/assets/media/brand" + path;
+        },
+        getOtherAsset(path) {
+            return this.app.assetURL + "/assets/media/other" + path;
         },
         // Sets the layout, useful for setting different layouts (under layouts/variations/)
         setLayout(payload) {
@@ -86,7 +94,6 @@ export const useTemplateStore = defineStore({
             return text.length > numberOfLimitLetter ? `${text.slice(0, numberOfLimitLetter)}...` : text;
         },
         isMP4(source) {
-            console.log(source);
             if (source) {
                 return source.endsWith(".mp4");
             } else {

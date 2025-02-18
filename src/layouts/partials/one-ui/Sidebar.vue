@@ -98,11 +98,11 @@ onMounted(() => {
                     <RouterLink to="/administrator/" class="fw-semibold text-dual">
                         <span class="smini-visible">
                             <div class="position-relative w-25" style="transform: translate(-20%, 50%)">
-                                <img src="@/../assets/media/brand/white_vlu_logo.png" class="w-75" style="object-fit: contain" />
+                                <img :src="store.getBrandAsset('/white_vlu_logo.png')" class="w-75" style="object-fit: contain" />
                             </div>
                         </span>
                         <span class="smini-hide fs-5 tracking-wider">
-                            <img src="@/../assets/media/brand/30_nam_phien_ban_don_sac.png" class="w-100" style="object-fit: contain" />
+                            <img :src="store.getBrandAsset('/30_nam_phien_ban_don_sac.png')" class="w-100" style="object-fit: contain" />
                         </span>
                     </RouterLink>
                     <!-- END Logo -->

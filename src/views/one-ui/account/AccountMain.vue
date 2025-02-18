@@ -1,7 +1,6 @@
 <template>
-    <BasePageHeading title="Quản Lý Tài Khoản" subtitle="">
+    <BasePageHeading title="Quản Lý Bài Viết" subtitle="">
         <template #extra>
-            <!-- Nút xóa nhiều tài khoản -->
             <button v-if="selectedUsers.length > 0" type="button" class="btn btn-danger me-2" @click="deleteMultiple">
                 <i class="fa fa-trash opacity-50 me-1"></i>
                 Xóa đã chọn ({{ selectedUsers.length }})
@@ -15,123 +14,109 @@
     </BasePageHeading>
 
     <div class="content">
-        <!-- Filters and Search -->
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <label hidden for="searchAccountInput">Tìm kiếm</label>
-                <input id="searchAccountInput" type="text" class="form-control" v-model="searchTerm" placeholder="Tên, Email, Nhóm tài khoản..." @input="onSearch" />
-            </div>
-            <div class="col-md-4">
-                <select class="form-select" v-model="selectedGroup" @change="onFilterGroup" title="Lọc tài khoản">
-                    <option value="">Tất cả nhóm tài khoản</option>
-                    <option v-for="group in groups" :key="group.value" :value="group.label">
-                        {{ group.label }}
-                    </option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Loading Spinner -->
-        <div v-if="loading" class="text-center">
-            <p>Đang tải dữ liệu...</p>
-        </div>
-
-        <!-- User Table -->
-        <div v-else>
-            <BaseBlock title="Danh sách tài khoản" class="shadow-sm rounded">
-                <div v-if="paginatedAccounts.length">
-                    <table class="table table-bordered table-striped table-vcenter align-middle">
-                        <thead class="bg-primary-light">
-                            <tr>
-                                <th class="text-center" style="width: 50px">
-                                    <label hidden for="checkAllAccount">Chọn tất cả</label>
-                                    <input id="checkAllAccount" type="checkbox" :checked="isAllSelected" @click="selectAll($event)" />
-                                </th>
-                                <th class="text-center">#</th>
-                                <th>Tình trạng</th>
-                                <th>Họ tên</th>
-                                <th>Email</th>
-                                <th>Nhóm tài khoản</th>
-                                <th class="text-center">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(user, index) in paginatedAccounts" :key="user.id">
-                                <td class="text-center">
-                                    <label hidden :for="`accountCheckbox-${index}`">{{ index }}</label>
-                                    <input :id="`accountCheckbox-${index}`" type="checkbox" :value="user.id" v-model="selectedUsers" @click.stop />
-                                </td>
-                                <td class="text-center">{{ currentPageIndex + index + 1 }}</td>
-                                <td>
-                                    <span :class="`badge bg-${user.status === 'Active' ? 'success' : 'danger'}`">
-                                        {{ user.status }}
-                                    </span>
-                                </td>
-                                <td>{{ user.FullName }}</td>
-                                <td>{{ user.Email }}</td>
-                                <td>{{ user.Role }}</td>
-                                <td class="text-center">
-                                    <div class="d-flex gap-2 justify-content-center">
-                                        <button class="btn btn-sm btn-alt-warning" @click.stop="editAccount(user.id)">
-                                            <i class="fa fa-fw fa-pencil-alt"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger" title="Xóa tài khoản" @click="deleteUser(user.id)">
-                                            <i class="fa fa-fw fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- Pagination -->
-                    <nav>
-                        <ul class="pagination justify-content-center mt-4">
-                            <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                                <button class="page-link" @click="changePage(currentPage - 1)">Trước</button>
-                            </li>
-                            <li v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }" class="page-item">
-                                <button class="page-link" @click="changePage(page)">
-                                    {{ page }}
-                                </button>
-                            </li>
-                            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                                <button class="page-link" @click="changePage(currentPage + 1)">Tiếp</button>
-                            </li>
-                        </ul>
-                    </nav>
+        <BaseBlock title="Danh sách tài khoản" content-full>
+            <Dataset v-slot="{ ds }" :ds-data="accountFiltered.length == 0 ? users : accountFiltered" :ds-sortby="sortBy" :ds-search-in="['status', 'name', 'email', 'accountGroup']">
+                <div class="row" :data-page-count="ds.dsPagecount">
+                    <div id="datasetLength" class="col-md-4 py-2">
+                        <DatasetShow />
+                    </div>
+                    <div class="col-md-4 py-2">
+                        <select @change="onFilterGroup" class="form-select" title="Lọc tài khoản theo thể loại">
+                            <option value="">Hiển thị tất cả</option>
+                            <option v-for="group in groupRoles" :key="group.id" :value="group.name">{{ group.name }}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 py-2">
+                        <!-- <DatasetSearch ds-search-placeholder="Tìm kiếm..." /> -->
+                        <label hidden for="searchBlogInput">Tìm kiếm bài viết</label>
+                        <input id="searchBlogInput" type="text" @input="search" class="form-control" placeholder="Tìm kiếm..." />
+                    </div>
                 </div>
-                <div v-else class="text-center">
-                    <p class="text-muted">Không có dữ liệu</p>
+                <hr />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" style="width: 50px">
+                                            <label hidden for="checkAllAccount">Chọn tất cả</label>
+                                            <input id="checkAllAccount" type="checkbox" class="form-check-input" @click="selectAll($event)" />
+                                        </th>
+                                        <th scope="col">#</th>
+                                        <th v-for="(th, index) in cols" :key="th.field" :class="['sort', th.sort]" @click="onSort($event, index)">
+                                            <div class="d-flex gap-2" style="white-space: nowrap">{{ th.name }} <i class="gg-select float-end"></i></div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody v-if="accountFiltered.length === 0">
+                                    <tr>
+                                        <td colspan="6" class="text-center">Không có dữ liệu</td>
+                                    </tr>
+                                </tbody>
+                                <DatasetItem v-else tag="tbody" class="fs-sm">
+                                    <template #default="{ row, rowIndex }">
+                                        <tr>
+                                            <td class="text-center">
+                                                <label hidden :for="`accountCheckbox-${rowIndex}`">{{ rowIndex }}</label>
+                                                <input :id="`accountCheckbox-${rowIndex}`" type="checkbox" :value="row.id" class="form-check-input" v-model="selectedUsers" @click.stop />
+                                            </td>
+                                            <td scope="row">{{ rowIndex + 1 }}</td>
+                                            <td>
+                                                <span :class="`badge bg-${row.status === 'Active' ? 'success' : 'danger'}`">
+                                                    {{ row.status }}
+                                                </span>
+                                            </td>
+                                            <td>{{ row.FullName }}</td>
+                                            <td>{{ row.Email }}</td>
+                                            <td>{{ row.Role }}</td>
+                                            <td class="text-center">
+                                                <div class="d-flex gap-2 justify-content-center">
+                                                    <button class="btn btn-sm btn-alt-warning" @click.stop="editAccount(row.id)">
+                                                        <i class="fa fa-fw fa-pencil-alt"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-danger" title="Xóa tài khoản" @click="deleteUser(row.id)">
+                                                        <i class="fa fa-fw fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </DatasetItem>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-            </BaseBlock>
-        </div>
+                <div class="d-flex flex-md-row flex-column justify-content-between align-items-center">
+                    <DatasetInfo class="py-3 fs-sm" />
+                    <DatasetPager class="flex-wrap py-3 fs-sm" />
+                </div>
+            </Dataset>
+        </BaseBlock>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, reactive } from "vue";
 import Swal from "sweetalert2";
-import { useRouter } from "vue-router";
-import { authRequest } from "../accountmanager/service/axiosConfig";
-
+import { RouterLink, useRouter } from "vue-router";
+import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
+import { authRequest } from "../../one-ui/accountmanager/service/axiosConfig";
 const router = useRouter();
+const loading = ref(true);
+const accountFiltered = ref([]);
 
 const users = ref([]);
-const searchTerm = ref("");
-const selectedGroup = ref("");
-const currentPage = ref(1);
-const itemsPerPage = 20;
-const groups = ref([]);
-const loading = ref(true);
+const groupRoles = ref([]);
 const selectedUsers = ref([]);
 
 // Fetch Groups
 const fetchGroups = async () => {
     try {
         const response = await authRequest.get("/AccountGroup/list");
-        groups.value = response.data.data.$values.map((group) => ({
+        groupRoles.value = response.data.data.$values.map((group) => ({
             value: group.Id,
-            label: group.GroupName,
+            name: group.GroupName,
         }));
     } catch (error) {
         console.error("Error fetching groups:", error);
@@ -149,6 +134,7 @@ const fetchUsers = async () => {
             Role: user.Role.toString(),
             status: user.state ? "Active" : "Inactive",
         }));
+        accountFiltered.value = users.value;
     } catch (error) {
         console.error("Error fetching users:", error);
     } finally {
@@ -162,27 +148,58 @@ onMounted(() => {
     fetchUsers();
 });
 
-// Computed Properties
-const filteredUsers = computed(() => {
-    return users.value.filter((user) => !selectedGroup.value || user.Role === selectedGroup.value);
-});
+function onFilterGroup(e) {
+    const filterName = e.target.value.trim();
+    console.log(filterName);
+    accountFiltered.value = [];
+    if (filterName === "") {
+        accountFiltered.value = users.value;
+    } else {
+        const resultFilter = users.value.filter((account) => account.Role.trim() === filterName);
+        if (resultFilter.length === 0) {
+            accountFiltered.value = [];
+        } else {
+            accountFiltered.value = resultFilter;
+        }
+    }
+}
 
-const totalPages = computed(() => Math.ceil(filteredUsers.value.length / itemsPerPage));
-const paginatedAccounts = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage;
-    return filteredUsers.value.slice(start, start + itemsPerPage);
-});
-const currentPageIndex = computed(() => (currentPage.value - 1) * itemsPerPage);
-
-// Methods
-const changePage = (page) => {
-    if (page >= 1 && page <= totalPages.value) currentPage.value = page;
+const editAccount = (id) => {
+    router.push({ name: "AdminAccountEdit", params: { id } });
 };
 
-const onSearch = () => (currentPage.value = 1);
-const onFilterGroup = () => {
-    currentPage.value = 1;
+const selectAll = (event) => {
+    if (event.target.checked) {
+        selectedUsers.value = (accountFiltered.value.length === 0 ? users : accountFiltered).value.map((user) => user.id);
+    } else {
+        selectedUsers.value = [];
+    }
 };
+
+function normalizeString(str) {
+    // Chuyển đổi thành chữ thường và loại bỏ dấu
+    return str
+        .toLowerCase()
+        .normalize("NFD") // Chuyển đổi các ký tự có dấu thành ký tự không dấu cộng với dấu
+        .replace(/[\u0300-\u036f]/g, ""); // Loại bỏ các dấu
+}
+
+function containsSubstring(x, y) {
+    const sanitizedX = normalizeString(x);
+    const sanitizedY = normalizeString(y);
+
+    return sanitizedY.includes(sanitizedX);
+}
+function search(input) {
+    const searchValue = input.target.value;
+    if (searchValue === "") {
+        accountFiltered.value = users.value;
+    } else {
+        if (users.value.length != 0) {
+            accountFiltered.value = users.value.filter((post) => containsSubstring(searchValue, post.FullName) || containsSubstring(searchValue, post.Email));
+        }
+    }
+}
 
 const deleteUser = async (id) => {
     Swal.fire({
@@ -201,7 +218,9 @@ const deleteUser = async (id) => {
         if (result.isConfirmed) {
             try {
                 await authRequest.delete(`/UserManagement/users/${id}`);
-                users.value = users.value.filter((user) => user.id !== id);
+                await fetchUsers();
+                selectedUsers.value = [];
+                accountFiltered.value = [];
                 Swal.fire("Deleted!", "Tài khoản đã được xóa.", "success");
             } catch (error) {
                 Swal.fire("Error", "Không thể xóa tài khoản.", "error");
@@ -247,6 +266,7 @@ const deleteMultiple = async () => {
                     // Refresh user list and clear selection
                     await fetchUsers();
                     selectedUsers.value = [];
+                    accountFiltered.value = [];
                 }
             } catch (error) {
                 console.error("Error response:", error.response?.data);
@@ -260,24 +280,125 @@ const deleteMultiple = async () => {
     });
 };
 
-const editAccount = (id) => {
-    router.push({ name: "AdminAccountEdit", params: { id } });
-};
+// Helper variables
+const cols = reactive([
+    {
+        name: "Tình trạng",
+        field: "status",
+        sort: "",
+    },
+    {
+        name: "Họ tên",
+        field: "FullName",
+        sort: "",
+    },
+    {
+        name: "Email",
+        field: "Email",
+        sort: "",
+    },
+    {
+        name: "Nhóm tài khoản",
+        field: "Role",
+        sort: "",
+    },
+]);
+// Apply a few Bootstrap 5 optimizations
+onMounted(() => {
+    // Remove labels from
+    document.querySelectorAll("#datasetLength label").forEach((el) => {
+        el.remove();
+    });
 
-const selectAll = (event) => {
-    if (event.target.checked) {
-        selectedUsers.value = paginatedAccounts.value.map((user) => user.id);
-    } else {
-        selectedUsers.value = [];
+    // Replace select classes
+    let selectLength = document.querySelector("#datasetLength select");
+
+    selectLength.classList = "";
+    selectLength.classList.add("form-select");
+    selectLength.style.width = "80px";
+});
+// Sort by functionality
+const sortBy = computed(() => {
+    return cols.reduce((acc, o) => {
+        if (o.sort) {
+            o.sort === "asc" ? acc.push(o.field) : acc.push("-" + o.field);
+        }
+        return acc;
+    }, []);
+});
+// On sort th click
+function onSort(event, i) {
+    let toset;
+    const sortEl = cols[i];
+
+    if (!event.shiftKey) {
+        cols.forEach((o) => {
+            if (o.field !== sortEl.field) {
+                o.sort = "";
+            }
+        });
     }
-};
+
+    if (!sortEl.sort) {
+        toset = "asc";
+    }
+
+    if (sortEl.sort === "desc") {
+        toset = event.shiftKey ? "" : "asc";
+    }
+
+    if (sortEl.sort === "asc") {
+        toset = "desc";
+    }
+
+    sortEl.sort = toset;
+}
 </script>
 
-<style scoped>
-.table th {
-    white-space: nowrap;
+<style lang="scss" scoped>
+.gg-select {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    transform: scale(1);
+    width: 22px;
+    height: 22px;
 }
-.pagination .page-link {
+.gg-select::after,
+.gg-select::before {
+    content: "";
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    left: 7px;
+    transform: rotate(-45deg);
+}
+.gg-select::before {
+    border-left: 2px solid;
+    border-bottom: 2px solid;
+    bottom: 4px;
+    opacity: 0.3;
+}
+.gg-select::after {
+    border-right: 2px solid;
+    border-top: 2px solid;
+    top: 4px;
+    opacity: 0.3;
+}
+th.sort {
     cursor: pointer;
+    user-select: none;
+    &.asc {
+        .gg-select::after {
+            opacity: 1;
+        }
+    }
+    &.desc {
+        .gg-select::before {
+            opacity: 1;
+        }
+    }
 }
 </style>

@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { RouterLink, useRouter } from "vue-router";
 
 // Main Pinia Store
 export const useTemplateStore = defineStore({
@@ -74,6 +75,11 @@ export const useTemplateStore = defineStore({
         },
         getOtherAsset(path) {
             return this.app.assetURL + "/assets/media/other" + path;
+        },
+        signOut(message) {
+            localStorage.removeItem("authToken");
+            const router = useRouter();
+            router.push(`/auth/signin?msg=${message || "Phiên đăng nhập đã hết hạn"}`);
         },
         // Sets the layout, useful for setting different layouts (under layouts/variations/)
         setLayout(payload) {

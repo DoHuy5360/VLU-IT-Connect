@@ -1,55 +1,55 @@
 <script setup></script>
 
 <template>
-  <BasePageHeading title="Chào Mừng Quản Trị Viên" subtitle="">
-    <template #extra>
-      <!-- <button type="button" class="btn btn-alt-primary" v-click-ripple>
+    <BasePageHeading title="Chào Mừng Quản Trị Viên" subtitle="">
+        <template #extra>
+            <!-- <button type="button" class="btn btn-alt-primary" v-click-ripple>
         <i class="fa fa-plus opacity-50 me-1"></i>
         Add
       </button> -->
-    </template>
-  </BasePageHeading>
+        </template>
+    </BasePageHeading>
 
-  <div class="content">
-    <div class="row">
-        <RouterLink to="/administrator/blog" class="col-3" style="cursor: pointer;">
-            <div class="navigate-items p-4 bg-white rounded border border-gray">
-                <div class="d-flex justify-content-between">
-                    <span>Danh sách bài viết</span>
-                    <span><i class="si si-arrow-right"></i></span>
+    <div class="content">
+        <div class="row g-4">
+            <RouterLink to="/administrator/blog" class="col-3" style="cursor: pointer">
+                <div class="navigate-items p-4 bg-white rounded border border-gray">
+                    <div class="d-flex justify-content-between">
+                        <span>Danh sách bài viết</span>
+                        <span><i class="si si-arrow-right"></i></span>
+                    </div>
                 </div>
-            </div>
-        </RouterLink>
-        <RouterLink to="/administrator/category" class="col-3" style="cursor: pointer;">
-            <div class="navigate-items p-4 bg-white rounded border border-gray">
-                <div class="d-flex justify-content-between">
-                    <span>Danh sách thể loại</span>
-                    <span><i class="si si-arrow-right"></i></span>
+            </RouterLink>
+            <RouterLink to="/administrator/category" class="col-3" style="cursor: pointer">
+                <div class="navigate-items p-4 bg-white rounded border border-gray">
+                    <div class="d-flex justify-content-between">
+                        <span>Danh sách thể loại</span>
+                        <span><i class="si si-arrow-right"></i></span>
+                    </div>
                 </div>
-            </div>
-        </RouterLink>
-        <RouterLink to="/administrator/account" class="col-3" style="cursor: pointer;">
-            <div class="navigate-items p-4 bg-white rounded border border-gray">
-                <div class="d-flex justify-content-between">
-                    <span>Danh sách tài khoản</span>
-                    <span><i class="si si-arrow-right"></i></span>
+            </RouterLink>
+            <RouterLink to="/administrator/account" class="col-3" style="cursor: pointer">
+                <div class="navigate-items p-4 bg-white rounded border border-gray">
+                    <div class="d-flex justify-content-between">
+                        <span>Danh sách tài khoản</span>
+                        <span><i class="si si-arrow-right"></i></span>
+                    </div>
                 </div>
-            </div>
-        </RouterLink>
-        <RouterLink to="/administrator/accountmanager" class="col-3" style="cursor: pointer;">
-            <div class="navigate-items p-4 bg-white rounded border border-gray">
-                <div class="d-flex justify-content-between">
-                    <span>Danh sách quyền hạn</span>
-                    <span><i class="si si-arrow-right"></i></span>
+            </RouterLink>
+            <RouterLink to="/administrator/accountmanager" class="col-3" style="cursor: pointer">
+                <div class="navigate-items p-4 bg-white rounded border border-gray">
+                    <div class="d-flex justify-content-between">
+                        <span>Danh sách quyền hạn</span>
+                        <span><i class="si si-arrow-right"></i></span>
+                    </div>
                 </div>
-            </div>
-        </RouterLink>
+            </RouterLink>
+        </div>
     </div>
-  </div>
 </template>
 
 <style>
-.navigate-items:hover{
-    background-color: #EFF6FF !important;
+.navigate-items:hover {
+    background-color: #eff6ff !important;
 }
 </style>

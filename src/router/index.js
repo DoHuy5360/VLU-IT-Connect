@@ -11,6 +11,10 @@ const Videos = () => import("@/views/it-connect/Videos.vue");
 const Search = () => import("@/views/it-connect/Search.vue");
 const Blog = () => import("@/views/it-connect/blog/BlogView.vue");
 const Detail = () => import("@/views/it-connect/blog/DetailView.vue");
+const Analysis = () => import("@/views/one-ui/monitor/Analysis.vue");
+const BlogDetailsReport = () => import("@/views/one-ui/monitor/report/BlogDetailsReport.vue");
+const TopBlogReport = () => import("@/views/one-ui/monitor/report/TopBlogReport.vue");
+const AccessUrlReport = () => import("@/views/one-ui/monitor/report/AccessUrlReport.vue");
 
 const BlogAdmin = () => import("@/views/one-ui/blog/BlogAdmin.vue");
 const BlogCreate = () => import("@/views/one-ui/blog/CreateBlog.vue");
@@ -66,6 +70,38 @@ const routes = [
                 path: "",
                 name: "index",
                 component: WelcomeAdmin,
+            },
+            {
+                path: "dashboard",
+                name: "Dashboard",
+                children: [
+                    {
+                        path: "analysis",
+                        name: "Analysis",
+                        component: Analysis,
+                    },
+                    {
+                        path: "report",
+                        name: "Report",
+                        children: [
+                            {
+                                path: "BlogDetails",
+                                name: "BlogDetailsReport",
+                                component: BlogDetailsReport,
+                            },
+                            {
+                                path: "TopBlogs",
+                                name: "TopBlogReport",
+                                component: TopBlogReport,
+                            },
+                            {
+                                path: "AccessURL",
+                                name: "AccessUrlReport",
+                                component: AccessUrlReport,
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 path: "blog",

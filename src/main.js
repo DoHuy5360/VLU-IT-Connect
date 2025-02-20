@@ -1,7 +1,6 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
-import axios from "axios";
 
 // Import CKEditor
 import CKEditor from "@ckeditor/ckeditor5-vue";

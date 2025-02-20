@@ -19,6 +19,12 @@
 .hover_underline:hover {
     text-decoration: underline;
 }
+.hover_blue_text:hover {
+    color: #0891b2;
+}
+.hover_red_text:hover {
+    color: #d72134;
+}
 * {
     scroll-behavior: smooth;
     scroll-padding-top: 3rem;

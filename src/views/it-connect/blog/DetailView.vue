@@ -64,45 +64,16 @@
                             </div>
                         </div>
                         <br />
-                        <strong>{{ featuredArticle?.author }}</strong>
+                        <strong> {{ featuredArticle?.author }}</strong>
                     </div>
                     <hr />
                     <div class="mt-4">
-                        <h3>Bình luận</h3>
-                        <div class="d-flex flex-column gap-2 mb-2 align-items-end">
-                            <div class="w-100">
-                                <textarea v-model="comment" class="form-control w-100" style="resize: vertical; min-height: 5rem" placeholder="Ý kiến gì đó..."></textarea>
-                            </div>
-                            <div class="">
-                                <div class="btn btn-sm btn-primary" @click="createComment">Lưu bình luận</div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="border p-2 rounded">
-                                <div class="d-flex flex-column">
-                                    <div class="text-muted">19/02/2025 - 18:20:30</div>
-                                    <div class="fs-3">đã thử nhưng ko được nhé. bạn đính kèm video hướng dẫn được ko?</div>
-                                    <div class="d-flex gap-3 justify-content-end">
-                                        <div class="hover_underline fw-semibold" style="cursor: pointer"><i class="si si-action-undo"></i> Trả lời</div>
-                                    </div>
-                                </div>
-                                <div class="mt-2">
-                                    <div class="d-flex flex-column border p-2 rounded">
-                                        <div class="d-flex align-items-center gap-1 border rounded px-1 bg-light">
-                                            <i class="si si-action-redo"></i>
-                                            <div>
-                                                {{ store.truncateText("đã thử nhưng ko được nhé. bạn đính kèm video hướng dẫn được ko?", 70) }}
-                                            </div>
-                                        </div>
-                                        <div class="text-muted">19/02/2025 - 18:20:30</div>
-                                        <div class="fs-3">Được nhé, chờ mình một lát!</div>
-                                        <div class="d-flex gap-3 justify-content-end">
-                                            <div class="hover_underline fw-semibold" style="cursor: pointer"><i class="si si-action-undo"></i> Trả lời</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <h3>Đánh giá nội dung bài viết</h3>
+                        <RatingBlog />
+                    </div>
+                    <hr />
+                    <div class="mt-4">
+                        <CommentView />
                     </div>
                 </div>
                 <div v-else class="h-100 d-grid align-items-center" style="text-align: center">Bài viết không tồn tại</div>
@@ -174,9 +145,12 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, reactive } from "vue";
 import { useTemplateStore } from "@/stores/template";
 import { guestRequest } from "../../one-ui/accountmanager/service/axiosConfig";
+import RatingBlog from "./components/RatingBlog.vue";
+import CommentView from "./components/CommentView.vue";
+
 const props = defineProps(["postSlug"]);
 const store = useTemplateStore();
 const featuredArticle = ref({});
@@ -184,8 +158,6 @@ const categories = ref([]);
 const relatedArticles = ref([]);
 let currentPostId;
 let categoryOfThisPost;
-
-const comment = ref("");
 
 const getPost = async () => {
     try {
@@ -303,10 +275,6 @@ const getRelatedArticles = async () => {
         console.error("Error fetching related articles:", error);
     }
 };
-
-function createComment() {
-    console.log(comment.value);
-}
 
 // Watcher để theo dõi slug
 watch(

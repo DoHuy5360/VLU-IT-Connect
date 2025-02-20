@@ -13,10 +13,10 @@ const isLoading = ref(false);
 
 // Set default elements for this layout
 store.setLayout({
-  header: true,
-  sidebar: true,
-  sideOverlay: true,
-  footer: true,
+    header: true,
+    sidebar: true,
+    sideOverlay: true,
+    footer: true,
 });
 
 // Set various template options for this layout variation
@@ -25,108 +25,119 @@ store.mainContent({ mode: "narrow" });
 
 // 🔍 Kiểm tra nếu không có token thì chuyển hướng sang Sign In
 onMounted(() => {
-  const token = localStorage.getItem("authToken");
-  if (!token) {
-    console.warn("🚫 Không tìm thấy token! Chuyển hướng đến trang đăng nhập.");
-    router.push("/auth/signin");
-  }
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+        console.warn("🚫 Không tìm thấy token! Chuyển hướng đến trang đăng nhập.");
+        router.push("/auth/signin");
+    }
 });
 
 function handleLogout() {
-  isLoading.value = true;
+    isLoading.value = true;
 
-  // Perform logout
-  localStorage.removeItem("authToken"); // Xóa token khỏi localStorage
-  router.push("/auth/signin"); // Chuyển hướng về trang đăng nhập
+    // Perform logout
+    localStorage.removeItem("authToken"); // Xóa token khỏi localStorage
+    router.push("/auth/signin"); // Chuyển hướng về trang đăng nhập
 
-  isLoading.value = false; // Reset loading state
+    isLoading.value = false; // Reset loading state
 }
 </script>
 <template>
-  <BaseLayout>
-    <!-- Side Overlay Content -->
-    <template #side-overlay-content>
-      <div class="content-side">
-        <button
-          type="button"
-          class="btn btn-lg btn-alt-danger d-flex align-items-center gap-2"
-          @click="handleLogout"
-          :disabled="isLoading"
-        >
-          <i class="si si-logout"></i>
-          <span v-if="!isLoading">Đăng xuất</span>
-          <span v-else>Logging out...</span>
-        </button>
-      </div>
-    </template>
-    <!-- END Side Overlay Content -->
+    <BaseLayout>
+        <!-- Side Overlay Content -->
+        <template #side-overlay-content>
+            <div class="content-side">
+                <button type="button" class="btn btn-lg btn-alt-danger d-flex align-items-center gap-2" @click="handleLogout" :disabled="isLoading">
+                    <i class="si si-logout"></i>
+                    <span v-if="!isLoading">Đăng xuất</span>
+                    <span v-else>Logging out...</span>
+                </button>
+            </div>
+        </template>
+        <!-- END Side Overlay Content -->
 
-    <!-- Sidebar Content -->
-    <template #sidebar-content>
-      <div class="content-side">
-        <BaseNavigation
-          :nodes="[{
-              name: 'Bài viết',
-              icon: 'si si-note',
-              to: 'AdminBlog'
-            },
-            {
-              name: 'Thể loại',
-              icon: 'si si-layers',
-              to: 'AdminCategory'
-            },
-            {
-              name: 'Tài khoản',
-              icon: 'si si-users',
-              to: 'AdminAccount'
-            },
-            {
-              name: 'Quyền hạn',
-              icon: 'si si-lock',
-              to: 'AdminAccountManager'
-            }
-          ]"
-        />
-      </div>
-    </template>
-    <!-- END Sidebar Content -->
+        <!-- Sidebar Content -->
+        <template #sidebar-content>
+            <div class="content-side">
+                <BaseNavigation
+                    :nodes="[
+                        {
+                            name: 'Dashboard',
+                            icon: 'si si-bar-chart',
+                            sub: [
+                                {
+                                    name: 'Thống kê',
+                                    to: 'Analysis',
+                                },
+                                {
+                                    name: 'Báo cáo',
+                                    sub: [
+                                        {
+                                            name: 'Chi tiết bài viết',
+                                            to: 'BlogDetailsReport',
+                                        },
+                                        {
+                                            name: 'Bài viết được quan tâm',
+                                            to: 'TopBlogReport',
+                                        },
+                                        {
+                                            name: 'Tần suất truy cập',
+                                            to: 'AccessUrlReport',
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            name: 'Bài viết',
+                            icon: 'si si-note',
+                            to: 'AdminBlog',
+                        },
+                        {
+                            name: 'Thể loại',
+                            icon: 'si si-layers',
+                            to: 'AdminCategory',
+                        },
+                        {
+                            name: 'Tài khoản',
+                            icon: 'si si-users',
+                            to: 'AdminAccount',
+                        },
+                        {
+                            name: 'Quyền hạn',
+                            icon: 'si si-lock',
+                            to: 'AdminAccountManager',
+                        },
+                    ]"
+                />
+            </div>
+        </template>
+        <!-- END Sidebar Content -->
 
-    <!-- Header Content Left -->
-    <template #header-content-left>
-      <button
-        type="button"
-        class="btn btn-sm btn-alt-secondary me-2 d-lg-none"
-        @click="store.sidebar({ mode: 'toggle' })"
-      >
-        <i class="fa fa-fw fa-bars"></i>
-      </button>
-      <button
-        type="button"
-        class="btn btn-sm btn-alt-secondary me-2 d-none d-lg-inline-block"
-        @click="store.sidebarMini({ mode: 'toggle' })"
-      >
-        <i class="fa fa-fw fa-ellipsis-v"></i>
-      </button>
-    </template>
-    <!-- END Header Content Left -->
+        <!-- Header Content Left -->
+        <template #header-content-left>
+            <button type="button" class="btn btn-sm btn-alt-secondary me-2 d-lg-none" @click="store.sidebar({ mode: 'toggle' })">
+                <i class="fa fa-fw fa-bars"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-alt-secondary me-2 d-none d-lg-inline-block" @click="store.sidebarMini({ mode: 'toggle' })">
+                <i class="fa fa-fw fa-ellipsis-v"></i>
+            </button>
+        </template>
+        <!-- END Header Content Left -->
 
-    <!-- Header Content Right -->
-    <template #header-content-right>
-      <button
-        type="button"
-        class="btn btn-sm btn-alt-secondary ms-2"
-        @click="store.sideOverlay({ mode: 'toggle' })"
-      >
-        <i class="fa fa-fw fa-list-ul fa-flip-horizontal"></i>
-      </button>
-    </template>
-    <!-- END Header Content Right -->
+        <!-- Header Content Right -->
+        <template #header-content-right>
+            <button type="button" class="btn btn-sm btn-alt-secondary ms-2" @click="store.sideOverlay({ mode: 'toggle' })">
+                <i class="fa fa-fw fa-list-ul fa-flip-horizontal"></i>
+            </button>
+        </template>
+        <!-- END Header Content Right -->
 
-    <!-- Footer Content Left -->
-    <template #footer-content-left>
-      <strong>My App</strong>
-      &copy; {{ store.app.copyright }}
-    </template>
-    <!-- END Footer Content Left -->
-  </BaseLayout>
+        <!-- Footer Content Left -->
+        <template #footer-content-left>
+            <strong>My App</strong>
+            &copy; {{ store.app.copyright }}
+        </template>
+        <!-- END Footer Content Left -->
+    </BaseLayout>
 </template>

@@ -1,5 +1,5 @@
 <template>
-    <BasePageHeading title="Quản Lý Bài Viết" subtitle="">
+    <BasePageHeading title="Quản Lý Tài Khoản" subtitle="">
         <template #extra>
             <button v-if="selectedUsers.length > 0" type="button" class="btn btn-danger me-2" @click="deleteMultiple">
                 <i class="fa fa-trash opacity-50 me-1"></i>

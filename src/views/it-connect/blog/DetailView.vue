@@ -4,7 +4,7 @@
             <!-- Left Column: Blog Details -->
             <div class="col-lg-8">
                 <div v-if="featuredArticle !== null" class="rounded p-4">
-                    <div class="blog-detail-box">
+                    <div class="">
                         <div class="d-flex gap-3 text-muted mb-3">
                             <div class="d-flex gap-2 align-items-center">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -55,7 +55,7 @@
                             />
                         </div>
                         <h4 class="mb-3">{{ featuredArticle?.title }}</h4>
-                        <div class="text-muted mb-3" id="blogContent" v-html="featuredArticle?.details"></div>
+                        <div class="mb-3" id="blogContent" v-html="featuredArticle?.details"></div>
                         <div v-if="featuredArticle?.video !== null" class="" style="height: 50vh">
                             <iframe :src="featuredArticle?.video" width="100%" height="100%" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
 
@@ -64,7 +64,16 @@
                             </div>
                         </div>
                         <br />
-                        <strong>{{ featuredArticle?.author }}</strong>
+                        <strong> {{ featuredArticle?.author }}</strong>
+                    </div>
+                    <hr />
+                    <div class="mt-4">
+                        <h3>Đánh giá nội dung bài viết</h3>
+                        <RatingBlog />
+                    </div>
+                    <hr />
+                    <div class="mt-4">
+                        <CommentView />
                     </div>
                 </div>
                 <div v-else class="h-100 d-grid align-items-center" style="text-align: center">Bài viết không tồn tại</div>
@@ -136,9 +145,12 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, reactive } from "vue";
 import { useTemplateStore } from "@/stores/template";
 import { guestRequest } from "../../one-ui/accountmanager/service/axiosConfig";
+import RatingBlog from "./components/RatingBlog.vue";
+import CommentView from "./components/CommentView.vue";
+
 const props = defineProps(["postSlug"]);
 const store = useTemplateStore();
 const featuredArticle = ref({});

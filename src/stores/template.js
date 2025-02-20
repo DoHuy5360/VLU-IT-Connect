@@ -1,4 +1,6 @@
 import { defineStore } from "pinia";
+import { RouterLink, useRouter } from "vue-router";
+import Swal from "sweetalert2";
 
 // Main Pinia Store
 export const useTemplateStore = defineStore({
@@ -74,6 +76,19 @@ export const useTemplateStore = defineStore({
         },
         getOtherAsset(path) {
             return this.app.assetURL + "/assets/media/other" + path;
+        },
+        signOut(message) {
+            localStorage.removeItem("authToken");
+            const router = useRouter();
+            router.push(`/auth/signin?msg=${message || "Phiên đăng nhập đã hết hạn"}`);
+        },
+        async alert({ title, text, icon }) {
+            return await Swal.fire({
+                title,
+                text,
+                icon: icon || "success",
+                confirmButtonText: "Đồng ý",
+            });
         },
         // Sets the layout, useful for setting different layouts (under layouts/variations/)
         setLayout(payload) {

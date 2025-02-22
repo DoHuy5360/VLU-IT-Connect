@@ -73,7 +73,7 @@
                     </div>
                     <hr />
                     <div class="mt-4">
-                        <CommentView />
+                        <CommentView :postId="featuredArticle?.id" />
                     </div>
                 </div>
                 <div v-else class="h-100 d-grid align-items-center" style="text-align: center">Bài viết không tồn tại</div>

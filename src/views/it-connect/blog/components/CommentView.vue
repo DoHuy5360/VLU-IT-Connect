@@ -62,8 +62,16 @@
 <script setup>
 import { useTemplateStore } from "@/stores/template";
 import CommentBox from "./CommentBox.vue";
-import { ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { reactive } from "vue";
+import { guestRequest } from "../../../one-ui/accountmanager/service/axiosConfig";
+
+const props = defineProps({
+    postId: {
+        type: Number,
+    },
+});
+
 const store = useTemplateStore();
 
 const commentSelectedForReply = ref(null);
@@ -92,6 +100,17 @@ const commentList = [
         ],
     },
 ];
+
+async function getComments() {
+    const response = await guestRequest(`/comment?PostId=${props.postId}`);
+}
+
+watch(
+    () => props.postId,
+    (newPostId) => {
+        getComments(newPostId);
+    }
+);
 </script>
 
 <style lang="scss" scoped></style>

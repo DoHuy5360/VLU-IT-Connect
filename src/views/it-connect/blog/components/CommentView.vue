@@ -1,55 +1,61 @@
 <template>
-    <h3>Bình luận</h3>
-    <CommentBox :postId="postId" />
-    <div>
-        <div v-for="comment in commentTree" :key="comment.Id">
-            <div class="border p-2 rounded">
-                <div class="d-flex flex-column">
-                    <div class="d-flex gap-2">
-                        <div class="fw-bold">Ẩn danh</div>
-                        <div class="text-muted">{{ store.formatDateTime(comment.CreatedAt) }}</div>
-                    </div>
-                    <div class="fs-4">{{ comment.Content }}</div>
-                    <div class="d-flex gap-3 justify-content-end px-2" style="user-select: none">
-                        <div class="d-flex gap-1 align-items-center fw-semibold" style="cursor: pointer">
-                            <div :onclick="() => handleLikeComment(comment)">
-                                <CommentLikeSwitch :active="hasLikeTheComment(comment.Id)" />
-                            </div>
-                            {{ comment.LikeCount }}
+    <h3>{{ store.isVietNamese() ? "Bình luận" : "Comment" }}</h3>
+    <div v-if="allowComment">
+        <CommentBox :postId="postId" :callback="handleAfterComment" />
+        <div class="d-flex flex-column gap-2">
+            <div v-for="parentComment in commentTree" :key="parentComment.Id">
+                <div class="border p-2 rounded">
+                    <div class="d-flex flex-column">
+                        <div class="d-flex gap-2">
+                            <div class="fw-bold">{{ store.isVietNamese() ? "Ẩn danh" : "Anonymous" }}</div>
+                            <div class="text-muted">{{ store.formatDateTime(parentComment.CreatedAt) }}</div>
                         </div>
-                        <div @click="commentSelectedForReply = comment.Id" class="hover_red_text fw-semibold" style="cursor: pointer"><i class="si si-action-undo"></i> Trả lời</div>
-                    </div>
-                    <div v-if="commentSelectedForReply == comment.Id">
-                        <CommentBox :postId="postId" :parentId="comment.Id" :replyTo="comment.Content">
-                            <div @click="commentSelectedForReply = null" class="btn btn-sm btn-primary">Hủy</div>
-                        </CommentBox>
-                    </div>
-                </div>
-                <div class="mt-2 d-flex flex-column gap-2">
-                    <div v-for="comment in comment.NestComment.$values" :key="comment.Id">
-                        <div class="border p-2 rounded">
-                            <div class="d-flex align-items-center gap-1 border rounded px-1 bg-light mb-1">
-                                <i class="si si-action-redo"></i>
-                                {{ store.truncateText(comment.ReplyTo, 70) }}
-                            </div>
-                            <div class="d-flex gap-2">
-                                <div class="fw-bold">Ẩn danh</div>
-                                <div class="text-muted">{{ store.formatDateTime(comment.CreatedAt) }}</div>
-                            </div>
-                            <div class="fs-4">{{ comment.Content }}</div>
-                            <div class="d-flex gap-3 justify-content-end" style="user-select: none">
-                                <div class="d-flex gap-1 align-items-center fw-semibold" style="cursor: pointer">
-                                    <div :onclick="() => handleLikeComment(comment)">
-                                        <CommentLikeSwitch :active="hasLikeTheComment(comment.Id)" />
-                                    </div>
-                                    {{ comment.LikeCount }}
+                        <div class="fs-4">{{ parentComment.Content }}</div>
+                        <div class="d-flex gap-3 justify-content-start px-2" style="user-select: none">
+                            <div class="d-flex gap-1 align-items-center fw-semibold" style="cursor: pointer">
+                                <div :onclick="() => handleLikeComment(parentComment)">
+                                    <CommentLikeSwitch :active="hasLikeTheComment(parentComment.Id)" />
                                 </div>
-                                <div @click="commentSelectedForReply = comment.Id" class="hover_red_text fw-semibold" style="cursor: pointer"><i class="si si-action-undo"></i> Trả lời</div>
+                                {{ parentComment.LikeCount }}
                             </div>
-                            <div v-if="commentSelectedForReply == comment.Id">
-                                <CommentBox :postId="postId" :parentId="comment.Id" :replyTo="comment.Content">
-                                    <div @click="commentSelectedForReply = null" class="btn btn-sm btn-primary">Hủy</div>
-                                </CommentBox>
+                            <div @click="() => openReplyCommentBox(parentComment.Id)" class="hover_red_text fw-semibold" style="cursor: pointer">
+                                <i class="si si-action-undo"></i> {{ store.isVietNamese() ? "Trả lời" : "Reply" }}
+                            </div>
+                        </div>
+                        <div v-if="isReplyThisComment(parentComment.Id)" class="mt-1">
+                            <CommentBox :postId="postId" :parentId="parentComment.Id" :replyTo="parentComment.Content" :callback="handleAfterComment">
+                                <div @click="() => closeCurrentReplyCommentBox()" class="btn btn-sm btn-primary">{{ store.isVietNamese() ? "Hủy" : "Cancel" }}</div>
+                            </CommentBox>
+                        </div>
+                    </div>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div v-for="childComment in parentComment.NestComment.$values" :key="childComment.Id">
+                            <div class="border p-2 rounded">
+                                <div class="d-flex align-items-center gap-1 border rounded px-1 bg-light mb-1">
+                                    <i class="si si-action-redo"></i>
+                                    {{ store.truncateText(childComment.ReplyTo, 70) }}
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <div class="fw-bold">{{ store.isVietNamese() ? "Ẩn danh" : "Anonymous" }}</div>
+                                    <div class="text-muted">{{ store.formatDateTime(childComment.CreatedAt) }}</div>
+                                </div>
+                                <div class="fs-4">{{ childComment.Content }}</div>
+                                <div class="d-flex gap-3 justify-content-start" style="user-select: none">
+                                    <div class="d-flex gap-1 align-items-center fw-semibold" style="cursor: pointer">
+                                        <div :onclick="() => handleLikeComment(childComment)">
+                                            <CommentLikeSwitch :active="hasLikeTheComment(childComment.Id)" />
+                                        </div>
+                                        {{ childComment.LikeCount }}
+                                    </div>
+                                    <div @click="() => openReplyCommentBox(childComment.Id)" class="hover_red_text fw-semibold" style="cursor: pointer">
+                                        <i class="si si-action-undo"></i> {{ store.isVietNamese() ? "Trả lời" : "Reply" }}
+                                    </div>
+                                </div>
+                                <div v-if="isReplyThisComment(childComment.Id)" class="mt-1">
+                                    <CommentBox :postId="postId" :parentId="parentComment.Id" :replyTo="childComment.Content" :callback="handleAfterComment">
+                                        <div @click="() => closeCurrentReplyCommentBox()" class="btn btn-sm btn-primary">{{ store.isVietNamese() ? "Hủy" : "Cancel" }}</div>
+                                    </CommentBox>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -57,6 +63,7 @@
             </div>
         </div>
     </div>
+    <div v-else>{{ store.isVietNamese() ? "Tính năng bình luận đăng bị tắt" : "Comment is not allowed" }}</div>
 </template>
 
 <script setup>
@@ -70,6 +77,14 @@ import CommentLikeSwitch from "./CommentLikeSwitch.vue";
 const props = defineProps({
     postId: {
         type: Number,
+    },
+    allowComment: {
+        type: Boolean,
+        default: false,
+    },
+    commentCensorship: {
+        type: Boolean,
+        default: false,
     },
 });
 
@@ -85,16 +100,45 @@ async function getComments(postId) {
     commentTree.value = response.data.$values;
 }
 
+function handleAfterComment() {
+    closeCurrentReplyCommentBox();
+    if (props.commentCensorship) {
+        store.alert({
+            title: store.isVietNamese() ? "Bình luận thành công!" : "Success!",
+        });
+    } else {
+        store.alert({
+            title: store.isVietNamese() ? "Bình luận thành công!" : "Success!",
+            text: store.isVietNamese() ? "Bình luận của bạn cần được quản trị viên phê duyệt để hiển thị." : "Your comment needs to be approved by an administrator to appear.",
+        });
+    }
+    // Update comment
+    getComments(props.postId);
+}
+
+// Handle reply comment
+function openReplyCommentBox(selectedCommentId) {
+    commentSelectedForReply.value = selectedCommentId;
+}
+
+function closeCurrentReplyCommentBox() {
+    commentSelectedForReply.value = null;
+}
+
+function isReplyThisComment(trackedCommentId) {
+    return commentSelectedForReply.value == trackedCommentId;
+}
+
 // Handle like comment
 function handleLikeComment(comment) {
     if (hasLikeTheComment(comment.Id)) {
         unLikeTheComment(comment.Id);
-        comment.LikeCount++;
-    } else {
-        likeTheComment(comment.Id);
         if (comment.LikeCount > 0) {
             comment.LikeCount--;
         }
+    } else {
+        likeTheComment(comment.Id);
+        comment.LikeCount++;
     }
 }
 

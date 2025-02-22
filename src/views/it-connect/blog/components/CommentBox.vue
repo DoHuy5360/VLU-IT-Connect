@@ -6,18 +6,20 @@
                 :class="{ 'is-invalid': v$.comment.$errors.length }"
                 class="form-control w-100"
                 style="resize: vertical; min-height: 5rem"
-                placeholder="Ý kiến gì đó..."
+                :placeholder="store.isVietNamese() ? 'Ý kiến gì đó...' : 'Type something...'"
             ></textarea>
             <div v-if="v$.comment.$errors.length" class="invalid-feedback">
-                <span v-if="v$.comment.$errors[0].$validator === 'required'">Bình luận không được để trống.</span>
+                <span v-if="v$.comment.$errors[0].$validator === 'required'">{{ store.isVietNamese() ? "Bình luận không được để trống." : "Required" }}</span>
             </div>
             <div v-if="v$.comment.$errors.length" class="invalid-feedback">
-                <span v-if="v$.comment.$errors[0].$validator === 'maxLength'">Bình luận không được vượt quá {{ MAX_COMMENT_LENGTH }} ký tự.</span>
+                <span v-if="v$.comment.$errors[0].$validator === 'maxLength'">{{
+                    store.isVietNamese() ? `Bình luận không được vượt quá ${MAX_COMMENT_LENGTH} ký tự.` : `Maximum letter allowed ${MAX_COMMENT_LENGTH}`
+                }}</span>
             </div>
         </div>
         <div class="d-flex gap-2 align-items-center">
             <slot></slot>
-            <div class="btn btn-sm btn-secondary" @click="createComment">Lưu bình luận</div>
+            <div class="btn btn-sm btn-secondary" @click="createComment">{{ store.isVietNamese() ? "Lưu bình luận" : "Save" }}</div>
         </div>
     </div>
 </template>
@@ -44,6 +46,10 @@ const props = defineProps({
         type: String,
         default: null,
     },
+    callback: {
+        type: Function,
+        default: function () {},
+    },
 });
 
 // Comment box
@@ -65,20 +71,26 @@ async function createComment() {
         return; // Nếu không hợp lệ, không gửi bình luận
     }
 
-    console.log(props.postId, props.parentId, props.replyTo, comment.value);
+    try {
+        await guestRequest.post(
+            "/comment",
+            {
+                PostId: props.postId,
+                ParentId: props.parentId,
+                ReplyTo: props.replyTo,
+                Content: comment.value,
+            },
+            {
+                headers: { "Content-Type": "application/json" },
+            }
+        );
 
-    const formData = new FormData();
-    formData.append("PostId", props.postId);
-    formData.append("ParentId", props.parentId);
-    formData.append("ReplyTo", props.replyTo);
-    formData.append("Content", comment.value);
-
-    const response = await guestRequest.post("/comment", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-    });
-    console.log(response);
-
-    store.alert({ title: "Bình luận thành công", text: "Bình luận đang được phê duyệt, vui lòng đợi." });
+        comment.value = "";
+        props.callback();
+    } catch (error) {
+        console.log(error);
+        store.alert({ title: "Bình luận thất bại", icon: "error", text: "" });
+    }
 }
 </script>
 

@@ -68,15 +68,15 @@
                     </div>
                     <hr />
                     <div class="mt-4">
-                        <h3>Đánh giá nội dung bài viết</h3>
+                        <h3>{{ store.isVietNamese() ? "Đánh giá nội dung bài viết" : "Rating" }}</h3>
                         <RatingBlog />
                     </div>
                     <hr />
                     <div class="mt-4">
-                        <CommentView :postId="featuredArticle?.id" />
+                        <CommentView :postId="featuredArticle?.id" :allowComment="featuredArticle.allowComment" :commentCensorship="featuredArticle.commentCensorship" />
                     </div>
                 </div>
-                <div v-else class="h-100 d-grid align-items-center" style="text-align: center">Bài viết không tồn tại</div>
+                <div v-else class="h-100 d-grid align-items-center" style="text-align: center">{{ store.isVietNamese() ? "Bài viết không tồn tại" : "No content" }}</div>
             </div>
             <!-- Right Column: Category List -->
             <div class="position-relative col-lg-4">
@@ -97,7 +97,7 @@
                                 </RouterLink>
                             </li>
                         </ul>
-                        <p v-else class="text-muted">{{ store.isVietNamese() ? "Không có danh mục nào để hiển thị." : "Nothing to show" }}</p>
+                        <p v-else class="text-muted">{{ store.isVietNamese() ? "Không có danh mục nào để hiển thị." : "No content" }}</p>
                     </div>
 
                     <!-- Related Posts -->
@@ -177,6 +177,8 @@ const getPost = async () => {
                 author: post.userName,
                 image: store.parseMetadataImage(post.metadata),
                 video: store.parseMetadataVideo(post.metadata),
+                allowComment: post.allowComment,
+                commentCensorship: post.commentCensorship,
             };
             store.setBreadcrumb([
                 {

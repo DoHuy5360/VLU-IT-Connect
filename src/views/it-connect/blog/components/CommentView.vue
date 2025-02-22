@@ -1,53 +1,53 @@
 <template>
     <h3>Bình luận</h3>
-    <CommentBox />
+    <CommentBox :postId="postId" />
     <div>
-        <div v-for="comment in commentList" :key="comment.id">
+        <div v-for="comment in commentTree" :key="comment.Id">
             <div class="border p-2 rounded">
                 <div class="d-flex flex-column">
                     <div class="d-flex gap-2">
                         <div class="fw-bold">Ẩn danh</div>
-                        <div class="text-muted">{{ comment.createdAt }}</div>
+                        <div class="text-muted">{{ store.formatDateTime(comment.CreatedAt) }}</div>
                     </div>
-                    <div class="fs-4">{{ comment.content }}</div>
-                    <div class="d-flex gap-3 justify-content-end px-2">
-                        <div class="d-flex gap-1 fw-semibold" style="cursor: pointer">
-                            <div class="hover_blue_text">
-                                <i class="si si-like"></i>
+                    <div class="fs-4">{{ comment.Content }}</div>
+                    <div class="d-flex gap-3 justify-content-end px-2" style="user-select: none">
+                        <div class="d-flex gap-1 align-items-center fw-semibold" style="cursor: pointer">
+                            <div :onclick="() => handleLikeComment(comment)">
+                                <CommentLikeSwitch :active="hasLikeTheComment(comment.Id)" />
                             </div>
-                            {{ comment.likeCount }}
+                            {{ comment.LikeCount }}
                         </div>
-                        <div @click="commentSelectedForReply = comment.id" class="hover_red_text fw-semibold" style="cursor: pointer"><i class="si si-action-undo"></i> Trả lời</div>
+                        <div @click="commentSelectedForReply = comment.Id" class="hover_red_text fw-semibold" style="cursor: pointer"><i class="si si-action-undo"></i> Trả lời</div>
                     </div>
-                    <div v-if="commentSelectedForReply == comment.id">
-                        <CommentBox :replyTo="comment.content">
+                    <div v-if="commentSelectedForReply == comment.Id">
+                        <CommentBox :postId="postId" :parentId="comment.Id" :replyTo="comment.Content">
                             <div @click="commentSelectedForReply = null" class="btn btn-sm btn-primary">Hủy</div>
                         </CommentBox>
                     </div>
                 </div>
                 <div class="mt-2 d-flex flex-column gap-2">
-                    <div v-for="comment in comment.replyComments" :key="comment.id">
+                    <div v-for="comment in comment.NestComment.$values" :key="comment.Id">
                         <div class="border p-2 rounded">
                             <div class="d-flex align-items-center gap-1 border rounded px-1 bg-light mb-1">
                                 <i class="si si-action-redo"></i>
-                                {{ store.truncateText(comment.replyTo, 70) }}
+                                {{ store.truncateText(comment.ReplyTo, 70) }}
                             </div>
                             <div class="d-flex gap-2">
                                 <div class="fw-bold">Ẩn danh</div>
-                                <div class="text-muted">{{ comment.createdAt }}</div>
+                                <div class="text-muted">{{ store.formatDateTime(comment.CreatedAt) }}</div>
                             </div>
-                            <div class="fs-4">{{ comment.content }}</div>
-                            <div class="d-flex gap-3 justify-content-end">
-                                <div class="d-flex gap-1 fw-semibold" style="cursor: pointer">
-                                    <div class="hover_blue_text">
-                                        <i class="si si-like"></i>
+                            <div class="fs-4">{{ comment.Content }}</div>
+                            <div class="d-flex gap-3 justify-content-end" style="user-select: none">
+                                <div class="d-flex gap-1 align-items-center fw-semibold" style="cursor: pointer">
+                                    <div :onclick="() => handleLikeComment(comment)">
+                                        <CommentLikeSwitch :active="hasLikeTheComment(comment.Id)" />
                                     </div>
-                                    {{ comment.likeCount }}
+                                    {{ comment.LikeCount }}
                                 </div>
-                                <div @click="commentSelectedForReply = comment.id" class="hover_red_text fw-semibold" style="cursor: pointer"><i class="si si-action-undo"></i> Trả lời</div>
+                                <div @click="commentSelectedForReply = comment.Id" class="hover_red_text fw-semibold" style="cursor: pointer"><i class="si si-action-undo"></i> Trả lời</div>
                             </div>
-                            <div v-if="commentSelectedForReply == comment.id">
-                                <CommentBox :replyTo="comment.content">
+                            <div v-if="commentSelectedForReply == comment.Id">
+                                <CommentBox :postId="postId" :parentId="comment.Id" :replyTo="comment.Content">
                                     <div @click="commentSelectedForReply = null" class="btn btn-sm btn-primary">Hủy</div>
                                 </CommentBox>
                             </div>
@@ -65,6 +65,7 @@ import CommentBox from "./CommentBox.vue";
 import { onMounted, ref, watch } from "vue";
 import { reactive } from "vue";
 import { guestRequest } from "../../../one-ui/accountmanager/service/axiosConfig";
+import CommentLikeSwitch from "./CommentLikeSwitch.vue";
 
 const props = defineProps({
     postId: {
@@ -76,33 +77,39 @@ const store = useTemplateStore();
 
 const commentSelectedForReply = ref(null);
 
-const commentList = [
-    {
-        id: 1,
-        content: "đã thử nhưng ko được nhé. bạn đính kèm video hướng dẫn được ko?",
-        createdAt: "19/02/2025 - 18:20:30",
-        likeCount: 243,
-        replyComments: [
-            {
-                id: 2,
-                content: "Được nhé, chờ mình một lát!",
-                createdAt: "19/02/2025 - 18:20:30",
-                likeCount: 2367,
-                replyTo: "đã thử nhưng ko được nhé. bạn đính kèm video hướng dẫn được ko?",
-            },
-            {
-                id: 3,
-                content: "Mãi vẫn chưa thấy đâu? Làm ăn chán thật.",
-                createdAt: "20/02/2025 - 18:20:30",
-                likeCount: 235,
-                replyTo: "Được nhé, chờ mình một lát!",
-            },
-        ],
-    },
-];
+const commentTree = ref([]);
 
-async function getComments() {
-    const response = await guestRequest(`/comment?PostId=${props.postId}`);
+// Handle get comment
+async function getComments(postId) {
+    const response = await guestRequest(`/comment?PostId=${postId}`);
+    commentTree.value = response.data.$values;
+}
+
+// Handle like comment
+function handleLikeComment(comment) {
+    if (hasLikeTheComment(comment.Id)) {
+        unLikeTheComment(comment.Id);
+        comment.LikeCount++;
+    } else {
+        likeTheComment(comment.Id);
+        if (comment.LikeCount > 0) {
+            comment.LikeCount--;
+        }
+    }
+}
+
+function getStateLikeCommentKeyCache(commentId) {
+    return `$itc:cmt:${commentId}:lk`;
+}
+
+function hasLikeTheComment(commentId) {
+    return localStorage.getItem(getStateLikeCommentKeyCache(commentId)) == "true";
+}
+function likeTheComment(commentId) {
+    localStorage.setItem(getStateLikeCommentKeyCache(commentId), "true");
+}
+function unLikeTheComment(commentId) {
+    localStorage.setItem(getStateLikeCommentKeyCache(commentId), "false");
 }
 
 watch(

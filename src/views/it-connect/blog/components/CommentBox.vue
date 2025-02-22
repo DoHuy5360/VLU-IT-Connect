@@ -27,10 +27,19 @@ import { ref } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength, maxLength, url } from "@vuelidate/validators";
 import { useTemplateStore } from "@/stores/template";
+import { guestRequest } from "../../../one-ui/accountmanager/service/axiosConfig";
 
 const store = useTemplateStore();
 
 const props = defineProps({
+    postId: {
+        type: Number,
+        default: null,
+    },
+    parentId: {
+        type: Number,
+        default: null,
+    },
     replyTo: {
         type: String,
         default: null,
@@ -56,8 +65,18 @@ async function createComment() {
         return; // Nếu không hợp lệ, không gửi bình luận
     }
 
-    console.log("Bình luận hợp lệ:", comment.value);
-    console.log("Trả lời", props.replyTo);
+    console.log(props.postId, props.parentId, props.replyTo, comment.value);
+
+    const formData = new FormData();
+    formData.append("PostId", props.postId);
+    formData.append("ParentId", props.parentId);
+    formData.append("ReplyTo", props.replyTo);
+    formData.append("Content", comment.value);
+
+    const response = await guestRequest.post("/comment", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    console.log(response);
 
     store.alert({ title: "Bình luận thành công", text: "Bình luận đang được phê duyệt, vui lòng đợi." });
 }

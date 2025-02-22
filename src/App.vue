@@ -22,6 +22,9 @@
 .hover_blue_text:hover {
     color: #0891b2;
 }
+.blue_text {
+    color: #0891b2;
+}
 .hover_red_text:hover {
     color: #d72134;
 }

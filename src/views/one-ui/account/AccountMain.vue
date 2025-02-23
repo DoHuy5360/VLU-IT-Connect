@@ -127,13 +127,15 @@ const fetchGroups = async () => {
 const fetchUsers = async () => {
     try {
         const response = await authRequest.get("/UserManagement/users");
-        users.value = response.data.data.$values.map((user) => ({
-            id: user.Id,
-            FullName: user.FullName,
-            Email: user.Email,
-            Role: user.Role.toString(),
-            status: user.state ? "Active" : "Inactive",
-        }));
+        users.value = response.data.data.$values
+            .map((user) => ({
+                id: user.Id,
+                FullName: user.FullName,
+                Email: user.Email,
+                Role: user.Role.toString(),
+                status: user.state ? "Active" : "Inactive",
+            }))
+            .reverse();
         accountFiltered.value = users.value;
     } catch (error) {
         console.error("Error fetching users:", error);

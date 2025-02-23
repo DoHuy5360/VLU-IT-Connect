@@ -139,20 +139,17 @@
                     </div>
 
                     <div class="my-4">
-                        <!-- Visibility Switch -->
-                        <div class="d-flex gap-2 align-items-center">
-                            <label for="visibility-switch" class="text-muted">Công bố</label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="visibility-switch" v-model="state.published" />
-                            </div>
+                        <div class="form-check">
+                            <label class="form-check-label" for="publish">Công bố</label>
+                            <input class="form-check-input" type="checkbox" v-model="state.published" id="publish" />
                         </div>
-
-                        <!-- Auto Comments Switch -->
-                        <div class="d-flex gap-2 align-items-center">
-                            <label for="auto-comments-switch" class="text-muted">Cho phép bình luận</label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="auto-comments-switch" v-model="state.enableComments" />
-                            </div>
+                        <div class="form-check">
+                            <label class="form-check-label" for="allowComment">Cho phép bình luận</label>
+                            <input class="form-check-input" type="checkbox" v-model="state.AllowComment" id="allowComment" />
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label" for="commentCensorship">Kiểm duyệt bình luận</label>
+                            <input class="form-check-input" type="checkbox" v-model="state.CommentCensorship" id="commentCensorship" />
                         </div>
                     </div>
                     <!-- Submit Buttons -->
@@ -216,6 +213,8 @@ const state = reactive({
     video: null,
     enableComments: false,
     published: true,
+    AllowComment: true,
+    CommentCensorship: false,
 });
 
 // Validate
@@ -260,6 +259,8 @@ const getPost = async () => {
             state.videoType = getTypeOfVideo(data.metadata);
             state.published = data.published || false;
             state.enableComments = JSON.parse(data.metadata)?.EnableComments || false;
+            state.AllowComment = data.AllowComment;
+            state.CommentCensorship = data.CommentCensorship;
         }
     } catch (error) {
         console.error("Lỗi khi lấy dữ liệu:", error);
@@ -345,6 +346,8 @@ const submitForm = async () => {
         formData.append("Files", state.image);
         formData.append("VideoFile", state.video);
         formData.append("VideoType", state.videoType);
+        formData.append("AllowComment", state.AllowComment);
+        formData.append("CommentCensorship", state.CommentCensorship);
 
         await authRequest.put(`/admin/posts/${route.params.id}`, formData, {
             headers: {

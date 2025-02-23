@@ -90,6 +90,18 @@ export const useTemplateStore = defineStore({
                 confirmButtonText: "Đồng ý",
             });
         },
+        async confirm({ title, text, icon, callback }) {
+            const confirmation = await Swal.fire({
+                title,
+                text: "Hành động này không thể hoàn tác.",
+                icon: icon || "warning",
+                showCancelButton: true,
+                confirmButtonText: "Đồng ý",
+                cancelButtonText: "Hủy",
+            });
+
+            if (confirmation.isConfirmed) callback();
+        },
         // Sets the layout, useful for setting different layouts (under layouts/variations/)
         setLayout(payload) {
             this.layout.header = payload.header;
@@ -117,7 +129,13 @@ export const useTemplateStore = defineStore({
             return `${day}/${month}/${year} - ${hours}:${minutes}:${seconds}`;
         },
         truncateText(text, numberOfLimitLetter) {
-            return text.length > numberOfLimitLetter ? `${text.slice(0, numberOfLimitLetter)}...` : text;
+            try {
+                if (text == null || text == undefined) return text;
+                return text.length > numberOfLimitLetter ? `${text.slice(0, numberOfLimitLetter)}...` : text;
+            } catch (error) {
+                console.log(error);
+                return text;
+            }
         },
         isMP4(source) {
             if (source) {

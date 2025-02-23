@@ -70,6 +70,14 @@
                         <td>{{ post.published ? "Có" : "Không" }}</td>
                     </tr>
                     <tr>
+                        <td style="white-space: nowrap">Cho phép bình luận</td>
+                        <td>{{ post.AllowComment ? "Có" : "Không" }}</td>
+                    </tr>
+                    <tr>
+                        <td style="white-space: nowrap">Kiểm duyệt bình luận</td>
+                        <td>{{ post.CommentCensorship ? "Có" : "Không" }}</td>
+                    </tr>
+                    <tr>
                         <td style="white-space: nowrap">Thể loại</td>
                         <td>{{ post.category.name }}</td>
                     </tr>
@@ -128,6 +136,8 @@ onMounted(async () => {
         post.category = response.data.category;
         post.imageUrl = store.parseMetadataImage(response.data.metadata);
         post.videoUrl = store.parseMetadataVideo(response.data.metadata);
+        post.AllowComment = response.data.AllowComment;
+        post.CommentCensorship = response.data.CommentCensorship;
     } catch (error) {
         console.error("Error fetching blog details:", error);
     } finally {

@@ -1,23 +1,23 @@
 <template>
-    <BasePageHeading title="Quản Lý Bài Viết" subtitle="">
+    <BasePageHeading title="Quản Lý Bình Luận Khả Dụng" subtitle="">
         <template #extra>
-            <button type="button" class="btn btn-success d-flex align-items-center" @click="navigateToCreate">
+            <!-- <button type="button" class="btn btn-success d-flex align-items-center" @click="">
                 <i class="fa fa-plus opacity-50 me-2"></i>
-                Thêm bài viết mới
-            </button>
+                Thêm bình luận mới
+            </button> -->
         </template>
     </BasePageHeading>
 
     <div class="content">
-        <BaseBlock title="Danh sách bài viết" content-full>
-            <Dataset v-slot="{ ds }" :ds-data="searchingPosts.length == 0 ? posts : searchingPosts" :ds-sortby="sortBy" :ds-search-in="['title', 'author', 'category', 'publishDate', 'createdAt']">
+        <BaseBlock title="Danh sách bình luận" content-full>
+            <Dataset v-slot="{ ds }" :ds-data="searchingPosts.length == 0 ? comments : searchingPosts" :ds-sortby="sortBy" :ds-search-in="[]">
                 <div class="row" :data-page-count="ds.dsPagecount">
                     <div id="datasetLength" class="col-md-8 py-2">
                         <DatasetShow />
                     </div>
                     <div class="col-md-4 py-2">
                         <!-- <DatasetSearch ds-search-placeholder="Tìm kiếm..." /> -->
-                        <label hidden for="searchBlogInput">Tìm kiếm bài viết</label>
+                        <label hidden for="searchBlogInput">Tìm kiếm bình luận</label>
                         <input id="searchBlogInput" type="text" @input="search" class="form-control" placeholder="Tìm kiếm..." />
                     </div>
                 </div>
@@ -38,24 +38,23 @@
                                     <template #default="{ row, rowIndex }">
                                         <tr>
                                             <th scope="row">{{ rowIndex + 1 }}</th>
-                                            <td style="">
-                                                <RouterLink :to="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer">{{
-                                                    store.truncateText(row.title, 50)
-                                                }}</RouterLink>
-                                            </td>
-                                            <td>{{ row.category }}</td>
-                                            <td>{{ row.publishDate }}</td>
-                                            <td>{{ row.createdAt }}</td>
-                                            <td>{{ row.author }}</td>
-                                            <td style="">{{ row.isPublished ? "Có" : "Không" }}</td>
-                                            <td style="">{{ row.AllowComment ? "Có" : "Không" }}</td>
-                                            <td style="">{{ row.CommentCensorship ? "Có" : "Không" }}</td>
+                                            <td>{{ store.truncateText(row.Content, 200) }}</td>
+                                            <td>{{ row.LikeCount }}</td>
+                                            <td>{{ store.formatDateTime(row.CreatedAt) }}</td>
+                                            <td>{{ store.truncateText(row.ReplyToContent) }}</td>
+                                            <td>{{ row.Approved ? "Có" : "Không" }}</td>
                                             <td style="">
                                                 <div class="d-flex gap-2 justify-content-center">
-                                                    <RouterLink :to="`/administrator/blog/edit/${row.id}`" class="btn btn-sm btn-alt-warning">
-                                                        <i class="fa fa-fw fa-pencil-alt"></i>
+                                                    <RouterLink :to="`/administrator/blog/viewdetail/${row.PostId}`" class="btn btn-sm btn-danger" target="_blank" title="Đi đến bài viết">
+                                                        <i class="fa fa-fw fa-share"></i>
                                                     </RouterLink>
-                                                    <button type="button" class="btn btn-sm btn-danger" title="Xóa bài viết" @click="swalConfirm(row.id)">
+                                                    <button v-if="row.Approved == false" type="button" class="btn btn-sm btn-alt-success" title="Duyệt bình luận" @click="() => approveComment(row.Id)">
+                                                        <i class="fa fa-fw fa-check"></i>
+                                                    </button>
+                                                    <button v-else type="button" class="btn btn-sm btn-alt-warning" title="Không duyệt bình luận" @click="() => unApproveComment(row.Id)">
+                                                        <i class="fa fa-fw fa-close"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-danger" title="Vô hiệu bình luận" @click="() => deleteComment(row.Id)">
                                                         <i class="fa fa-fw fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -78,18 +77,21 @@
 
 <script setup>
 import { ref, computed, onMounted, reactive } from "vue";
-import Swal from "sweetalert2";
-import { RouterLink, useRouter } from "vue-router";
-import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
 import { authRequest } from "../accountmanager/service/axiosConfig";
-import { useTemplateStore } from "../../../stores/template";
+import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
+import Swal from "sweetalert2";
+import { useTemplateStore } from "@/stores/template";
 
 const store = useTemplateStore();
 
-const router = useRouter();
-const posts = ref([]);
-const loading = ref(true);
+const comments = ref([]);
 const searchingPosts = ref([]);
+
+async function getComments() {
+    const response = await authRequest(`/admin/comment`);
+    comments.value = response.data.$values;
+}
+getComments();
 
 function normalizeString(str) {
     // Chuyển đổi thành chữ thường và loại bỏ dấu
@@ -110,126 +112,93 @@ function search(input) {
     if (searchValue === "") {
         searchingPosts.value = [];
     } else {
-        if (posts.value.length != 0) {
-            searchingPosts.value = posts.value.filter((post) => containsSubstring(searchValue, post.title));
+        if (comments.value.length != 0) {
+            searchingPosts.value = comments.value.filter((post) => containsSubstring(searchValue, post.Content));
         }
     }
 }
 
-onMounted(async () => {
-    try {
-        const response = await authRequest.get("/admin/posts?PageNumber=1&PageSize=99999");
-        posts.value = response.data.data.$values.map((post) => ({
-            id: post.id,
-            author: post.author,
-            slug: post.slug,
-            title: post.title,
-            isPublished: post.published,
-            publishDate: store.formatDate(post.publishedAt),
-            createdAt: store.formatDate(post.createdAt),
-            metadata: post.metadata,
-            category: post.categoryName,
-            AllowComment: post.AllowComment,
-            CommentCensorship: post.CommentCensorship,
-        }));
-    } catch (error) {
-        switch (error.code) {
-            case "ERR_NETWORK":
-                handleLogout();
-                break;
-            default:
-                console.error("Error fetching posts:", error);
-                break;
-        }
-    } finally {
-        loading.value = false;
-    }
-});
-
-function handleLogout() {
-    localStorage.removeItem("authToken"); // Xóa token khỏi localStorage
-    router.push("/auth/signin?msg=timeout"); // Chuyển hướng về trang đăng nhập
-}
-
-const isAllowComment = (metadata) => {
-    try {
-        const metaObj = JSON.parse(metadata);
-        return metaObj.EnableComments;
-    } catch (error) {
-        console.error("Error parsing metadata:", error);
-        return false;
-    }
-};
-
-const navigateToCreate = () => router.push("/administrator/blog/create");
-
-const swalConfirm = async (id) => {
-    const confirmation = await Swal.fire({
-        title: "Bạn có chắc chắn?",
-        text: "Hành động này không thể hoàn tác.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Đồng ý xóa!",
-        cancelButtonText: "Hủy",
+async function approveComment(commentSelectedId) {
+    await store.confirm({
+        title: "Duyệt bình luận",
+        callback: async () => {
+            try {
+                await authRequest.put(`/admin/comment/${commentSelectedId}/approve`);
+                // comments.value = comments.value.filter((comment) => comment.Id !== commentSelectedId);
+                store.alert({ title: "Duyệt thành công" });
+            } catch (error) {
+                store.alert({ title: "Duyệt thất bại", icon: "error" });
+                console.error("Error approve comment:", error);
+            } finally {
+                getComments();
+            }
+        },
     });
+}
+async function unApproveComment(commentSelectedId) {
+    await store.confirm({
+        title: "Không duyệt bình luận",
+        callback: async () => {
+            try {
+                await authRequest.put(`/admin/comment/${commentSelectedId}/unapprove`);
+                // comments.value = comments.value.filter((comment) => comment.Id !== commentSelectedId);
+                store.alert({ title: "Thu hồi phê duyệt thành công" });
+            } catch (error) {
+                store.alert({ title: "Thu hồi phê duyệt thất bại", icon: "error" });
+                console.error("Error approve comment:", error);
+            } finally {
+                getComments();
+            }
+        },
+    });
+}
+async function deleteComment(commentSelectedId) {
+    await store.confirm({
+        title: "Xóa bình luận",
+        callback: async () => {
+            try {
+                await authRequest.put(`/admin/comment/${commentSelectedId}/disable`);
+                // comments.value = comments.value.filter((comment) => comment.Id !== commentSelectedId);
+                store.alert({ title: "Xóa thành công" });
+            } catch (error) {
+                store.alert({ title: "Xóa thất bại", icon: "error" });
+                console.error("Error deleting comment:", error);
+            } finally {
+                getComments();
+            }
+        },
+    });
+}
 
-    if (confirmation.isConfirmed) {
-        try {
-            loading.value = true;
-            await authRequest.delete(`/admin/posts/${id}`);
-            posts.value = posts.value.filter((user) => user.id !== id);
-            Swal.fire("Đã xóa!", `Bài viết với ID: ${id} đã được xóa.`, "success");
-        } catch (error) {
-            Swal.fire("Lỗi", "Xóa bài viết thất bại. Vui lòng thử lại.", "error");
-            console.error("Error deleting post:", error);
-        } finally {
-            loading.value = false;
-        }
-    }
-};
 // Helper variables
 const cols = reactive([
     {
-        name: "Tiêu đề",
-        field: "title",
+        name: "Nội dung",
+        field: "Content",
         sort: "",
     },
     {
-        name: "Thể loại",
-        field: "category",
-        sort: "",
-    },
-    {
-        name: "Ngày đăng",
-        field: "publishDate",
+        name: "Lượt thích",
+        field: "LikeCount",
         sort: "",
     },
     {
         name: "Ngày tạo",
-        field: "createdAt",
+        field: "CreatedAt",
         sort: "",
     },
     {
-        name: "Tác giả",
-        field: "author",
+        name: "Phản hồi cho",
+        field: "ReplyToContent",
         sort: "",
     },
     {
-        name: "Hiển thị",
-        field: "isPublished",
-        sort: "",
-    },
-    {
-        name: "Bình luận",
-        field: "AllowComment",
-        sort: "",
-    },
-    {
-        name: "Kiểm duyệt",
-        field: "CommentCensorship",
+        name: "Duyệt",
+        field: "Approved",
         sort: "",
     },
 ]);
+
 // Apply a few Bootstrap 5 optimizations
 onMounted(() => {
     // Remove labels from

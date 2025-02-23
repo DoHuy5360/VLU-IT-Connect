@@ -1,7 +1,11 @@
 <template>
     <h3>{{ store.isVietNamese() ? "Bình luận" : "Comment" }}</h3>
     <div v-if="allowComment">
-        <CommentBox :postId="postId" :callback="handleAfterComment" />
+        <CommentBox :postId="postId" :callback="handleAfterComment">
+            <div v-if="commentCensorship" class="text-muted">
+                {{ store.isVietNamese() ? "Bình luận của bạn sẽ được kiểm tra trước khi hiển thị" : "Your comment will be moderated before being displayed" }}
+            </div>
+        </CommentBox>
         <div class="d-flex flex-column gap-2">
             <div v-for="parentComment in commentTree" :key="parentComment.Id">
                 <div class="border p-2 rounded">
@@ -23,7 +27,11 @@
                             </div>
                         </div>
                         <div v-if="isReplyThisComment(parentComment.Id)" class="mt-1">
-                            <CommentBox :postId="postId" :parentId="parentComment.Id" :replyTo="parentComment.Content" :callback="handleAfterComment">
+                            <CommentBox :postId="postId" :parentId="parentComment.Id" :replyTo="parentComment.Id" :replyToContent="parentComment.Content" :callback="handleAfterComment">
+                                <div v-if="commentCensorship" class="text-muted">
+                                    {{ store.isVietNamese() ? "Bình luận của bạn sẽ được kiểm tra trước khi hiển thị" : "Your comment will be moderated before being displayed" }}
+                                </div>
+
                                 <div @click="() => closeCurrentReplyCommentBox()" class="btn btn-sm btn-primary">{{ store.isVietNamese() ? "Hủy" : "Cancel" }}</div>
                             </CommentBox>
                         </div>
@@ -33,7 +41,7 @@
                             <div class="border p-2 rounded">
                                 <div class="d-flex align-items-center gap-1 border rounded px-1 bg-light mb-1">
                                     <i class="si si-action-redo"></i>
-                                    {{ store.truncateText(childComment.ReplyTo, 70) }}
+                                    {{ store.truncateText(childComment.ReplyToContent, 70) }}
                                 </div>
                                 <div class="d-flex gap-2">
                                     <div class="fw-bold">{{ store.isVietNamese() ? "Ẩn danh" : "Anonymous" }}</div>
@@ -52,7 +60,11 @@
                                     </div>
                                 </div>
                                 <div v-if="isReplyThisComment(childComment.Id)" class="mt-1">
-                                    <CommentBox :postId="postId" :parentId="parentComment.Id" :replyTo="childComment.Content" :callback="handleAfterComment">
+                                    <CommentBox :postId="postId" :parentId="parentComment.Id" :replyTo="childComment.Id" :replyToContent="childComment.Content" :callback="handleAfterComment">
+                                        <div v-if="commentCensorship" class="text-muted">
+                                            {{ store.isVietNamese() ? "Bình luận của bạn sẽ được kiểm tra trước khi hiển thị" : "Your comment will be moderated before being displayed" }}
+                                        </div>
+
                                         <div @click="() => closeCurrentReplyCommentBox()" class="btn btn-sm btn-primary">{{ store.isVietNamese() ? "Hủy" : "Cancel" }}</div>
                                     </CommentBox>
                                 </div>
@@ -105,11 +117,11 @@ function handleAfterComment() {
     if (props.commentCensorship) {
         store.alert({
             title: store.isVietNamese() ? "Bình luận thành công!" : "Success!",
+            text: store.isVietNamese() ? "Bình luận của bạn cần được quản trị viên phê duyệt để hiển thị." : "Your comment needs to be approved by an administrator to appear.",
         });
     } else {
         store.alert({
             title: store.isVietNamese() ? "Bình luận thành công!" : "Success!",
-            text: store.isVietNamese() ? "Bình luận của bạn cần được quản trị viên phê duyệt để hiển thị." : "Your comment needs to be approved by an administrator to appear.",
         });
     }
     // Update comment

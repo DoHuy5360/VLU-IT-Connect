@@ -17,9 +17,9 @@
                 }}</span>
             </div>
         </div>
-        <div class="d-flex gap-2 align-items-center">
+        <div class="d-flex gap-2 align-items-start align-items-lg-center">
             <slot></slot>
-            <div class="btn btn-sm btn-secondary" @click="createComment">{{ store.isVietNamese() ? "Lưu bình luận" : "Save" }}</div>
+            <div class="btn btn-sm btn-secondary" style="white-space: nowrap" @click="createComment">{{ store.isVietNamese() ? "Lưu bình luận" : "Save" }}</div>
         </div>
     </div>
 </template>
@@ -43,6 +43,10 @@ const props = defineProps({
         default: null,
     },
     replyTo: {
+        type: Number,
+        default: null,
+    },
+    replyToContent: {
         type: String,
         default: null,
     },
@@ -78,6 +82,7 @@ async function createComment() {
                 PostId: props.postId,
                 ParentId: props.parentId,
                 ReplyTo: props.replyTo,
+                ReplyToContent: props.replyToContent,
                 Content: comment.value,
             },
             {

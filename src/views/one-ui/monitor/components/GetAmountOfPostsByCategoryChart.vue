@@ -1,159 +1,230 @@
 <template>
-    <!-- <div class="row mb-3">
-        <div class="col-3">
+  <BaseBlock
+    title="THỐNG KÊ SỐ LƯỢNG BÀI VIẾT THEO THỂ LOẠI"
+    class="flex-grow-1 d-flex flex-column"
+  >
+    <template #options>
+      <div class="row justify-content-end">
+        <div class="col-4 d-flex gap-2 align-items-center">
+          <label for="from-date">Từ</label>
+          <FlatPickr
+            id="from-date"
+            class="form-control"
+            placeholder="D-M-Y"
+            v-model="fromDate.selectedDate"
+            :config="fromDate.config"
+            @on-change="fetchData"
+          />
         </div>
-    </div> -->
-    <BaseBlock title="THỐNG KÊ SỐ LƯỢNG BÀI VIẾT THEO THỂ LOẠI" class="flex-grow-1 d-flex flex-column">
-        <template #options>
-            <div class="row justify-content-end">
-                <div class="col-4 d-flex gap-2 align-items-center">
-                    <label for="">Từ</label>
-                    <FlatPickr id="example-flatpickr-default" class="form-control" placeholder="D-M-Y" v-model="fromDate.selectedDate" :config="fromDate.config" />
-                </div>
-                <div class="col-4 d-flex gap-2 align-items-center">
-                    <label for="">Đến</label>
-                    <FlatPickr id="example-flatpickr-default" class="form-control" placeholder="D-M-Y" v-model="toDate.selectedDate" :config="toDate.config" />
-                </div>
-            </div>
-        </template>
-        <template #content>
-            <div class="block-content block-content-full flex-grow-1 d-flex items-center">
-                <Bar ref="chartRef" :data="earningsData" :options="totalEarningsOptions" :plugins="plugins" class="w-100" />
-            </div>
-        </template>
-    </BaseBlock>
+        <div class="col-4 d-flex gap-2 align-items-center">
+          <label for="to-date">Đến</label>
+          <FlatPickr
+            id="to-date"
+            class="form-control"
+            placeholder="D-M-Y"
+            v-model="toDate.selectedDate"
+            :config="toDate.config"
+            @on-change="fetchData"
+          />
+        </div>
+      </div>
+    </template>
+
+    <template #content>
+      <div
+        class="block-content block-content-full flex-grow-1 d-flex items-center"
+      >
+        <Bar
+          v-if="chartData.labels.length > 0"
+          ref="chartRef"
+          :data="chartData"
+          :options="chartOptions"
+          :plugins="plugins"
+          class="w-100"
+        />
+        <div v-else class="w-100 text-center py-5">Đang tải dữ liệu...</div>
+      </div>
+    </template>
+  </BaseBlock>
 </template>
 
 <script setup>
 import { onMounted, ref, reactive } from "vue";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import { Bar } from "vue-chartjs";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { guestRequest } from "../../accountmanager/service/axiosConfig";
 import FlatPickr from "vue-flatpickr-component";
+import "flatpickr/dist/flatpickr.css";
+import BaseBlock from "@/components/BaseBlock.vue";
+import axios from "axios";
 
-function getDateTwoMonthsBefore() {
-    // Lấy ra ngày hiện tại
-    const currentDate = new Date();
+// Đăng ký Chart.js plugins
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartDataLabels
+);
 
-    // Tính toán ngày cách ngày hiện tại 2 tháng
-    const targetDate = new Date(currentDate);
-    targetDate.setMonth(currentDate.getMonth() - 2);
-
-    // Format lại ngày theo định dạng 'dd-mm-yyyy'
-    const formattedDate = String(targetDate.getDate()).padStart(2, "0") + "-" + String(targetDate.getMonth() + 1).padStart(2, "0") + "-" + targetDate.getFullYear();
-
-    return formattedDate;
-}
-
-// Flatpickr variables
-const fromDate = reactive({
-    selectedDate: null,
-    config: { dateFormat: "d-m-Y", minDate: getDateTwoMonthsBefore(), maxDate: "today" },
-});
-const toDate = reactive({
-    selectedDate: null,
-    config: { dateFormat: "d-m-Y", minDate: getDateTwoMonthsBefore(), maxDate: "today" },
-});
-
-// Tuỳ chọn biểu đồ
-const totalEarningsOptions = {
-    maintainAspectRatio: false,
-    tension: 0.4,
-    indexAxis: "y",
-    scales: {
-        x: { display: true },
-        y: { display: true },
-    },
-    plugins: {
-        legend: { display: true },
-        datalabels: {
-            anchor: "end",
-            align: "left",
-            color: "#fff",
-            font: { weight: "bold", size: 12 },
-            formatter: (value) => `$${value}`,
-        },
-    },
-};
-
-// Đăng ký plugin
+const chartRef = ref(null);
 const plugins = [ChartDataLabels];
 
-// Tham chiếu đến biểu đồ
-const chartRef = ref(null);
-
-// Dữ liệu biểu đồ (CẦN `ref()`, KHÔNG `reactive()`)
-const earningsData = ref({
-    labels: [],
-    datasets: [],
+const chartData = ref({
+  labels: [],
+  datasets: [
+    {
+      label: "Tổng số bài viết được tạo",
+      backgroundColor: "#6c757d",
+      data: [],
+      barThickness: 20,
+    },
+    {
+      label: "Tổng số bài viết được công bố",
+      backgroundColor: "#0d6efd",
+      data: [],
+      barThickness: 20,
+    },
+  ],
 });
 
-// Hàm cập nhật dữ liệu
-const updateChartData = (labels, values) => {
-    // Kiểm tra dữ liệu hợp lệ
-    if (!labels.length || !values.length) {
-        console.warn("Dữ liệu trống!");
-        return;
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  indexAxis: "y",
+  scales: {
+    x: {
+      beginAtZero: true,
+      ticks: { stepSize: 1 },
+    },
+    y: { grid: { display: false } },
+  },
+  plugins: {
+    legend: { position: "top", align: "start" },
+    datalabels: {
+      color: "#fff",
+      font: { weight: "bold" },
+      formatter: (value) => `${value}`,
+    },
+  },
+};
+
+// Hàm lấy ngày trước 2 tháng
+function getDateTwoMonthsBefore() {
+  const currentDate = new Date();
+  currentDate.setMonth(currentDate.getMonth() - 2);
+  return currentDate.toISOString().split("T")[0];
+}
+
+// Cấu hình date picker
+const fromDate = reactive({
+  selectedDate: null,
+  config: {
+    dateFormat: "Y-m-d",
+    minDate: getDateTwoMonthsBefore(),
+    maxDate: "today",
+    enableTime: false,
+    time_24hr: true,
+  },
+});
+
+const toDate = reactive({
+  selectedDate: null,
+  config: {
+    dateFormat: "Y-m-d",
+    minDate: getDateTwoMonthsBefore(),
+    maxDate: "today",
+    enableTime: false,
+    time_24hr: true,
+  },
+});
+
+// Hàm lấy token từ localStorage
+function getAuthToken() {
+  return localStorage.getItem("authToken") || null;
+}
+
+// Hàm format ngày cho API
+function formatDateForAPI(date) {
+  if (!date) return null;
+  return new Date(date).toISOString().split("T")[0];
+}
+
+// Hàm fetch dữ liệu từ API với token
+const fetchData = async () => {
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      console.error("❌ Không có token, yêu cầu đăng nhập!");
+      return;
     }
 
-    // Cập nhật toàn bộ object (Không dùng `.push()`)
-    earningsData.value = {
-        labels: [...labels],
-        datasets: [
-            {
-                label: "Tổng số bài viết được tạo",
-                fill: true,
-                backgroundColor: "rgba(100, 116, 139, .7)",
-                borderColor: "transparent",
-                data: [...values],
-                barThickness: 20,
-            },
-            {
-                label: "Tổng số bài viết được công bố",
-                fill: true,
-                backgroundColor: "rgba(100, 116, 139, .7)",
-                borderColor: "transparent",
-                data: [...values],
-                barThickness: 20,
-            },
-        ],
+    const params = {
+      fromDate: formatDateForAPI(fromDate.selectedDate),
+      toDate: formatDateForAPI(toDate.selectedDate),
     };
 
-    // Đảm bảo biểu đồ cập nhật lại
-    if (chartRef.value?.chart) {
-        chartRef.value.chart.update();
+    // Log params để debug
+    //console.log("Params gửi đi:", params);
+
+    const response = await axios.get(
+      "https://localhost:7017/api/Dashboard/category-statistics",
+      {
+        params,
+        headers: { Authorization: ` ${token}` },
+      }
+    );
+
+    if (
+      response.data?.Categories?.$values &&
+      response.data?.TotalPostsArray?.$values &&
+      response.data?.TotalPublishPostsArray?.$values
+    ) {
+      chartData.value = {
+        labels: response.data.Categories.$values,
+        datasets: [
+          {
+            label: "Tổng số bài viết được tạo",
+            backgroundColor: "#ff756b",
+            data: response.data.TotalPostsArray.$values,
+            barThickness: 20,
+          },
+          {
+            label: "Tổng số bài viết được công bố",
+            backgroundColor: "#0d6efd",
+            data: response.data.TotalPublishPostsArray.$values,
+            barThickness: 20,
+          },
+        ],
+      };
+
+      if (chartRef.value?.chart) {
+        chartRef.value.chart.update("resize");
+      }
     } else {
-        console.warn("chartRef chưa sẵn sàng!");
+      console.error("⚠ API trả về dữ liệu không hợp lệ!");
     }
+  } catch (error) {
+    console.error("❌ Lỗi khi gọi API:", error.response?.data || error);
+  }
 };
 
-// Trích xuất dữ liệu từ API
-const spreadCategory = (categoryJsonTree, labels, values) => {
-    for (const category of categoryJsonTree) {
-        labels.push(category.Name);
-        values.push(category.AmountOfPosts);
-
-        if (category.Children?.values?.$values?.length) {
-            spreadCategory(category.Children.values.$values, labels, values);
-        }
-    }
-};
-
-// Gọi API và cập nhật dữ liệu
-const getCategories = async () => {
-    try {
-        const response = await guestRequest.get("/posts/getallcategories");
-
-        const labels = [];
-        const values = [];
-        spreadCategory(response.data.data.categories.values.$values, labels, values);
-
-        updateChartData(labels, values);
-    } catch (error) {
-        console.error("Lỗi API:", error.response?.data || error.message);
-    }
-};
-
-// Gọi API khi component được mount
-onMounted(getCategories);
+// Khi component mounted, fetch dữ liệu ngay
+onMounted(fetchData);
 </script>
+
+<style scoped>
+.block-content {
+  min-height: 400px;
+}
+</style>

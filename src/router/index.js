@@ -16,6 +16,8 @@ const BlogDetailsReport = () => import("@/views/one-ui/monitor/report/BlogDetail
 const TopBlogReport = () => import("@/views/one-ui/monitor/report/TopBlogReport.vue");
 const AccessUrlReport = () => import("@/views/one-ui/monitor/report/AccessUrlReport.vue");
 
+const DisabledCommentView = () => import("@/views/one-ui/comment/DisabledCommentView.vue");
+const CommentView = () => import("@/views/one-ui/comment/CommentView.vue");
 const BlogAdmin = () => import("@/views/one-ui/blog/BlogAdmin.vue");
 const BlogCreate = () => import("@/views/one-ui/blog/CreateBlog.vue");
 const BlogEdit = () => import("@/views/one-ui/blog/EditBlog.vue");
@@ -125,6 +127,21 @@ const routes = [
                         path: "viewdetail/:id",
                         name: "AdminBlogViewDetail",
                         component: BlogViewDetail,
+                    },
+                ],
+            },
+            {
+                path: "comment",
+                children: [
+                    {
+                        path: "available",
+                        name: "CommentView",
+                        component: CommentView,
+                    },
+                    {
+                        path: "disabled",
+                        name: "DisabledCommentView",
+                        component: DisabledCommentView,
                     },
                 ],
             },

@@ -148,12 +148,16 @@
 
                     <div style="user-select: none">
                         <div class="form-check">
-                            <label class="form-check-label" for="allowComment">Cho phép bình luận</label>
-                            <input class="form-check-input" type="checkbox" v-model="state.enableComments" id="allowComment" />
-                        </div>
-                        <div class="form-check">
                             <label class="form-check-label" for="publish">Công bố</label>
                             <input class="form-check-input" type="checkbox" v-model="state.published" id="publish" />
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label" for="allowComment">Cho phép bình luận</label>
+                            <input class="form-check-input" type="checkbox" v-model="state.AllowComment" id="allowComment" />
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label" for="commentCensorship">Kiểm duyệt bình luận</label>
+                            <input class="form-check-input" type="checkbox" v-model="state.CommentCensorship" id="commentCensorship" />
                         </div>
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
@@ -189,6 +193,8 @@ const state = reactive({
     video: null,
     enableComments: false,
     published: true,
+    AllowComment: true,
+    CommentCensorship: false,
 });
 // Validate
 const maxSize = (size) => (value) => {
@@ -285,10 +291,12 @@ const submitForm = async () => {
         formData.append("Files", state.image);
         formData.append("Excerpt", state.excerpt);
         formData.append("Published", state.published);
-        formData.append("EnableComments", state.enableComments);
+        formData.append("EnableComments", false);
         formData.append("VideoType", state.videoType);
         formData.append("VideoUrl", state.videoUrl);
         formData.append("VideoFile", state.video);
+        formData.append("AllowComment", state.AllowComment);
+        formData.append("CommentCensorship", state.CommentCensorship);
 
         await authRequest.post("/admin/posts", formData, {
             headers: { "Content-Type": "multipart/form-data" },

@@ -90,6 +90,18 @@ export const useTemplateStore = defineStore({
                 confirmButtonText: "Đồng ý",
             });
         },
+        async confirm({ title, text, icon, callback }) {
+            const confirmation = await Swal.fire({
+                title,
+                text: "Hành động này không thể hoàn tác.",
+                icon: icon || "warning",
+                showCancelButton: true,
+                confirmButtonText: "Đồng ý",
+                cancelButtonText: "Hủy",
+            });
+
+            if (confirmation.isConfirmed) callback();
+        },
         // Sets the layout, useful for setting different layouts (under layouts/variations/)
         setLayout(payload) {
             this.layout.header = payload.header;
@@ -105,8 +117,25 @@ export const useTemplateStore = defineStore({
 
             return `${day}/${month}/${year}`;
         },
+        formatDateTime(stringDate) {
+            const date = new Date(stringDate);
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, "0");
+            const minutes = String(date.getMinutes()).padStart(2, "0");
+            const seconds = String(date.getSeconds()).padStart(2, "0");
+
+            return `${day}/${month}/${year} - ${hours}:${minutes}:${seconds}`;
+        },
         truncateText(text, numberOfLimitLetter) {
-            return text.length > numberOfLimitLetter ? `${text.slice(0, numberOfLimitLetter)}...` : text;
+            try {
+                if (text == null || text == undefined) return text;
+                return text.length > numberOfLimitLetter ? `${text.slice(0, numberOfLimitLetter)}...` : text;
+            } catch (error) {
+                console.log(error);
+                return text;
+            }
         },
         isMP4(source) {
             if (source) {

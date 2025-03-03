@@ -1,9 +1,9 @@
 <template>
     <div class="position-relative w-100">
         <div class="position-relative overflow-hidden">
-            <img :src="store.getBrandAsset('/hero.png')" class="hero-image" alt="Hero Image" />
-            <img :src="store.getBrandAsset('/hero-partial-right.png')" class="hero-decoration-right" alt="Hero Decoration Right" />
-            <img :src="store.getBrandAsset('/hero-partial-left.png')" class="hero-decoration-left" alt="Hero Decoration Left" />
+            <img :src="store.getBrandAsset('/hero.png')" class="hero-image" alt="Hero Image" draggable="false" />
+            <img :src="store.getBrandAsset('/hero-partial-right.png')" class="hero-decoration-right" alt="Hero Decoration Right" draggable="false" />
+            <img :src="store.getBrandAsset('/hero-partial-left.png')" class="hero-decoration-left" alt="Hero Decoration Left" draggable="false" />
         </div>
         <div class="position-absolute w-100 top-50 hero-content">
             <div class="container">

@@ -94,6 +94,20 @@ function handleLogout() {
                             to: 'AdminBlog',
                         },
                         {
+                            name: 'Bình luận',
+                            icon: 'si si-bubble',
+                            sub: [
+                                {
+                                    name: 'Khả dụng',
+                                    to: 'CommentView',
+                                },
+                                {
+                                    name: 'Đã xóa',
+                                    to: 'DisabledCommentView',
+                                },
+                            ],
+                        },
+                        {
                             name: 'Thể loại',
                             icon: 'si si-layers',
                             to: 'AdminCategory',

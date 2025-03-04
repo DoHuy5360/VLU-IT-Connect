@@ -1,4 +1,17 @@
-<script setup></script>
+<script setup>
+import { msRequest } from "./accountmanager/service/axiosConfig";
+
+async function fetchProtectedData() {
+    const response = await msRequest.get("/api/admin/posts/de");
+    try {
+        console.log("Kết quả nhận được:", response.data);
+    } catch (error) {
+        console.error("Lỗi khi gọi API:", error);
+    }
+}
+
+fetchProtectedData();
+</script>
 
 <template>
     <BasePageHeading title="Chào Mừng Quản Trị Viên" subtitle="">
@@ -7,6 +20,7 @@
         <i class="fa fa-plus opacity-50 me-1"></i>
         Add
       </button> -->
+            <!-- <div>{{ msalConfig.state }}</div> -->
         </template>
     </BasePageHeading>
 

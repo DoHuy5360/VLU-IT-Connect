@@ -64,7 +64,7 @@
                                         <span class="bg-white px-3">Hoặc</span>
                                     </div>
                                     <div class="text-center">
-                                        <button type="button" class="btn btn-alt-primary btn-lg px-4" :disabled="isLoading.microsoft" @click="signInWithMicrosoft">
+                                        <button type="button" class="btn btn-alt-primary btn-lg px-4" :disabled="isLoading.microsoft" @click="handleLoginByMicrosoft">
                                             <i class="fab fa-microsoft me-3"></i>
                                             Đăng nhập bằng Microsoft
                                         </button>
@@ -80,16 +80,34 @@
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { reactive, onMounted, inject } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import { useRouter } from "vue-router";
 import { gateRequest } from "../accountmanager/service/axiosConfig";
 import { useTemplateStore } from "@/stores/template";
+import { myMSALObj } from "../../../config/msalConfig";
+import { useAuth } from "../../../config/useAuth";
+
+const { login, logout, handleRedirect } = useAuth();
 
 const store = useTemplateStore();
 
 const router = useRouter();
+
+const msalInstance = inject("msalInstance"); // Inject từ `main.js`
+
+const handleLoginByMicrosoft = async () => {
+    await login();
+};
+
+onMounted(async () => {
+    await msalInstance.initialize();
+    const isAuthenticate = await handleRedirect();
+    if (isAuthenticate) {
+        router.push({ name: "index" });
+    }
+});
 
 const state = reactive({
     email: "",
@@ -133,15 +151,6 @@ const onSubmit = async () => {
         state.loginError = true;
     } finally {
         isLoading.login = false;
-    }
-};
-
-const signInWithMicrosoft = async () => {
-    try {
-        console.log("Microsoft login clicked");
-    } catch (error) {
-        alert("Microsoft login failed.");
-        console.error("Microsoft login failed:", error.response?.data || error.message);
     }
 };
 </script>

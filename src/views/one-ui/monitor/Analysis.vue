@@ -31,7 +31,7 @@
             </div>
         </div>
 
-        <BarChart />
+        <GetInteractiveOnPostsChart />
         <!-- <LineChart /> -->
     </div>
 </template>
@@ -39,7 +39,7 @@
 <script setup>
 import { ref } from "vue";
 import { guestRequest } from "../accountmanager/service/axiosConfig";
-import BarChart from "./components/GetInteractiveOnPostsChart.vue";
+import GetInteractiveOnPostsChart from "./components/GetInteractiveOnPostsChart.vue";
 import CardData from "./components/CardData.vue";
 import { Chart, registerables } from "chart.js";
 import GetAmountOfPostsByCategoryChart from "./components/GetAmountOfPostsByCategoryChart.vue";

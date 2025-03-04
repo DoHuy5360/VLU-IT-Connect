@@ -25,8 +25,10 @@
                             </svg>
                         </div>
                         <div style="transform: translateY(1px)">
-                            <a href="javascript:void(0)" v-if="crumb.disabled">{{ store.isVietNamese() ? crumb.name.vn : crumb.name.en }}</a>
-                            <RouterLink v-else :to="crumb.path" style="font-size: 1rem" class="text-black hover_underline">{{ store.isVietNamese() ? crumb.name.vn : crumb.name.en }}</RouterLink>
+                            <a href="javascript:void(0)" v-if="crumb.disabled">{{ store.truncateText(store.isVietNamese() ? crumb.name.vn : crumb.name.en, 40) }}</a>
+                            <RouterLink v-else :to="crumb.path" style="font-size: 1rem" class="text-black hover_underline">{{
+                                store.truncateText(store.isVietNamese() ? crumb.name.vn : crumb.name.en, 40)
+                            }}</RouterLink>
                         </div>
                     </div>
                 </div>

@@ -16,12 +16,12 @@
                         </div>
                         <div class="fs-4">{{ parentComment.Content }}</div>
                         <div class="d-flex gap-3 justify-content-start px-2" style="user-select: none">
-                            <div class="d-flex gap-1 align-items-center fw-semibold" style="cursor: pointer">
+                            <!-- <div class="d-flex gap-1 align-items-center fw-semibold" style="cursor: pointer">
                                 <div :onclick="() => handleLikeComment(parentComment)">
                                     <CommentLikeSwitch :active="hasLikeTheComment(parentComment.Id)" />
                                 </div>
                                 {{ parentComment.LikeCount }}
-                            </div>
+                            </div> -->
                             <div @click="() => openReplyCommentBox(parentComment.Id)" class="hover_red_text fw-semibold" style="cursor: pointer">
                                 <i class="si si-action-undo"></i> {{ store.isVietNamese() ? "Trả lời" : "Reply" }}
                             </div>
@@ -49,12 +49,12 @@
                                 </div>
                                 <div class="fs-4">{{ childComment.Content }}</div>
                                 <div class="d-flex gap-3 justify-content-start" style="user-select: none">
-                                    <div class="d-flex gap-1 align-items-center fw-semibold" style="cursor: pointer">
+                                    <!-- <div class="d-flex gap-1 align-items-center fw-semibold" style="cursor: pointer">
                                         <div :onclick="() => handleLikeComment(childComment)">
                                             <CommentLikeSwitch :active="hasLikeTheComment(childComment.Id)" />
                                         </div>
                                         {{ childComment.LikeCount }}
-                                    </div>
+                                    </div> -->
                                     <div @click="() => openReplyCommentBox(childComment.Id)" class="hover_red_text fw-semibold" style="cursor: pointer">
                                         <i class="si si-action-undo"></i> {{ store.isVietNamese() ? "Trả lời" : "Reply" }}
                                     </div>

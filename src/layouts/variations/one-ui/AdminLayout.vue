@@ -6,10 +6,9 @@ import { useTemplateStore } from "@/stores/template";
 import BaseLayout from "@/layouts/BaseLayout.vue";
 import BaseNavigation from "@/components/BaseNavigation.vue";
 import { useAuth } from "@/config/useAuth";
-const { login, logout, handleRedirect } = useAuth();
+const { logout } = useAuth();
 // Main store
 const store = useTemplateStore();
-const router = useRouter();
 const isLoading = ref(false);
 
 // Set default elements for this layout
@@ -27,7 +26,6 @@ store.mainContent({ mode: "narrow" });
 async function handleLogout() {
     sessionStorage.clear();
     await logout();
-    router.push("/auth/signin"); // Chuyển hướng về trang đăng nhập
 }
 </script>
 <template>

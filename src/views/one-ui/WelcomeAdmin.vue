@@ -2,7 +2,7 @@
 import { msRequest } from "./accountmanager/service/axiosConfig";
 
 async function fetchProtectedData() {
-    const response = await msRequest.get("/api/admin/posts/de");
+    const response = await msRequest.get("/api/admin/posts");
     try {
         console.log("Kết quả nhận được:", response.data);
     } catch (error) {

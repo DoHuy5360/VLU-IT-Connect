@@ -1,8 +1,17 @@
 import axios from "axios";
-import { myMSALObj } from "../../../../config/msalConfig";
+import { msalEntity } from "../../../../config/msalConfig";
 import { useAuth } from "@/config/useAuth";
 
 const { getAccessToken } = useAuth();
+
+function checkAccountExisting() {
+    const account = msalEntity.getActiveAccount();
+    if (!account) {
+        console.log("Không có tài khoản đăng nhập");
+        return false;
+    }
+    return true;
+}
 
 // Tạo instance axios với base URL
 const authRequest = axios.create({
@@ -17,13 +26,20 @@ const authRequest = axios.create({
 
 // Request interceptor
 authRequest.interceptors.request.use(
-    (config) => {
+    async (config) => {
         // Log URL để debug
-        console.log("Request URL:", `${config.baseURL}${config.url}`);
+        // console.log("Request URL:", `${config.baseURL}${config.url}`);
 
-        const token = localStorage.getItem("authToken");
-        if (token) {
-            config.headers["Authorization"] = token;
+        // const token = localStorage.getItem("authToken");
+        // if (token) {
+        //     config.headers["Authorization"] = token;
+        // }
+        if (checkAccountExisting()) {
+            try {
+                config.headers.Authorization = `Bearer ${await getAccessToken()}`;
+            } catch (error) {
+                console.error("Lỗi khi lấy token", error);
+            }
         }
         return config;
     },
@@ -82,7 +98,7 @@ const msRequest = axios.create({
 });
 
 msRequest.interceptors.request.use(async (config) => {
-    const account = myMSALObj.getActiveAccount();
+    const account = msalEntity.getActiveAccount();
     if (!account) {
         throw new Error("Không có tài khoản đăng nhập");
     }

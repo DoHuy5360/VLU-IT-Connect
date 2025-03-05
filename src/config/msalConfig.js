@@ -23,4 +23,4 @@ export const state = reactive({
     user: null,
 });
 
-export const myMSALObj = new PublicClientApplication(msalConfig);
+export const msalEntity = new PublicClientApplication(msalConfig);

@@ -1,16 +1,16 @@
 import { ref } from "vue";
-import { myMSALObj, state, graphScopes } from "./msalConfig.js";
+import { msalEntity, state, graphScopes } from "./msalConfig.js";
 
 export function useAuth() {
     const isAuthenticated = ref(false);
     const login = async () => {
         try {
-            if (!myMSALObj) {
+            if (!msalEntity) {
                 throw new Error("MSAL not initialized");
             }
-            await myMSALObj.loginRedirect();
+            await msalEntity.loginRedirect();
             isAuthenticated.value = true;
-            const loginResponse = await myMSALObj.loginRedirect();
+            const loginResponse = await msalEntity.loginRedirect();
             isAuthenticated.value = true;
             console.log("Login success: ", loginResponse);
         } catch (error) {
@@ -19,20 +19,20 @@ export function useAuth() {
     };
 
     const logout = () => {
-        if (!myMSALObj) {
+        if (!msalEntity) {
             throw new Error("MSAL not initialized");
         }
-        myMSALObj.logoutRedirect();
+        msalEntity.logoutRedirect();
         isAuthenticated.value = false;
         console.log("Logged out");
     };
     const handleRedirect = async () => {
         try {
-            await myMSALObj.handleRedirectPromise();
-            state.isAuthenticated = myMSALObj.getAllAccounts().length > 0;
-            state.user = myMSALObj.getAllAccounts()[0];
+            await msalEntity.handleRedirectPromise();
+            state.isAuthenticated = msalEntity.getAllAccounts().length > 0;
+            state.user = msalEntity.getAllAccounts()[0];
             if (state.user != null) {
-                myMSALObj.setActiveAccount(state.user);
+                msalEntity.setActiveAccount(state.user);
             }
 
             console.log(state.isAuthenticated, state.user);
@@ -43,11 +43,13 @@ export function useAuth() {
     };
     const getAccessToken = async () => {
         try {
-            const accounts = myMSALObj.getAllAccounts();
+            await msalEntity.initialize();
+
+            const accounts = msalEntity.getAllAccounts();
             if (accounts.length >= 1) {
                 const account = { account: accounts[0] };
                 const request = Object.assign(graphScopes, account);
-                const tokenResponse = await myMSALObj.acquireTokenSilent(request);
+                const tokenResponse = await msalEntity.acquireTokenSilent(request);
                 return tokenResponse.accessToken;
             }
             return null;

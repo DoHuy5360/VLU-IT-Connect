@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import NProgress from "nprogress/nprogress.js";
 import De from "../views/De.vue";
-import { myMSALObj } from "../config/msalConfig";
+import { msalEntity } from "../config/msalConfig";
 
 // Import components
 const WelcomeAdmin = () => import("@/views/one-ui/WelcomeAdmin.vue");
@@ -300,7 +300,7 @@ router.beforeResolve((to, from, next) => {
 });
 // Navigation Guard để kiểm tra trạng thái đăng nhập
 router.beforeEach((to, from, next) => {
-    const account = myMSALObj.getActiveAccount(); // Kiểm tra user đã đăng nhập chưa
+    const account = msalEntity.getActiveAccount(); // Kiểm tra user đã đăng nhập chưa
 
     // const token = localStorage.getItem("authToken");
 
@@ -321,7 +321,6 @@ router.beforeEach((to, from, next) => {
     } else {
         next();
     }
-    next();
 });
 router.afterEach(() => {
     NProgress.done();

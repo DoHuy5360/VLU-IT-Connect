@@ -128,6 +128,11 @@ export const useTemplateStore = defineStore({
 
             return `${day}/${month}/${year} - ${hours}:${minutes}:${seconds}`;
         },
+        YYYYmmddFormat(dateString) {
+            if (!dateString) return null;
+            const [day, month, year] = dateString.split("-"); // Tách ngày, tháng, năm
+            return `${year}-${month}-${day}`; // Trả về định dạng mới
+        },
         truncateText(text, numberOfLimitLetter) {
             try {
                 if (text == null || text == undefined) return text;
@@ -179,6 +184,34 @@ export const useTemplateStore = defineStore({
                 console.error("Error parsing metadata:", error);
                 return "";
             }
+        },
+        downloadFile(fileData, fileName){
+            // Tạo URL cho file blob
+            const url = window.URL.createObjectURL(new Blob([fileData]));
+                    
+            // Tạo thẻ <a> để tải file
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName); // Tên file khi tải xuống
+
+            // Thêm thẻ <a> vào document và click vào nó để tải file
+            document.body.appendChild(link);
+            link.click();
+
+            // Xóa thẻ <a> sau khi tải xong
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url); // Giải phóng URL blob
+        },
+        getCurrentDateObject() {
+            const date = new Date();
+        
+            const padZero = (num) => num.toString().padStart(2, "0"); // Hàm để thêm số 0 vào trước nếu cần
+        
+            return {
+                day: padZero(date.getDate()),
+                month: padZero(date.getMonth() + 1),
+                year: date.getFullYear(),
+            };
         },
         // Sets sidebar visibility (open, close, toggle)
         sidebar(payload) {

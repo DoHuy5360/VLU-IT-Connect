@@ -67,11 +67,11 @@
                         <strong> {{ featuredArticle?.author }}</strong>
                     </div>
                     <hr />
-                    <div class="mt-4">
+                    <!-- <div class="mt-4">
                         <h3>{{ store.isVietNamese() ? "Đánh giá nội dung bài viết" : "Rating" }}</h3>
                         <RatingBlog />
                     </div>
-                    <hr />
+                    <hr /> -->
                     <div class="mt-4">
                         <CommentView :postId="featuredArticle?.id" :allowComment="featuredArticle.allowComment" :commentCensorship="featuredArticle.commentCensorship" />
                     </div>

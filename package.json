@@ -19,6 +19,7 @@
         "not Explorer <= 11"
     ],
     "dependencies": {
+        "@azure/msal-browser": "^3.28.1",
         "@chenfengyuan/vue-countdown": "^2.1.1",
         "@ckeditor/ckeditor5-build-balloon": "^38.1.0",
         "@ckeditor/ckeditor5-build-balloon-block": "^38.1.0",

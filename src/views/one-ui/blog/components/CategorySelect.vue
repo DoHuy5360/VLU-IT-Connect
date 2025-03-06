@@ -12,17 +12,14 @@
 
 <script setup>
 import { ref, onMounted, watch } from "vue";
-import axios from "axios";
+import { authRequest } from "../../accountmanager/service/axiosConfig";
 
 const categories = ref([]);
 const selectedCategory = ref("");
 
-const token = localStorage.getItem("authToken");
-
 onMounted(() => {
-    axios
+    authRequest
         .get("/Categories/getallcategories", {
-            headers: { Authorization: `Bearer ${token}` },
             params: {
                 cateName: "",
                 indexPage: 1,

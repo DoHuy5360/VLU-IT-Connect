@@ -5,10 +5,10 @@ import { useTemplateStore } from "@/stores/template";
 
 import BaseLayout from "@/layouts/BaseLayout.vue";
 import BaseNavigation from "@/components/BaseNavigation.vue";
-
+import { useAuth } from "@/config/useAuth";
+const { logout } = useAuth();
 // Main store
 const store = useTemplateStore();
-const router = useRouter();
 const isLoading = ref(false);
 
 // Set default elements for this layout
@@ -23,23 +23,9 @@ store.setLayout({
 store.headerStyle({ mode: "light" });
 store.mainContent({ mode: "narrow" });
 
-// 🔍 Kiểm tra nếu không có token thì chuyển hướng sang Sign In
-onMounted(() => {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-        console.warn("🚫 Không tìm thấy token! Chuyển hướng đến trang đăng nhập.");
-        router.push("/auth/signin");
-    }
-});
-
-function handleLogout() {
-    isLoading.value = true;
-
-    // Perform logout
-    localStorage.removeItem("authToken"); // Xóa token khỏi localStorage
-    router.push("/auth/signin"); // Chuyển hướng về trang đăng nhập
-
-    isLoading.value = false; // Reset loading state
+async function handleLogout() {
+    sessionStorage.clear();
+    await logout();
 }
 </script>
 <template>

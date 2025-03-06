@@ -46,16 +46,16 @@
                                 <DatasetItem tag="tbody" class="fs-sm">
                                     <template #default="{ row, rowIndex }">
                                         <tr>
-                                            <th scope="row">{{ rowIndex + 1 }}</th>
-                                            <td style="">
-                                                <RouterLink :to="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer">{{
-                                                    store.truncateText(row.title, 100)
-                                                }}</RouterLink>
+                                            <th scope="row">{{ row.STT }}</th>
+                                            <td class="truncate-cell">
+                                                <div class="truncate-text" :title="row.Title">
+                                                    {{ row.Title }}
+                                                </div>
                                             </td>
-                                            <td>{{ row.totalAccess }}</td>
-                                            <td>{{ row.accessProportion }}</td>
-                                            <td>{{ row.totalComment }}</td>
-                                            <td>{{ row.commentProportion }}</td>
+                                            <td>{{ row.TotalViewCount }}</td>
+                                            <td>{{ row.ViewPercentage }}%</td>
+                                            <td>{{ row.TotalCommentCount }}</td>
+                                            <td>{{ row.CommentPercentage }}%</td>
                                         </tr>
                                     </template>
                                 </DatasetItem>
@@ -82,10 +82,48 @@ import { useTemplateStore } from "@/stores/template";
 import FlatPickr from "vue-flatpickr-component";
 
 const store = useTemplateStore();
-
 const posts = ref([]);
 const loading = ref(true);
 const searchingPosts = ref([]);
+
+async function getrepsost() {
+    try {
+        loading.value = true;
+        const response = await authRequest.get("/Report/combined-statistics");
+
+        posts.value = response.data.data.$values;
+
+    } catch (error) {
+        console.error("Lỗi khi gọi API:", error);
+        store.alert({
+            title: "Lỗi",
+            text: "Không thể tải dữ liệu báo cáo. Vui lòng thử lại sau.",
+            icon: "error",
+        });
+    } finally {
+        loading.value = false;
+    }
+}
+
+async function exportReport() {
+    try {
+        const response = await authRequest.get("/ExportExcel/combined-statistics", {
+            headers: {
+                Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            },
+            responseType: "blob"
+        });
+
+        store.downloadFile(response.data)
+    } catch (error) {
+        console.error("Lỗi khi xuất báo cáo:", error);
+        store.alert({
+            title: "Lỗi xuất báo cáo",
+            text: "Không thể xuất báo cáo. Vui lòng thử lại sau.",
+            icon: "error",
+        });
+    }
+}
 
 function normalizeString(str) {
     // Chuyển đổi thành chữ thường và loại bỏ dấu
@@ -101,13 +139,14 @@ function containsSubstring(x, y) {
 
     return sanitizedY.includes(sanitizedX);
 }
+
 function search(input) {
     const searchValue = input.target.value;
     if (searchValue === "") {
         searchingPosts.value = [];
     } else {
         if (posts.value.length != 0) {
-            searchingPosts.value = posts.value.filter((post) => containsSubstring(searchValue, post.title));
+            searchingPosts.value = posts.value.filter((post) => containsSubstring(searchValue, post.Title));
         }
     }
 }
@@ -122,112 +161,51 @@ const toDate = reactive({
     config: { dateFormat: "d-m-Y", maxDate: "today" },
 });
 
-onMounted(async () => {
-    try {
-        const response = await authRequest.get("/admin/posts?PageNumber=1&PageSize=99999");
-        // posts.value = response.data.data.$values.map((post) => ({
-        //     id: post.id,
-        //     author: post.author,
-        //     slug: post.slug,
-        //     title: post.title,
-        //     isPublished: post.published,
-        //     publishDate: store.formatDate(post.publishedAt),
-        //     createdAt: store.formatDate(post.createdAt),
-        //     metadata: post.metadata,
-        //     category: post.categoryName,
-        // }));
-        posts.value = [
-            { title: "Cách hách VLU 1", totalAccess: 1023, totalComment: 239, accessProportion: 19, commentProportion: 29 },
-            { title: "Cách hách VLU 2", totalAccess: 876, totalComment: 154, accessProportion: 39, commentProportion: 49 },
-            { title: "Cách hách VLU 3", totalAccess: 583, totalComment: 45, accessProportion: 59, commentProportion: 69 },
-            { title: "Cách hách VLU 4", totalAccess: 1290, totalComment: 320, accessProportion: 79, commentProportion: 89 },
-            { title: "Cách hách VLU 5", totalAccess: 765, totalComment: 120, accessProportion: 99, commentProportion: 109 },
-            { title: "Cách hách VLU 6", totalAccess: 943, totalComment: 203, accessProportion: 119, commentProportion: 129 },
-            { title: "Cách hách VLU 7", totalAccess: 432, totalComment: 87, accessProportion: 139, commentProportion: 149 },
-            { title: "Cách hách VLU 8", totalAccess: 1123, totalComment: 99, accessProportion: 159, commentProportion: 169 },
-            { title: "Cách hách VLU 9", totalAccess: 654, totalComment: 75, accessProportion: 179, commentProportion: 189 },
-            { title: "Cách hách VLU 10", totalAccess: 890, totalComment: 150, accessProportion: 199, commentProportion: 209 },
-            { title: "Cách hách VLU 11", totalAccess: 1024, totalComment: 200, accessProportion: 219, commentProportion: 229 },
-            { title: "Cách hách VLU 12", totalAccess: 1100, totalComment: 280, accessProportion: 239, commentProportion: 249 },
-            { title: "Cách hách VLU 13", totalAccess: 500, totalComment: 60, accessProportion: 259, commentProportion: 269 },
-            { title: "Cách hách VLU 14", totalAccess: 1300, totalComment: 310, accessProportion: 279, commentProportion: 289 },
-            { title: "Cách hách VLU 15", totalAccess: 720, totalComment: 190, accessProportion: 299, commentProportion: 309 },
-            { title: "Cách hách VLU 16", totalAccess: 850, totalComment: 130, accessProportion: 319, commentProportion: 329 },
-            { title: "Cách hách VLU 17", totalAccess: 645, totalComment: 80, accessProportion: 339, commentProportion: 349 },
-            { title: "Cách hách VLU 18", totalAccess: 1150, totalComment: 245, accessProportion: 359, commentProportion: 369 },
-            { title: "Cách hách VLU 19", totalAccess: 930, totalComment: 170, accessProportion: 379, commentProportion: 389 },
-            { title: "Cách hách VLU 20", totalAccess: 800, totalComment: 190, accessProportion: 399, commentProportion: 409 },
-        ];
-    } catch (error) {
-        switch (error.code) {
-            case "ERR_NETWORK":
-                store.signOut();
-                break;
-            default:
-                console.error("Error fetching posts:", error);
-                break;
-        }
-    } finally {
-        loading.value = false;
-    }
-});
-
-function exportReport() {
-    console.log("Export");
-}
-
-const swalConfirm = async (id) => {
-    const confirmation = await Swal.fire({
-        title: "Bạn có chắc chắn?",
-        text: "Hành động này không thể hoàn tác.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Đồng ý xóa!",
-        cancelButtonText: "Hủy",
+// Gọi API khi component được mount
+onMounted(() => {
+    getrepsost();
+    // Remove labels from
+    document.querySelectorAll("#datasetLength label").forEach((el) => {
+        el.remove();
     });
 
-    if (confirmation.isConfirmed) {
-        try {
-            loading.value = true;
-            await authRequest.delete(`/admin/posts/${id}`);
-            posts.value = posts.value.filter((user) => user.id !== id);
-            Swal.fire("Đã xóa!", `Bài viết với ID: ${id} đã được xóa.`, "success");
-        } catch (error) {
-            Swal.fire("Lỗi", "Xóa bài viết thất bại. Vui lòng thử lại.", "error");
-            console.error("Error deleting post:", error);
-        } finally {
-            loading.value = false;
-        }
-    }
-};
+    // Replace select classes
+    let selectLength = document.querySelector("#datasetLength select");
+
+    selectLength.classList = "";
+    selectLength.classList.add("form-select");
+    selectLength.style.width = "80px";
+});
+
 // Helper variables
 const cols = reactive([
     {
         name: "Tiêu đề",
-        field: "title",
+        field: "Title",
         sort: "",
     },
     {
         name: "Tổng số lượt truy cập",
-        field: "totalAccess",
+        field: "TotalViewCount",
         sort: "",
     },
     {
-        name: "Tỷ lệ truy cập",
-        field: "accessProportion",
+        name: "Tỷ lệ truy cập (%)",
+        field: "ViewPercentage",
         sort: "",
     },
     {
         name: "Tổng số bình luận",
-        field: "totalComment",
+        field: "TotalCommentCount",
         sort: "",
     },
     {
-        name: "Tỷ lệ bình luận",
-        field: "commentProportion",
+        name: "Tỷ lệ bình luận (%)",
+        field: "CommentPercentage",
         sort: "",
     },
 ]);
+
 // Apply a few Bootstrap 5 optimizations
 onMounted(() => {
     // Remove labels from
@@ -242,6 +220,7 @@ onMounted(() => {
     selectLength.classList.add("form-select");
     selectLength.style.width = "80px";
 });
+
 // Sort by functionality
 const sortBy = computed(() => {
     return cols.reduce((acc, o) => {
@@ -251,6 +230,7 @@ const sortBy = computed(() => {
         return acc;
     }, []);
 });
+
 // On sort th click
 function onSort(event, i) {
     let toset;
@@ -285,10 +265,11 @@ function onSort(event, i) {
     box-sizing: border-box;
     position: relative;
     display: block;
-    transform: scale(1);
+    transform: scale(var(--ggs, 1));
     width: 22px;
     height: 22px;
 }
+
 .gg-select::after,
 .gg-select::before {
     content: "";
@@ -300,30 +281,65 @@ function onSort(event, i) {
     left: 7px;
     transform: rotate(-45deg);
 }
-.gg-select::before {
-    border-left: 2px solid;
-    border-bottom: 2px solid;
-    bottom: 4px;
-    opacity: 0.3;
-}
+
 .gg-select::after {
-    border-right: 2px solid;
+    border-bottom: 2px solid;
+    border-left: 2px solid;
+    bottom: 4px;
+}
+
+.gg-select::before {
     border-top: 2px solid;
+    border-right: 2px solid;
     top: 4px;
+}
+
+.hover_underline:hover {
+    text-decoration: underline;
+}
+
+.sort {
+    cursor: pointer;
+}
+
+.sort.asc .gg-select::after {
+    opacity: 1;
+}
+
+.sort.asc .gg-select::before {
     opacity: 0.3;
 }
-th.sort {
-    cursor: pointer;
-    user-select: none;
-    &.asc {
-        .gg-select::after {
-            opacity: 1;
-        }
-    }
-    &.desc {
-        .gg-select::before {
-            opacity: 1;
-        }
-    }
+
+.sort.desc .gg-select::after {
+    opacity: 0.3;
+}
+
+.sort.desc .gg-select::before {
+    opacity: 1;
+}
+
+/* Styles for truncating text */
+.truncate-cell {
+    max-width: 300px; /* Adjust this width as needed */
+    position: relative;
+}
+
+.truncate-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.truncate-text:hover {
+    white-space: normal;
+    overflow: visible;
+    position: relative;
+    z-index: 1;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 5px;
+    transition: all 0.3s ease;
 }
 </style>

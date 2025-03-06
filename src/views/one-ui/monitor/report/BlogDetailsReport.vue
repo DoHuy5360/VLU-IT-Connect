@@ -6,6 +6,12 @@
                 Thêm bài viết mới
             </button>
         </template> -->
+        <template #extra>
+            <button type="button" class="btn btn-success d-flex align-items-center" @click="exportReport">
+                <i class="fa fa-file-excel opacity-50 me-2"></i>
+                Xuất kết quả
+            </button>
+        </template>
     </BasePageHeading>
 
     <div class="content">
@@ -46,14 +52,14 @@
                                 <DatasetItem tag="tbody" class="fs-sm">
                                     <template #default="{ row, rowIndex }">
                                         <tr>
-                                            <th scope="row">{{ rowIndex + 1 }}</th>
-                                            <td style="">
-                                                <RouterLink :to="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer">{{
-                                                    store.truncateText(row.title, 100)
-                                                }}</RouterLink>
+                                            <th scope="row">{{ row.STT }}</th>
+                                            <td class="">
+                                                <div class="" :title="row.Title">
+                                                    {{ row.Title }}
+                                                </div>
                                             </td>
-                                            <td>{{ row.totalAccess }}</td>
-                                            <td>{{ row.totalComment }}</td>
+                                            <td>{{ row.TotalViewCount }}</td>
+                                            <td>{{ row.TotalCommentCount }}</td>
                                         </tr>
                                     </template>
                                 </DatasetItem>
@@ -80,10 +86,54 @@ import { useTemplateStore } from "@/stores/template";
 import FlatPickr from "vue-flatpickr-component";
 
 const store = useTemplateStore();
-
 const posts = ref([]);
 const loading = ref(true);
 const searchingPosts = ref([]);
+const datas = ref(null);
+
+async function getrepsost() {
+    try {
+        loading.value = true;
+        const response = await authRequest.get("/Report/combined-statistics");
+
+        posts.value = response.data.data.$values;
+    } catch (error) {
+        console.error("Lỗi khi gọi API:", error);
+        store.alert({
+            title: "Lỗi",
+            text: "Không thể tải dữ liệu báo cáo. Vui lòng thử lại sau.",
+            icon: "error",
+        });
+    } finally {
+        loading.value = false;
+    }
+}
+
+// Gọi API khi component được mount
+onMounted(() => {
+    getrepsost();
+});
+
+// xử lý xuất kết quả
+async function exportReport() {
+    try {
+        const response = await authRequest.get("/ExportExcel/most-viewed-posts", {
+            headers: {
+                Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            },
+            responseType: 'blob'
+        });
+
+        store.downloadFile(response.data)
+    } catch (error) {
+        console.error("Lỗi khi xuất báo cáo:", error);
+        store.alert({
+            title: "Lỗi xuất báo cáo",
+            text: "Không thể xuất báo cáo. Vui lòng thử lại sau.",
+            icon: "error",
+        });
+    }
+}
 
 function normalizeString(str) {
     // Chuyển đổi thành chữ thường và loại bỏ dấu
@@ -105,7 +155,7 @@ function search(input) {
         searchingPosts.value = [];
     } else {
         if (posts.value.length != 0) {
-            searchingPosts.value = posts.value.filter((post) => containsSubstring(searchValue, post.title));
+            searchingPosts.value = posts.value.filter((post) => containsSubstring(searchValue, post.Title));
         }
     }
 }
@@ -120,105 +170,21 @@ const toDate = reactive({
     config: { dateFormat: "d-m-Y", maxDate: "today" },
 });
 
-onMounted(async () => {
-    try {
-        const response = await authRequest.get("/admin/posts?PageNumber=1&PageSize=99999");
-        // posts.value = response.data.data.$values.map((post) => ({
-        //     id: post.id,
-        //     author: post.author,
-        //     slug: post.slug,
-        //     title: post.title,
-        //     isPublished: post.published,
-        //     publishDate: store.formatDate(post.publishedAt),
-        //     createdAt: store.formatDate(post.createdAt),
-        //     metadata: post.metadata,
-        //     category: post.categoryName,
-        // }));
-        posts.value = [
-            { title: "Cách hách VLU 1", totalAccess: 1023, totalComment: 239 },
-            { title: "Cách hách VLU 2", totalAccess: 876, totalComment: 154 },
-            { title: "Cách hách VLU 3", totalAccess: 583, totalComment: 45 },
-            { title: "Cách hách VLU 4", totalAccess: 1290, totalComment: 320 },
-            { title: "Cách hách VLU 5", totalAccess: 765, totalComment: 120 },
-            { title: "Cách hách VLU 6", totalAccess: 943, totalComment: 203 },
-            { title: "Cách hách VLU 7", totalAccess: 432, totalComment: 87 },
-            { title: "Cách hách VLU 8", totalAccess: 1123, totalComment: 99 },
-            { title: "Cách hách VLU 9", totalAccess: 654, totalComment: 75 },
-            { title: "Cách hách VLU 10", totalAccess: 890, totalComment: 150 },
-            { title: "Cách hách VLU 11", totalAccess: 1024, totalComment: 200 },
-            { title: "Cách hách VLU 12", totalAccess: 1100, totalComment: 280 },
-            { title: "Cách hách VLU 13", totalAccess: 500, totalComment: 60 },
-            { title: "Cách hách VLU 14", totalAccess: 1300, totalComment: 310 },
-            { title: "Cách hách VLU 15", totalAccess: 720, totalComment: 190 },
-            { title: "Cách hách VLU 16", totalAccess: 850, totalComment: 130 },
-            { title: "Cách hách VLU 17", totalAccess: 645, totalComment: 80 },
-            { title: "Cách hách VLU 18", totalAccess: 1150, totalComment: 245 },
-            { title: "Cách hách VLU 19", totalAccess: 930, totalComment: 170 },
-            { title: "Cách hách VLU 20", totalAccess: 800, totalComment: 190 },
-        ];
-    } catch (error) {
-        switch (error.code) {
-            case "ERR_NETWORK":
-                store.signOut();
-                break;
-            default:
-                console.error("Error fetching posts:", error);
-                break;
-        }
-    } finally {
-        loading.value = false;
-    }
-});
-
-const isAllowComment = (metadata) => {
-    try {
-        const metaObj = JSON.parse(metadata);
-        return metaObj.EnableComments;
-    } catch (error) {
-        console.error("Error parsing metadata:", error);
-        return false;
-    }
-};
-
-const swalConfirm = async (id) => {
-    const confirmation = await Swal.fire({
-        title: "Bạn có chắc chắn?",
-        text: "Hành động này không thể hoàn tác.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Đồng ý xóa!",
-        cancelButtonText: "Hủy",
-    });
-
-    if (confirmation.isConfirmed) {
-        try {
-            loading.value = true;
-            await authRequest.delete(`/admin/posts/${id}`);
-            posts.value = posts.value.filter((user) => user.id !== id);
-            Swal.fire("Đã xóa!", `Bài viết với ID: ${id} đã được xóa.`, "success");
-        } catch (error) {
-            Swal.fire("Lỗi", "Xóa bài viết thất bại. Vui lòng thử lại.", "error");
-            console.error("Error deleting post:", error);
-        } finally {
-            loading.value = false;
-        }
-    }
-};
 // Helper variables
 const cols = reactive([
     {
         name: "Tiêu đề",
-        field: "title",
+        field: "Title",
         sort: "",
     },
     {
         name: "Tổng số lượt truy cập",
-        field: "totalAccess",
+        field: "TotalViewCount",
         sort: "",
     },
     {
         name: "Tổng số bình luận",
-        field: "totalComment",
+        field: "TotalCommentCount",
         sort: "",
     },
 ]);
@@ -279,10 +245,11 @@ function onSort(event, i) {
     box-sizing: border-box;
     position: relative;
     display: block;
-    transform: scale(1);
+    transform: scale(var(--ggs, 1));
     width: 22px;
     height: 22px;
 }
+
 .gg-select::after,
 .gg-select::before {
     content: "";
@@ -294,30 +261,40 @@ function onSort(event, i) {
     left: 7px;
     transform: rotate(-45deg);
 }
-.gg-select::before {
-    border-left: 2px solid;
-    border-bottom: 2px solid;
-    bottom: 4px;
-    opacity: 0.3;
-}
+
 .gg-select::after {
-    border-right: 2px solid;
+    border-bottom: 2px solid;
+    border-left: 2px solid;
+    bottom: 4px;
+}
+
+.gg-select::before {
     border-top: 2px solid;
+    border-right: 2px solid;
     top: 4px;
+}
+
+.hover_underline:hover {
+    text-decoration: underline;
+}
+
+.sort {
+    cursor: pointer;
+}
+
+.sort.asc .gg-select::after {
+    opacity: 1;
+}
+
+.sort.asc .gg-select::before {
     opacity: 0.3;
 }
-th.sort {
-    cursor: pointer;
-    user-select: none;
-    &.asc {
-        .gg-select::after {
-            opacity: 1;
-        }
-    }
-    &.desc {
-        .gg-select::before {
-            opacity: 1;
-        }
-    }
+
+.sort.desc .gg-select::after {
+    opacity: 0.3;
+}
+
+.sort.desc .gg-select::before {
+    opacity: 1;
 }
 </style>

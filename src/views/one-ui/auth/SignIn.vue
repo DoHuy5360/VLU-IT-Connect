@@ -11,13 +11,13 @@
             <div class="row justify-content-center push">
                 <div class="col-md-8 col-lg-6 col-xl-4">
                     <!-- Sign In Block -->
-                    <BaseBlock title="" class="mb-0">
-                        <div class="p-sm-3 px-lg-4 px-xxl-5 py-lg-5">
-                            <div class="text-center mb-4">
+                    <BaseBlock title="IT-Connect" class="mb-0">
+                        <div class="p-sm-3 px-lg-4 px-xxl-5 py-lg-5 py-6">
+                            <div class="text-center mb-6">
                                 <img :src="store.getBrandAsset('/30_years_vertical_version.png')" alt="VLU Logo" style="max-width: 80%; height: auto" />
                             </div>
                             <p class="fw-medium text-muted text-center">Vui lòng đăng nhập</p>
-                            <form @submit.prevent="onSubmit">
+                            <!-- <form @submit.prevent="onSubmit">
                                 <div class="py-3">
                                     <div class="mb-4">
                                         <label hidden for="email">email</label>
@@ -53,24 +53,20 @@
                                     </div>
                                     <div v-if="state.loginError" class="text-danger mt-2 text-center mb-3">Đăng nhập thất bại, vui lòng kiểm tra lại Email và Mật khẩu</div>
                                     <div class="mb-4 d-flex justify-content-between align-items-center">
-                                        <div class="form-check">
-                                            <!-- <input class="form-check-input" type="checkbox" />
-                      <label class="form-check-label">Nhớ tôi</label> -->
-                                        </div>
                                         <button type="submit" class="btn btn-alt-success" :disabled="isLoading.login">Đăng nhập</button>
                                     </div>
                                     <div class="text-center my-3">
                                         <hr class="my-4" />
                                         <span class="bg-white px-3">Hoặc</span>
                                     </div>
-                                    <div class="text-center">
-                                        <button type="button" class="btn btn-alt-primary btn-lg px-4" :disabled="isLoading.microsoft" @click="signInWithMicrosoft">
-                                            <i class="fab fa-microsoft me-3"></i>
-                                            Đăng nhập bằng Microsoft
-                                        </button>
-                                    </div>
                                 </div>
-                            </form>
+                            </form> -->
+                            <div class="text-center mt-4">
+                                <button type="button" class="btn btn-alt-success btn-lg px-4" :disabled="isLoading.microsoft" @click="handleLoginByMicrosoft">
+                                    <i class="fab fa-microsoft me-3"></i>
+                                    Đăng nhập bằng Microsoft
+                                </button>
+                            </div>
                         </div>
                     </BaseBlock>
                 </div>
@@ -80,16 +76,32 @@
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { reactive, onMounted } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import { useRouter } from "vue-router";
 import { gateRequest } from "../accountmanager/service/axiosConfig";
 import { useTemplateStore } from "@/stores/template";
+import { msalEntity } from "../../../config/msalConfig";
+import { useAuth } from "../../../config/useAuth";
+
+const { login, logout, handleRedirect } = useAuth();
 
 const store = useTemplateStore();
 
 const router = useRouter();
+
+const handleLoginByMicrosoft = async () => {
+    await login();
+};
+
+onMounted(async () => {
+    await msalEntity.initialize();
+    const isAuthenticate = await handleRedirect();
+    if (isAuthenticate) {
+        router.push({ name: "index" });
+    }
+});
 
 const state = reactive({
     email: "",
@@ -133,15 +145,6 @@ const onSubmit = async () => {
         state.loginError = true;
     } finally {
         isLoading.login = false;
-    }
-};
-
-const signInWithMicrosoft = async () => {
-    try {
-        console.log("Microsoft login clicked");
-    } catch (error) {
-        alert("Microsoft login failed.");
-        console.error("Microsoft login failed:", error.response?.data || error.message);
     }
 };
 </script>

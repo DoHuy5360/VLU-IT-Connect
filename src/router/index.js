@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import NProgress from "nprogress/nprogress.js";
 import De from "../views/De.vue";
+import { msalEntity } from "../config/msalConfig";
 
 // Import components
 const WelcomeAdmin = () => import("@/views/one-ui/WelcomeAdmin.vue");
@@ -66,6 +67,7 @@ const routes = [
     {
         path: "/administrator",
         name: "AdminPage",
+        meta: { requiresAuth: true },
         component: AdminLayout,
         children: [
             {
@@ -289,43 +291,37 @@ const router = createRouter({
 // NProgress configuration
 NProgress.configure({ showSpinner: false });
 
-// Session timeout setup
-const SESSION_TIMEOUT_MINUTES = 1000;
-const SESSION_TIMEOUT_MS = SESSION_TIMEOUT_MINUTES * 60 * 1000;
-
-let sessionTimeout;
-
-const resetSessionTimeout = () => {
-    clearTimeout(sessionTimeout);
-    sessionTimeout = setTimeout(() => {
-        localStorage.removeItem("authToken");
-        router.push({ name: "AuthSignIn" });
-        alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.");
-    }, SESSION_TIMEOUT_MS);
-};
-
-// Start/reset session timeout on each interaction
-window.addEventListener("mousemove", resetSessionTimeout);
-window.addEventListener("keydown", resetSessionTimeout);
-window.addEventListener("click", resetSessionTimeout);
-resetSessionTimeout();
-
 router.beforeResolve((to, from, next) => {
     if (to.name) {
         NProgress.start();
     }
 
-    // Kiểm tra xác thực
-    const isAuthenticated = !!localStorage.getItem("authToken");
-
-    // Nếu người dùng truy cập trang quản trị nhưng chưa đăng nhập
-    if (to.path.startsWith("/administrator") && !isAuthenticated) {
-        return next({ name: "AuthSignIn" });
-    }
-
     next();
 });
+// Navigation Guard để kiểm tra trạng thái đăng nhập
+router.beforeEach((to, from, next) => {
+    const account = msalEntity.getActiveAccount(); // Kiểm tra user đã đăng nhập chưa
 
+    // const token = localStorage.getItem("authToken");
+
+    // if (to.meta.requiresAuth && token == null) {
+    //     if (to.meta.requiresAuth && !account) {
+    //         // Nếu route yêu cầu đăng nhập nhưng không có account → Chuyển hướng đến login
+    //         next("/auth/signin");
+    //     } else {
+    //         next();
+    //     }
+    // } else {
+    //     next();
+    // }
+
+    if (to.meta.requiresAuth && !account) {
+        // Nếu route yêu cầu đăng nhập nhưng không có account → Chuyển hướng đến login
+        next("/auth/signin");
+    } else {
+        next();
+    }
+});
 router.afterEach(() => {
     NProgress.done();
 });

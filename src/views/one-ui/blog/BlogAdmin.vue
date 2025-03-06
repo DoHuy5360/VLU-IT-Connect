@@ -135,7 +135,7 @@ onMounted(async () => {
     } catch (error) {
         switch (error.code) {
             case "ERR_NETWORK":
-                handleLogout();
+                // handleLogout();
                 break;
             default:
                 console.error("Error fetching posts:", error);

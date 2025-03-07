@@ -7,6 +7,7 @@ import { msalEntity } from "../config/msalConfig";
 const WelcomeAdmin = () => import("@/views/one-ui/WelcomeAdmin.vue");
 const Home = () => import("@/views/it-connect/Home.vue");
 const RequestSupport = () => import("@/views/it-connect/RequestSupport.vue");
+const Help = () => import("@/views/it-connect/Help.vue");
 const Categories = () => import("@/views/it-connect/Categories.vue");
 const Videos = () => import("@/views/it-connect/Videos.vue");
 const Search = () => import("@/views/it-connect/Search.vue");
@@ -238,6 +239,11 @@ const routes = [
                 path: "support",
                 name: "RequestSupport",
                 component: RequestSupport,
+            },
+            {
+                path: "help",
+                name: "Help",
+                component: Help,
             },
             {
                 path: "categories",

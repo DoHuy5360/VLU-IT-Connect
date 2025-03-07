@@ -1,7 +1,7 @@
 <template>
-    <BasePageHeading title="Báo Cáo Chi Tiết Bài Viết" subtitle="">
+    <BasePageHeading title="Báo Cáo Số Liệu Các Bài Viết Được Quan Tâm" subtitle="">
         <template #extra>
-            <button type="button" class="btn btn-success d-flex align-items-center" @click="exportReport">
+            <button type="button" class="btn btn-success d-flex align-items-center" @click="exportTopBlogsReport">
                 <i class="fa fa-file-excel opacity-50 me-2"></i>
                 Xuất kết quả
             </button>
@@ -15,15 +15,16 @@
                     <div id="datasetLength" class="col-md-2 py-2">
                         <DatasetShow />
                     </div>
-                    <div class="col-3 d-flex gap-2 align-items-center">
+                    <div class="col"></div>
+                    <div class="col-2 d-flex gap-2 align-items-center">
                         <label for="">Từ</label>
-                        <FlatPickr id="example-flatpickr-default" class="form-control" placeholder="D-M-Y" v-model="fromDate.selectedDate" :config="fromDate.config" />
+                        <FlatPickr id="example-flatpickr-default" class="form-control" placeholder="D-M-Y" v-model="fromDate.selectedDate" :config="fromDate.config" @change="getMostViewBlogReport"/>
                     </div>
-                    <div class="col-3 d-flex gap-2 align-items-center">
+                    <div class="col-2 d-flex gap-2 align-items-center">
                         <label for="">Đến</label>
-                        <FlatPickr id="example-flatpickr-default" class="form-control" placeholder="D-M-Y" v-model="toDate.selectedDate" :config="toDate.config" />
+                        <FlatPickr id="example-flatpickr-default" class="form-control" placeholder="D-M-Y" v-model="toDate.selectedDate" :config="toDate.config" @change="getMostViewBlogReport"/>
                     </div>
-                    <div class="col-md-4 py-2">
+                    <div class="col-md-3 py-2">
                         <!-- <DatasetSearch ds-search-placeholder="Tìm kiếm..." /> -->
 
                         <label hidden for="searchBlogInput">Tìm kiếm bài viết</label>
@@ -43,15 +44,16 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <DatasetItem tag="tbody" class="fs-sm">
+                                <tbody v-if="searchingPosts.length == 0 && posts.length == 0">
+                                    <tr>
+                                        <td colspan="6" class="text-center">Không có dữ liệu</td>
+                                    </tr>
+                                </tbody>
+                                <DatasetItem v-else tag="tbody" class="fs-sm">
                                     <template #default="{ row, rowIndex }">
                                         <tr>
-                                            <th scope="row">{{ row.STT }}</th>
-                                            <td class="truncate-cell">
-                                                <div class="truncate-text" :title="row.Title">
-                                                    {{ row.Title }}
-                                                </div>
-                                            </td>
+                                            <th scope="row">{{ rowIndex + 1 }}</th>
+                                            <td>{{ row.Title }}</td>
                                             <td>{{ row.TotalViewCount }}</td>
                                             <td>{{ row.ViewPercentage }}%</td>
                                             <td>{{ row.TotalCommentCount }}</td>
@@ -74,8 +76,6 @@
 
 <script setup>
 import { ref, computed, onMounted, reactive } from "vue";
-import Swal from "sweetalert2";
-import { RouterLink, useRouter } from "vue-router";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
 import { authRequest } from "../../accountmanager/service/axiosConfig";
 import { useTemplateStore } from "@/stores/template";
@@ -86,13 +86,18 @@ const posts = ref([]);
 const loading = ref(true);
 const searchingPosts = ref([]);
 
-async function getrepsost() {
+async function getMostViewBlogReport() {
     try {
         loading.value = true;
-        const response = await authRequest.get("/Report/combined-statistics");
+        const params = {
+            fromDate: store.YYYYmmddFormat(fromDate.selectedDate),
+            toDate: store.YYYYmmddFormat(toDate.selectedDate),
+        };
+        const response = await authRequest.get("/Dashboard/most-viewed-posts", {
+            params,
+        });
 
         posts.value = response.data.data.$values;
-
     } catch (error) {
         console.error("Lỗi khi gọi API:", error);
         store.alert({
@@ -105,16 +110,24 @@ async function getrepsost() {
     }
 }
 
-async function exportReport() {
+async function exportTopBlogsReport() {
     try {
-        const response = await authRequest.get("/ExportExcel/combined-statistics", {
+        const params = {
+            fromDate: store.YYYYmmddFormat(fromDate.selectedDate),
+            toDate: store.YYYYmmddFormat(toDate.selectedDate),
+        };
+        const response = await authRequest.get("/ExportExcel/most-viewed-posts", {
+            params,
             headers: {
                 Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             },
-            responseType: "blob"
+            responseType: "blob",
         });
+        const fileName =
+            (fromDate.selectedDate == null ? `${day}-${month}-${year}` : `${fromDate.selectedDate}_${toDate.selectedDate}`) +
+            "-IT-Connect_Bài_viết_được_quan_tâm.xlsx";
 
-        store.downloadFile(response.data)
+        store.downloadFile(response.data, fileName);
     } catch (error) {
         console.error("Lỗi khi xuất báo cáo:", error);
         store.alert({
@@ -150,20 +163,20 @@ function search(input) {
         }
     }
 }
-
+const { day, month, year } = store.getCurrentDateObject();
 // Flatpickr variables
 const fromDate = reactive({
     selectedDate: null,
     config: { dateFormat: "d-m-Y", maxDate: "today" },
 });
 const toDate = reactive({
-    selectedDate: null,
+    selectedDate: `${day}-${month}-${year}`,
     config: { dateFormat: "d-m-Y", maxDate: "today" },
 });
 
 // Gọi API khi component được mount
 onMounted(() => {
-    getrepsost();
+    getMostViewBlogReport();
     // Remove labels from
     document.querySelectorAll("#datasetLength label").forEach((el) => {
         el.remove();
@@ -316,30 +329,5 @@ function onSort(event, i) {
 
 .sort.desc .gg-select::before {
     opacity: 1;
-}
-
-/* Styles for truncating text */
-.truncate-cell {
-    max-width: 300px; /* Adjust this width as needed */
-    position: relative;
-}
-
-.truncate-text {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-}
-
-.truncate-text:hover {
-    white-space: normal;
-    overflow: visible;
-    position: relative;
-    z-index: 1;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    padding: 5px;
-    transition: all 0.3s ease;
 }
 </style>

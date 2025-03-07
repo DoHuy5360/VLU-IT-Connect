@@ -15,12 +15,12 @@
                 </CardData>
             </div>
             <div class="col-sm-6 col-xxl-3">
-                <CardData :value="amountOfview" label="Tổng số lượt truy cập">
+                <CardData :value="totalViews" label="Tổng số lượt truy cập">
                     <i class="si si-eye fs-3 text-primary"></i>
                 </CardData>
             </div>
             <div class="col-sm-6 col-xxl-3">
-                <CardData :value="amountOfcomment" label="Tổng số bình luận">
+                <CardData :value="totalComments" label="Tổng số bình luận">
                     <i class="si si-bubbles fs-3 text-primary"></i>
                 </CardData>
             </div>
@@ -60,35 +60,33 @@ Chart.defaults.plugins.tooltip.radius = 3;
 Chart.defaults.plugins.legend.labels.boxWidth = 10;
 
 const amountOfBlog = ref(0);
-const amountOfview = ref(0);
+const totalViews = ref(0);
 
-async function getPosts() {
-    const response = await authRequest.get(`/posts?PageNumber=1&PageSize=9999&IsAdmin=true`);
-    amountOfBlog.value = response.data.data.length;
-    //   console.log("bai viet", response.data.data.length);
+async function getTotalBlogs() {
+    const response = await authRequest.get(`/Dashboard/total-blogs`);
+    amountOfBlog.value = response.data
 }
-getPosts();
-const amountOfcomment = ref(0);
+getTotalBlogs();
+const totalComments = ref(0);
 
 async function getComments() {
-    const response = await authRequest.get(`/admin/comment`);
+    const response = await authRequest.get(`/Dashboard/total-comments`);
 
-    //   console.log("giá trị", response.data.$values.length);
-    amountOfcomment.value = response.data.$values.length;
+    totalComments.value = response.data;
 }
 getComments();
 
-const getviews = async () => {
+const getTotalViews = async () => {
     try {
-        const response = await authRequest.get(`/admin/posts/view-statistics`);
+        const response = await authRequest.get(`/Dashboard/total-views`);
 
-        amountOfview.value = response.data.data.totalViews
+        totalViews.value = response.data
     } catch (error) {
         console.error(error);
     }
 };
 
-getviews();
+getTotalViews();
 </script>
 
 <style lang="scss" scoped></style>

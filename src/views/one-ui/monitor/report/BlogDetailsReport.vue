@@ -21,15 +21,16 @@
                     <div id="datasetLength" class="col-md-2 py-2">
                         <DatasetShow />
                     </div>
-                    <div class="col-3 d-flex gap-2 align-items-center">
+                    <div class="col"></div>
+                    <div class="col-2 d-flex gap-2 align-items-center">
                         <label for="">Từ</label>
-                        <FlatPickr id="example-flatpickr-default" class="form-control" placeholder="D-M-Y" v-model="fromDate.selectedDate" :config="fromDate.config" />
+                        <FlatPickr id="example-flatpickr-default" class="form-control" placeholder="D-M-Y" v-model="fromDate.selectedDate" :config="fromDate.config" @change="getDetailsBlogReport" />
                     </div>
-                    <div class="col-3 d-flex gap-2 align-items-center">
+                    <div class="col-2 d-flex gap-2 align-items-center">
                         <label for="">Đến</label>
-                        <FlatPickr id="example-flatpickr-default" class="form-control" placeholder="D-M-Y" v-model="toDate.selectedDate" :config="toDate.config" />
+                        <FlatPickr id="example-flatpickr-default" class="form-control" placeholder="D-M-Y" v-model="toDate.selectedDate" :config="toDate.config" @change="getDetailsBlogReport" />
                     </div>
-                    <div class="col-md-4 py-2">
+                    <div class="col-md-3 py-2">
                         <!-- <DatasetSearch ds-search-placeholder="Tìm kiếm..." /> -->
 
                         <label hidden for="searchBlogInput">Tìm kiếm bài viết</label>
@@ -49,17 +50,19 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <DatasetItem tag="tbody" class="fs-sm">
+                                <tbody v-if="searchingPosts.length == 0 && posts.length == 0">
+                                    <tr>
+                                        <td colspan="5" class="text-center">Không có dữ liệu</td>
+                                    </tr>
+                                </tbody>
+                                <DatasetItem v-else tag="tbody" class="fs-sm">
                                     <template #default="{ row, rowIndex }">
                                         <tr>
-                                            <th scope="row">{{ row.STT }}</th>
-                                            <td class="">
-                                                <div class="" :title="row.Title">
-                                                    {{ row.Title }}
-                                                </div>
-                                            </td>
-                                            <td>{{ row.TotalViewCount }}</td>
-                                            <td>{{ row.TotalCommentCount }}</td>
+                                            <th style="width: 5%" scope="row">{{ rowIndex + 1 }}</th>
+                                            <td style="width: 50%">{{ row.PostTitle }}</td>
+                                            <td style="width: 35%">{{ row.CategoryName }}</td>
+                                            <td style="width: 5%">{{ row.ViewCount }}</td>
+                                            <td style="width: 5%">{{ row.CommentCount }}</td>
                                         </tr>
                                     </template>
                                 </DatasetItem>
@@ -78,8 +81,6 @@
 
 <script setup>
 import { ref, computed, onMounted, reactive } from "vue";
-import Swal from "sweetalert2";
-import { RouterLink, useRouter } from "vue-router";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
 import { authRequest } from "../../accountmanager/service/axiosConfig";
 import { useTemplateStore } from "@/stores/template";
@@ -89,12 +90,17 @@ const store = useTemplateStore();
 const posts = ref([]);
 const loading = ref(true);
 const searchingPosts = ref([]);
-const datas = ref(null);
 
-async function getrepsost() {
+async function getDetailsBlogReport() {
     try {
         loading.value = true;
-        const response = await authRequest.get("/Report/combined-statistics");
+
+        const params = {
+            fromDate: store.YYYYmmddFormat(fromDate.selectedDate),
+            toDate: store.YYYYmmddFormat(toDate.selectedDate),
+        };
+
+        const response = await authRequest.get("/Dashboard/post-detail-report", { params });
 
         posts.value = response.data.data.$values;
     } catch (error) {
@@ -111,20 +117,27 @@ async function getrepsost() {
 
 // Gọi API khi component được mount
 onMounted(() => {
-    getrepsost();
+    getDetailsBlogReport();
 });
 
 // xử lý xuất kết quả
 async function exportReport() {
     try {
-        const response = await authRequest.get("/ExportExcel/most-viewed-posts", {
+        const params = {
+            fromDate: store.YYYYmmddFormat(fromDate.selectedDate),
+            toDate: store.YYYYmmddFormat(toDate.selectedDate),
+        };
+        const response = await authRequest.get("/ExportExcel/blog-details", {
+            params,
             headers: {
                 Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             },
-            responseType: 'blob'
+            responseType: "blob",
         });
 
-        store.downloadFile(response.data)
+        const fileName = `${fromDate.selectedDate}_${toDate.selectedDate}` + "-IT-Connect-Báo_cáo_chi_tiết_bài_viết.xlsx";
+
+        store.downloadFile(response.data, fileName);
     } catch (error) {
         console.error("Lỗi khi xuất báo cáo:", error);
         store.alert({
@@ -159,14 +172,14 @@ function search(input) {
         }
     }
 }
-
+const { day, month, year } = store.getCurrentDateObject();
 // Flatpickr variables
 const fromDate = reactive({
-    selectedDate: null,
+    selectedDate: `01-${month}-${year}`,
     config: { dateFormat: "d-m-Y", maxDate: "today" },
 });
 const toDate = reactive({
-    selectedDate: null,
+    selectedDate: `${day}-${month}-${year}`,
     config: { dateFormat: "d-m-Y", maxDate: "today" },
 });
 
@@ -174,17 +187,22 @@ const toDate = reactive({
 const cols = reactive([
     {
         name: "Tiêu đề",
-        field: "Title",
+        field: "PostTitle",
         sort: "",
     },
     {
-        name: "Tổng số lượt truy cập",
-        field: "TotalViewCount",
+        name: "Thể loại",
+        field: "Category",
         sort: "",
     },
     {
-        name: "Tổng số bình luận",
-        field: "TotalCommentCount",
+        name: "Lượt truy cập",
+        field: "ViewCount",
+        sort: "",
+    },
+    {
+        name: "Lượt bình luận",
+        field: "CommentCount",
         sort: "",
     },
 ]);

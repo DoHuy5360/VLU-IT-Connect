@@ -15,15 +15,16 @@
                     <div id="datasetLength" class="col-md-2 py-2">
                         <DatasetShow />
                     </div>
-                    <div class="col-3 d-flex gap-2 align-items-center">
+                    <div class="col"></div>
+                    <div class="col-2 d-flex gap-2 align-items-center">
                         <label for="">Từ</label>
                         <FlatPickr id="example-flatpickr-default" class="form-control" placeholder="D-M-Y" v-model="fromDate.selectedDate" :config="fromDate.config" @change="getRedirects" />
                     </div>
-                    <div class="col-3 d-flex gap-2 align-items-center">
+                    <div class="col-2 d-flex gap-2 align-items-center">
                         <label for="">Đến</label>
                         <FlatPickr id="example-flatpickr-default" class="form-control" placeholder="D-M-Y" v-model="toDate.selectedDate" :config="toDate.config" @change="getRedirects" />
                     </div>
-                    <div class="col-md-4 py-2">
+                    <div class="col-md-3 py-2">
                         <label hidden for="searchBlogInput">Tìm kiếm URL</label>
                         <input id="searchBlogInput" type="text" @input="search" class="form-control" placeholder="Tìm kiếm..." />
                     </div>
@@ -97,7 +98,7 @@ function getTimeParams() {
 async function getRedirects() {
     try {
         loading.value = true;
-        const response = await authRequest.get("/Report/redirects", { params: getTimeParams() });
+        const response = await authRequest.get("/Dashboard/redirects", { params: getTimeParams() });
 
         posts.value = response.data.data.$values;
     } catch (error) {
@@ -122,7 +123,9 @@ async function exportReport() {
             responseType: "blob",
         });
 
-        const fileName = (fromDate.selectedDate==null || toDate.selectedDate==null ? `${day}-${month}-${year}` : `${fromDate.selectedDate}_${toDate.selectedDate}`) + "-IT-Connect-Báo_cáo_tần_suất_truy_cập_URL.xlsx"
+        const fileName =
+            (fromDate.selectedDate == null ? `${day}-${month}-${year}` : `${fromDate.selectedDate}_${toDate.selectedDate}`) +
+            "-IT-Connect-Báo_cáo_tần_suất_truy_cập_URL.xlsx";
 
         store.downloadFile(response.data, fileName);
     } catch (error) {

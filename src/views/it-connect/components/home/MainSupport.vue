@@ -45,18 +45,20 @@
                         </div>
                     </RouterLink>
                     <div class="col-sm-4 p-3">
-                        <img :src="store.getOtherAsset('/submit_a_ticket.png')" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
-                        <div class="d-flex flex-column mt-2">
-                            <b>{{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}</b>
-                            <span style="">{{
-                                store.isVietNamese()
-                                    ? "Hỗ trợ nhanh theo các danh mục dịch vụ Công nghệ thông tin sẵn có."
-                                    : "Quick support according to available Information Technology service categories."
-                            }}</span>
-                        </div>
+                        <RouterLink to="/support" class="hover_underline text-black">
+                            <img :src="store.getOtherAsset('/submit_a_ticket.png')" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
+                            <div class="d-flex flex-column mt-2">
+                                <b>{{ store.isVietNamese() ? "Yêu cầu hỗ trợ" : "Request support" }}</b>
+                                <span style="">{{
+                                    store.isVietNamese()
+                                        ? "Hỗ trợ nhanh theo các danh mục dịch vụ Công nghệ thông tin sẵn có."
+                                        : "Quick support according to available Information Technology service categories."
+                                }}</span>
+                            </div>
+                        </RouterLink>
                     </div>
                     <div class="col-sm-4 p-3">
-                        <RouterLink to="/support" class="hover_underline text-black">
+                        <RouterLink to="/help" class="hover_underline text-black">
                             <img :src="store.getOtherAsset('/request_something.png')" style="object-fit: cover; display: block; width: 100%; height: 120px" alt="" />
                             <div class="d-flex flex-column mt-2">
                                 <b>{{ store.isVietNamese() ? "Trợ giúp" : "Help" }}</b>

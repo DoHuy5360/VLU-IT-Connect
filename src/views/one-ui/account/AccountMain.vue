@@ -220,9 +220,9 @@ const deleteUser = async (id) => {
         if (result.isConfirmed) {
             try {
                 await authRequest.delete(`/UserManagement/users/${id}`);
-                await fetchUsers();
                 selectedUsers.value = [];
                 accountFiltered.value = [];
+                await fetchUsers();
                 Swal.fire("Deleted!", "Tài khoản đã được xóa.", "success");
             } catch (error) {
                 Swal.fire("Error", "Không thể xóa tài khoản.", "error");

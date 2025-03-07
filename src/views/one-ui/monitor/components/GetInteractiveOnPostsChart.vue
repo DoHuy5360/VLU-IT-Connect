@@ -14,7 +14,7 @@
         </template>
         <template #content>
             <div class="block-content p-1 text-center overflow-hidden">
-                <Line v-if="totalOrdersData.labels.length != 0" :data="totalOrdersData" :options="totalOrdersOptions" style="height: 90px" />
+                <Line v-if="totalOrdersData.labels.length != 0" :data="totalOrdersData" :options="totalOrdersOptions" />
                 <div v-else class="w-100 text-center py-5">
                     Không có dữ liệu thống kê từ <strong>{{ fromDate.selectedDate }}</strong> đến <strong>{{ toDate.selectedDate }}</strong>
                 </div>
@@ -190,6 +190,7 @@ const totalOrdersOptions = reactive({
             position: "top",
         },
         tooltip: {
+            enabled: true,
             callbacks: {
                 label: function (context) {
                     let label = context.dataset.label || "";
@@ -203,6 +204,9 @@ const totalOrdersOptions = reactive({
                 },
             },
         },
+        datalabels: {
+            display: false, // Nếu bạn đang sử dụng plugin datalabels
+        }
     },
 });
 </script>

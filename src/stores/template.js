@@ -358,7 +358,7 @@ export const useTemplateStore = defineStore({
         // Dark Mode
         darkMode(payload) {
             if (payload.mode === "on") {
-                this.settings.darkMode = true;
+                // this.settings.darkMode = true;
             } else if (payload.mode === "off") {
                 this.settings.darkMode = false;
             } else if (payload.mode === "toggle") {

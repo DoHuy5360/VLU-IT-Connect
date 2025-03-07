@@ -17,7 +17,6 @@ const Analysis = () => import("@/views/one-ui/monitor/Analysis.vue");
 const BlogDetailsReport = () => import("@/views/one-ui/monitor/report/BlogDetailsReport.vue");
 const TopBlogReport = () => import("@/views/one-ui/monitor/report/TopBlogReport.vue");
 const AccessUrlReport = () => import("@/views/one-ui/monitor/report/AccessUrlReport.vue");
-
 const DisabledCommentView = () => import("@/views/one-ui/comment/DisabledCommentView.vue");
 const CommentView = () => import("@/views/one-ui/comment/CommentView.vue");
 const BlogAdmin = () => import("@/views/one-ui/blog/BlogAdmin.vue");
@@ -35,6 +34,8 @@ const AccountAdminManager = () => import("@/views/one-ui/accountmanager/AccountM
 const AccountManagerCreate = () => import("@/views/one-ui/accountmanager/CreateAccountManager.vue");
 const AccountManagerEdit = () => import("@/views/one-ui/accountmanager/EditAccountManager.vue");
 const AddAccountManager = () => import("@/views/one-ui/accountmanager/AssignUserToGroup.vue");
+const NotificationSubscription = () => import("@/views/one-ui/notification/NotificationSubscription.vue");
+const NotificationManager = () => import("@/views/one-ui/notification/NotificationManager.vue");
 
 // Layouts
 const MainLayout = () => import("@/layouts/variations/it-connect/MainLayout.vue");
@@ -197,6 +198,16 @@ const routes = [
                 ],
             },
             {
+                path: "notification",
+                children: [
+                    {
+                        path: "",
+                        name: "AdminNotificationManager",
+                        component: NotificationManager,
+                    },
+                ],
+            },
+            {
                 path: "account",
                 children: [
                     {
@@ -280,6 +291,14 @@ const routes = [
                         component: Search,
                     },
                 ],
+            },
+            {
+                path: "notification/subscribe",
+                name: "notification-subscribe",
+                component: NotificationSubscription,
+                meta: {
+                    title: "Đăng Ký Nhận Thông Báo"
+                }
             },
         ],
     },

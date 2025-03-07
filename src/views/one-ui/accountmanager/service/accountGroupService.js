@@ -108,7 +108,6 @@ const accountGroupService = {
             };
         }
     },
-
     // Delete multiple groups
     async deleteMultipleGroups(groupIds) {
         console.log("Deleting Multiple Groups:", {

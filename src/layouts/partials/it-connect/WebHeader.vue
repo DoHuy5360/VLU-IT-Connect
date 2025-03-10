@@ -130,7 +130,7 @@
                         </svg>
                     </span>
                     <!-- Hamburger icon -->
-                    <label for="searchInputMobileVer" @click="toggleHeaderInMobileView">
+                    <label for="searchInputMobileVer" @click="()=>toggleHeaderInMobileView(true)">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="M18.9613 12.8714H5.03867C4.80789 12.8714 4.58656 12.7798 4.42337 12.6166C4.26019 12.4534 4.16851 12.2321 4.16851 12.0013C4.16851 11.7705 4.26019 11.5492 4.42337 11.386C4.58656 11.2228 4.80789 11.1311 5.03867 11.1311H18.9613C19.1921 11.1311 19.4134 11.2228 19.5766 11.386C19.7398 11.5492 19.8315 11.7705 19.8315 12.0013C19.8315 12.2321 19.7398 12.4534 19.5766 12.6166C19.4134 12.7798 19.1921 12.8714 18.9613 12.8714ZM22.5 19.9024C22.5 19.6716 22.4083 19.4503 22.2451 19.2871C22.0819 19.1239 21.8606 19.0322 21.6298 19.0322H2.37017C2.13938 19.0322 1.91805 19.1239 1.75487 19.2871C1.59168 19.4503 1.5 19.6716 1.5 19.9024C1.5 20.1332 1.59168 20.3545 1.75487 20.5177C1.91805 20.6809 2.13938 20.7725 2.37017 20.7725H21.6298C21.8597 20.7695 22.0793 20.6769 22.2418 20.5144C22.4044 20.3518 22.497 20.1322 22.5 19.9024ZM22.5 4.10017C22.497 3.87032 22.4044 3.65073 22.2418 3.48819C22.0793 3.32565 21.8597 3.23301 21.6298 3.23H2.37017C2.13938 3.23 1.91805 3.32168 1.75487 3.48487C1.59168 3.64806 1.5 3.86939 1.5 4.10017C1.5 4.33095 1.59168 4.55228 1.75487 4.71547C1.91805 4.87866 2.13938 4.97034 2.37017 4.97034H21.6298C21.8606 4.97034 22.0819 4.87866 22.2451 4.71547C22.4083 4.55228 22.5 4.33095 22.5 4.10017Z"
@@ -181,12 +181,12 @@
             </svg>
         </div>
     </div>
-    <div class="d-sm-none position-absolute bg-white w-100 z-2 h-100" style="top: 0; left: 100%; transition: 300ms linear" ref="headerAsSidebar">
+    <div :style="{left: isShowSidebar ? '0 !important' : '100%'}" class="d-sm-none position-absolute bg-white w-100 z-2 h-100" style="top: 0; transition: 300ms linear">
         <div class="d-flex justify-content-between p-3">
             <div>
                 <img :src="store.getBrandAsset('/30_years_vertical_version.png')" class="col-sm-2 col-5 image-responsive" style="object-fit: contain" alt="Van Lang Logo" />
             </div>
-            <div @click="toggleHeaderInMobileView" style="width: 24px">
+            <div @click="()=>toggleHeaderInMobileView(false)" style="width: 24px">
                 <!-- Close header sidebar icon -->
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -304,15 +304,15 @@ const isShowLanguageChoice = ref(false);
 
 const store = useTemplateStore();
 
-const disableScroll = inject("disableScroll");
-
 const headerAsSidebar = ref(null);
 const searchBar = ref(null);
 const isSelectLanguageChoice = ref(false);
+const isShowSidebar = ref(false)
 
-function toggleHeaderInMobileView() {
-    headerAsSidebar.value.classList.toggle("header_visibility");
-    disableScroll();
+
+function toggleHeaderInMobileView(state) {
+    isShowSidebar.value = state
+    store.setWindowScroll(!state)
 }
 
 function toggleSearchBar() {
@@ -346,6 +346,9 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="css" scoped>
+.stop_scroll{
+  overflow-y: hidden;
+}
 .header_visibility {
     left: 0 !important;
 }

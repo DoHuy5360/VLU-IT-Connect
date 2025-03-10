@@ -24,7 +24,7 @@
                                 class="w-25"
                                 @error="
                                     () => {
-                                        post.imageUrl = store.getBrandAsset('/logo-khong-chu.png');
+                                        post.imageUrl = store.getBrandAsset('/30_years_vertical_version.png');
                                     }
                                 "
                             />

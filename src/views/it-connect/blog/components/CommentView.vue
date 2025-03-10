@@ -9,12 +9,12 @@
         <div class="d-flex flex-column gap-2">
             <div v-for="parentComment in commentTree" :key="parentComment.Id">
                 <div class="border p-2 rounded">
-                    <div class="d-flex flex-column">
+                    <div class="d-flex gap-1 flex-column">
                         <div class="d-flex gap-2">
                             <div class="fw-bold">{{ store.isVietNamese() ? "Ẩn danh" : "Anonymous" }}</div>
                             <div class="text-muted">{{ store.formatDateTime(parentComment.CreatedAt) }}</div>
                         </div>
-                        <div class="fs-4">{{ parentComment.Content }}</div>
+                        <div class="fs-6">{{ parentComment.Content }}</div>
                         <div class="d-flex gap-3 justify-content-start px-2" style="user-select: none">
                             <!-- <div class="d-flex gap-1 align-items-center fw-semibold" style="cursor: pointer">
                                 <div :onclick="() => handleLikeComment(parentComment)">
@@ -47,7 +47,7 @@
                                     <div class="fw-bold">{{ store.isVietNamese() ? "Ẩn danh" : "Anonymous" }}</div>
                                     <div class="text-muted">{{ store.formatDateTime(childComment.CreatedAt) }}</div>
                                 </div>
-                                <div class="fs-4">{{ childComment.Content }}</div>
+                                <div class="fs-6">{{ childComment.Content }}</div>
                                 <div class="d-flex gap-3 justify-content-start" style="user-select: none">
                                     <!-- <div class="d-flex gap-1 align-items-center fw-semibold" style="cursor: pointer">
                                         <div :onclick="() => handleLikeComment(childComment)">

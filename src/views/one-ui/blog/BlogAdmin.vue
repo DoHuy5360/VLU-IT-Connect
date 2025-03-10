@@ -58,6 +58,9 @@
                                                     <button type="button" class="btn btn-sm btn-danger" title="Xóa bài viết" @click="swalConfirm(row.id)">
                                                         <i class="fa fa-fw fa-trash"></i>
                                                     </button>
+                                                    <button type="button" class="btn btn-sm btn-success" title="Gửi thông báo" @click="showSendingNotifyWindow(true)">
+                                                        <i class="fa fa-fw fa-share"></i>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -74,6 +77,15 @@
             </Dataset>
         </BaseBlock>
     </div>
+    <div v-if="isShowingNotifyWindow" class="position-fixed w-100 h-100 bg-white d-flex flex-column" style="top: 0; left: 0; z-index: 1040">
+        <div class="p-3 bg-white d-flex justify-content-between align-items-center" style="user-select: none;">
+            <strong class="fs-4">Gửi thông báo</strong>
+            <div class="btn btn-sm btn-danger" @click="showSendingNotifyWindow(false)">
+                <i class="fa fa-fw fa-close"></i>
+            </div>
+        </div>
+        <SendNotifyWindow/>
+    </div>
 </template>
 
 <script setup>
@@ -83,6 +95,7 @@ import { RouterLink, useRouter } from "vue-router";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
 import { authRequest } from "../accountmanager/service/axiosConfig";
 import { useTemplateStore } from "../../../stores/template";
+import SendNotifyWindow from "./components/SendNotifyWindow.vue";
 
 const store = useTemplateStore();
 
@@ -90,6 +103,13 @@ const router = useRouter();
 const posts = ref([]);
 const loading = ref(true);
 const searchingPosts = ref([]);
+
+const isShowingNotifyWindow = ref(true);
+
+function showSendingNotifyWindow(state) {
+    isShowingNotifyWindow.value = state;
+    window.document.body.style.overflowY = state ? "hidden" : "scroll";
+}
 
 function normalizeString(str) {
     // Chuyển đổi thành chữ thường và loại bỏ dấu

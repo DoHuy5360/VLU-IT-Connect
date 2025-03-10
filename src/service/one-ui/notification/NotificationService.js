@@ -36,23 +36,6 @@ export const subscribeNotification = async (subscriptionData) => {
 };
 
 /**
- * Lấy danh sách đăng ký của một email
- * @param {string} email Email cần kiểm tra
- * @returns {Promise} Danh sách đăng ký
- */
-export const getSubscriptionsByEmail = async (email) => {
-  try {
-    const response = await guestRequest.get(
-      `/Notification/Subscriptions/${email}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Lỗi khi lấy danh sách đăng ký:", error);
-    throw error;
-  }
-};
-
-/**
  * Lấy danh sách tất cả các đăng ký nhận thông báo (phân trang)
  * @param {number} page Số trang
  * @param {number} pageSize Số lượng mục trên mỗi trang

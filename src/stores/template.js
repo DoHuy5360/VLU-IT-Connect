@@ -56,8 +56,14 @@ export const useTemplateStore = defineStore({
             sideTransitions: true,
             mainContent: "", // 'boxed', ''narrow'
         },
+        body: {
+            allowedScroll: true
+        }
     }),
     actions: {
+        setWindowScroll(state){
+            this.body.allowedScroll = state
+        },
         setLanguage(language) {
             this.app.language = language;
             localStorage.setItem("it-connect:language", language);

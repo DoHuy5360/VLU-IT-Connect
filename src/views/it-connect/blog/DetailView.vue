@@ -5,7 +5,7 @@
             <div class="col-lg-8">
                 <div v-if="featuredArticle !== null" class="rounded p-4">
                     <div class="">
-                        <div class="d-flex gap-3 text-muted mb-3">
+                        <div class="d-flex gap-3 text-muted mb-3" style="flex-wrap: wrap;">
                             <div class="d-flex gap-2 align-items-center">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -90,7 +90,7 @@
                     <hr />
                     <div class="mt-4">
                         <h3>{{ store.isVietNamese() ? "Chia sẻ" : "Share" }}</h3>
-                        <div class="d-flex gap-3 align-items-center">
+                        <div class="d-flex gap-3 align-items-center" style="flex-wrap: wrap;">
                             <div
                                 class="hover_underline d-flex gap-2 align-items-center"
                                 style="cursor: pointer"
@@ -167,14 +167,14 @@
                                 {{ store.isVietNamese() ? "Danh Mục" : "Category" }}
                             </h4>
                         </RouterLink>
-                        <ul v-if="categories.length" class="list-unstyled" style="overflow-y: scroll; height: 250px">
+                        <ul v-if="categories.length > 0" class="list-unstyled" style="height: 250px" :style="{overflowY: categories.length > 9 ? 'scroll' : ''}">
                             <li v-for="(category, index) in categories" :key="index" class="hover_underline mb-1" style="cursor: pointer; padding-right: 1rem">
                                 <RouterLink :to="`/blog?category=${category.Slug}`" class="text-black d-flex justify-content-between">
                                     <span>
                                         {{ store.truncateText(category.Name, 30) }}
                                     </span>
                                     <strong>
-                                        {{ category.AmountOfPosts }}
+                                        {{ category.TotalPosts }}
                                     </strong>
                                 </RouterLink>
                             </li>
@@ -191,12 +191,12 @@
                         </h4>
                         <div v-if="relatedArticles.length" class="d-flex flex-column gap-2">
                             <div v-for="(article, index) in relatedArticles" :key="index">
-                                <RouterLink :to="`/blog/detail/${article.slug}`" class="hover_underline row py-2 text-black" style="cursor: pointer">
-                                    <div class="col-4 d-flex">
+                                <RouterLink :to="`/blog/detail/${article.slug}`" class="hover_underline row py-2 text-black align-items-start" style="cursor: pointer">
+                                    <div class="col-2 col-lg-3 d-flex">
                                         <img
                                             :src="article.image"
                                             alt="Related Post Image"
-                                            class="rounded border w-100 h-100"
+                                            class="rounded w-100 h-100"
                                             style="object-fit: contain"
                                             @error="
                                                 () => {
@@ -205,7 +205,7 @@
                                             "
                                         />
                                     </div>
-                                    <div class="col-8">
+                                    <div class="col-10 col-lg-9">
                                         <h6 class="mb-1 clickable-text text-truncate" :title="article.title">
                                             {{ store.truncateText(article.title, 30) }}
                                         </h6>
@@ -334,36 +334,10 @@ const getPostDetails = async () => {
     }
 };
 
-function spreadCategory(categoryJsonTree) {
-    for (let index = 0; index < categoryJsonTree.length; index++) {
-        const category = categoryJsonTree[index];
-        if (category.AmountOfPosts !== 0) {
-            if (category.Children.values.$values.length === 0) {
-                categories.value.push({
-                    Id: category.Id,
-                    Name: category.Name,
-                    Slug: category.Slug,
-                    NestDepth: category.NestDepth,
-                    AmountOfPosts: category.AmountOfPosts,
-                });
-            } else {
-                categories.value.push({
-                    Id: category.Id,
-                    Name: category.Name,
-                    Slug: category.Slug,
-                    NestDepth: category.NestDepth,
-                    AmountOfPosts: category.AmountOfPosts,
-                });
-                spreadCategory(category.Children.values.$values);
-            }
-        }
-    }
-}
-
 const getCategories = async () => {
     try {
         const response = await guestRequest.get("/posts/getallcategories");
-        spreadCategory(response.data.data.categories.values.$values);
+        categories.value = response.data.$values
     } catch (error) {
         console.error("Error fetching categories:", error.response?.data || error.message);
     }

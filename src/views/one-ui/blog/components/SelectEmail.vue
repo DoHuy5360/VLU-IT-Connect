@@ -1,14 +1,5 @@
 <template>
-    <BasePageHeading :title="`Quản lý ${config.name}`" subtitle="">
-        <template #extra>
-            <button type="button" class="btn btn-success d-flex align-items-center" @click="">
-                <i class="fa fa-plus opacity-50 me-2"></i>
-                Thêm {{ config.name }}
-            </button>
-        </template>
-    </BasePageHeading>
-
-    <div class="content">
+    <div class="">
         <BaseBlock :title="`Danh sách ${config.name}`" content-full>
             <Dataset v-slot="{ ds }" :ds-data="searchingListData.length == 0 ? originListData : searchingListData" :ds-sortby="sortBy" :ds-search-in="[]">
                 <div class="row" :data-page-count="ds.dsPagecount">
@@ -29,13 +20,14 @@
                             <table class="table table-striped mb-0">
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th scope="col">#</th>
                                         <th v-for="(th, index) in cols" :key="th.field" :class="['sort', th.sort]" @click="onSort($event, index)">
                                             <div class="d-flex gap-2" style="white-space: nowrap">{{ th.name }} <i class="gg-select float-end"></i></div>
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody v-if="(searchingListData.length == 0 ? originListData : searchingListData).length == 0">
+                                <tbody v-if="(searchingListData.length == 0 ? originListData : searchingListData)?.length == 0">
                                     <tr>
                                         <td :colspan="cols.length+1" class="text-center">Không có dữ liệu</td>
                                     </tr>
@@ -43,18 +35,15 @@
                                 <DatasetItem tag="tbody" class="fs-sm">
                                     <template #default="{ row, rowIndex }">
                                         <tr>
-                                            <th scope="row">{{ rowIndex + 1 }}</th>
-                                            <td>{{ row.category }}</td>
-                                            <td style="">
-                                                <div class="d-flex gap-2 justify-content-center">
-                                                    <RouterLink :to="``" class="btn btn-sm btn-alt-warning">
-                                                        <i class="fa fa-fw fa-pencil-alt"></i>
-                                                    </RouterLink>
-                                                    <button type="button" class="btn btn-sm btn-danger" :title="`Xóa ${config.name}`" @click="">
-                                                        <i class="fa fa-fw fa-trash"></i>
-                                                    </button>
-                                                </div>
+                                            <td class="text-center">
+                                                <label hidden :for="`accountCheckbox-${rowIndex}`">{{ rowIndex }}</label>
+                                                <input :id="`accountCheckbox-${rowIndex}`" type="radio" :value="row.Id" class="form-check-input" name="email" v-model="selectedEmail" @click.stop />
                                             </td>
+                                            <th scope="row">{{ rowIndex + 1 }}</th>
+                                            <td>{{ row.Title }}</td>
+                                            <td>{{ row.Content }}</td>
+                                            <td>{{ row.Type }}</td>
+                                            <td>{{ row.Identify }}</td>
                                         </tr>
                                     </template>
                                 </DatasetItem>
@@ -77,11 +66,14 @@ import Swal from "sweetalert2";
 import { RouterLink, useRouter } from "vue-router";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
 import { useTemplateStore } from "@/stores/template";
+import { authRequest } from '../../accountmanager/service/axiosConfig';
+
+const data = defineModel()
 
 const store = useTemplateStore();
-
+const selectedEmail = ref(null);
 const config = reactive({
-    name: "<danh mục>",
+    name: "Mẫu Email",
 });
 
 const originListData = ref([]);
@@ -109,11 +101,17 @@ function search(input) {
         searchingListData.value = [];
     } else {
         if (originListData.value.length != 0) {
-            searchingListData.value = originListData.value.filter((data) => containsSubstring(searchValue, data.title));
+            searchingListData.value = originListData.value.filter((data) => containsSubstring(searchValue, data.Title));
         }
     }
 }
 
+async function getEmail(){
+   const response = await authRequest.get("/Notification/email-notify")
+   originListData.value = response.data.$values
+}
+
+getEmail()
 onMounted(async () => {
     loading.value = true;
     try {
@@ -130,7 +128,22 @@ onMounted(async () => {
 const cols = reactive([
     {
         name: "Tiêu đề",
-        field: "title",
+        field: "Title",
+        sort: "",
+    },
+    {
+        name: "Nội dung",
+        field: "Content",
+        sort: "",
+    },
+    {
+        name: "Loại",
+        field: "Type",
+        sort: "",
+    },
+    {
+        name: "Mã nhận dạng",
+        field: "Identify",
         sort: "",
     },
 ]);

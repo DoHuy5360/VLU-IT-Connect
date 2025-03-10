@@ -1,14 +1,5 @@
 <template>
-    <BasePageHeading :title="`Quản lý ${config.name}`" subtitle="">
-        <template #extra>
-            <button type="button" class="btn btn-success d-flex align-items-center" @click="">
-                <i class="fa fa-plus opacity-50 me-2"></i>
-                Thêm {{ config.name }}
-            </button>
-        </template>
-    </BasePageHeading>
-
-    <div class="content">
+    <div class="">
         <BaseBlock :title="`Danh sách ${config.name}`" content-full>
             <Dataset v-slot="{ ds }" :ds-data="searchingListData.length == 0 ? originListData : searchingListData" :ds-sortby="sortBy" :ds-search-in="[]">
                 <div class="row" :data-page-count="ds.dsPagecount">
@@ -29,13 +20,17 @@
                             <table class="table table-striped mb-0">
                                 <thead>
                                     <tr>
+                                        <th class="text-center" style="width: 50px">
+                                            <label hidden for="checkAll">Chọn tất cả</label>
+                                            <input id="checkAll" type="checkbox" class="form-check-input" @click="selectAll($event)" />
+                                        </th>
                                         <th scope="col">#</th>
                                         <th v-for="(th, index) in cols" :key="th.field" :class="['sort', th.sort]" @click="onSort($event, index)">
                                             <div class="d-flex gap-2" style="white-space: nowrap">{{ th.name }} <i class="gg-select float-end"></i></div>
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody v-if="(searchingListData.length == 0 ? originListData : searchingListData).length == 0">
+                                <tbody v-if="(searchingListData.length == 0 ? originListData : searchingListData)?.length == 0">
                                     <tr>
                                         <td :colspan="cols.length+1" class="text-center">Không có dữ liệu</td>
                                     </tr>
@@ -43,18 +38,14 @@
                                 <DatasetItem tag="tbody" class="fs-sm">
                                     <template #default="{ row, rowIndex }">
                                         <tr>
-                                            <th scope="row">{{ rowIndex + 1 }}</th>
-                                            <td>{{ row.category }}</td>
-                                            <td style="">
-                                                <div class="d-flex gap-2 justify-content-center">
-                                                    <RouterLink :to="``" class="btn btn-sm btn-alt-warning">
-                                                        <i class="fa fa-fw fa-pencil-alt"></i>
-                                                    </RouterLink>
-                                                    <button type="button" class="btn btn-sm btn-danger" :title="`Xóa ${config.name}`" @click="">
-                                                        <i class="fa fa-fw fa-trash"></i>
-                                                    </button>
-                                                </div>
+                                            <td class="text-center">
+                                                <label hidden :for="`accountCheckbox-${rowIndex}`">{{ rowIndex }}</label>
+                                                <input :id="`accountCheckbox-${rowIndex}`" type="checkbox" :value="row.Id" class="form-check-input" v-model="selectedSubscriptions" @click.stop />
                                             </td>
+                                            <th scope="row">{{ rowIndex + 1 }}</th>
+                                            <td>{{ row.Email }}</td>
+                                            <td>{{ row.Notes }}</td>
+                                            <td>{{ row.CreatedAt }}</td>
                                         </tr>
                                     </template>
                                 </DatasetItem>
@@ -77,11 +68,14 @@ import Swal from "sweetalert2";
 import { RouterLink, useRouter } from "vue-router";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
 import { useTemplateStore } from "@/stores/template";
+import { authRequest } from '../../accountmanager/service/axiosConfig';
+
+const data = defineModel()
 
 const store = useTemplateStore();
-
+const selectedSubscriptions = ref([]);
 const config = reactive({
-    name: "<danh mục>",
+    name: "Đăng ký",
 });
 
 const originListData = ref([]);
@@ -109,11 +103,24 @@ function search(input) {
         searchingListData.value = [];
     } else {
         if (originListData.value.length != 0) {
-            searchingListData.value = originListData.value.filter((data) => containsSubstring(searchValue, data.title));
+            searchingListData.value = originListData.value.filter((data) => containsSubstring(searchValue, data.Email));
         }
     }
 }
+const selectAll = (event) => {
+    if (event.target.checked) {
+        selectedSubscriptions.value = (searchingListData.value.length === 0 ? originListData : searchingListData).value.map((user) => user.Id);
+    } else {
+        selectedSubscriptions.value = [];
+    }
+};
 
+async function getSubscriptions(){
+   const response = await authRequest.get("/Notification/subscriptions-by-category?categoryId=1085")
+   originListData.value = response.data.$values
+}
+
+getSubscriptions()
 onMounted(async () => {
     loading.value = true;
     try {
@@ -129,8 +136,18 @@ onMounted(async () => {
 // Helper variables
 const cols = reactive([
     {
-        name: "Tiêu đề",
-        field: "title",
+        name: "Email",
+        field: "Email",
+        sort: "",
+    },
+    {
+        name: "Ghi chú",
+        field: "Notes",
+        sort: "",
+    },
+    {
+        name: "Ngày đăng ký",
+        field: "CreatedAt",
         sort: "",
     },
 ]);

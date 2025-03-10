@@ -82,22 +82,34 @@ export const useTemplateStore = defineStore({
             const router = useRouter();
             router.push(`/auth/signin?msg=${message || "Phiên đăng nhập đã hết hạn"}`);
         },
-        async alert({ title, text, icon }) {
+        async alert({ title, text, icon, translate = true }) {
+            let confirmButtonText = "Đồng ý"
+            if(translate){
+                confirmButtonText = translate && this.isVietNamese() ? "Đồng ý" : "Ok"
+            }
             return await Swal.fire({
                 title,
                 text,
                 icon: icon || "success",
-                confirmButtonText: "Đồng ý",
+                confirmButtonText,
             });
         },
-        async confirm({ title, text, icon, callback }) {
+        async confirm({ title, text, icon, callback, translate = true }) {
+            let confirmButtonText = "Đồng ý"
+            let cancelButtonText = "Hủy"
+            if(text==undefined) text = "Hành động này không thể hoàn tác"
+            if(translate){
+                confirmButtonText = translate && this.isVietNamese() ? "Đồng ý" : "Ok"
+                cancelButtonText = translate && this.isVietNamese() ? "Hủy" : "Cancel"
+                if(text==undefined) text = this.isVietNamese() ? "Hành động này không thể hoàn tác" : "This action cannot be reversed"
+            }
             const confirmation = await Swal.fire({
                 title,
-                text: "Hành động này không thể hoàn tác.",
+                text,
                 icon: icon || "warning",
                 showCancelButton: true,
-                confirmButtonText: "Đồng ý",
-                cancelButtonText: "Hủy",
+                confirmButtonText,
+                cancelButtonText,
             });
 
             if (confirmation.isConfirmed) callback();

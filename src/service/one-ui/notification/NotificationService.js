@@ -108,7 +108,7 @@ export const deleteSubscription = async (id) => {
  */
 export const deleteMultipleSubscriptions = async (ids) => {
   try {
-    const response = await guestRequest.post("/Notification/Subscriptions/DeleteMultiple", { ids });
+    const response = await guestRequest.post("/Notification/Subscriptions/multiple", ids);
     return {
       success: response.data.success,
       message: response.data.message

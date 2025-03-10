@@ -34,7 +34,6 @@ const AccountAdminManager = () => import("@/views/one-ui/accountmanager/AccountM
 const AccountManagerCreate = () => import("@/views/one-ui/accountmanager/CreateAccountManager.vue");
 const AccountManagerEdit = () => import("@/views/one-ui/accountmanager/EditAccountManager.vue");
 const AddAccountManager = () => import("@/views/one-ui/accountmanager/AssignUserToGroup.vue");
-const NotificationSubscription = () => import("@/views/one-ui/notification/NotificationSubscription.vue");
 const NotificationManager = () => import("@/views/one-ui/notification/NotificationManager.vue");
 
 // Layouts
@@ -291,14 +290,6 @@ const routes = [
                         component: Search,
                     },
                 ],
-            },
-            {
-                path: "notification/subscribe",
-                name: "notification-subscribe",
-                component: NotificationSubscription,
-                meta: {
-                    title: "Đăng Ký Nhận Thông Báo"
-                }
             },
         ],
     },

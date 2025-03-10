@@ -174,6 +174,9 @@ import {
 import Swal from "sweetalert2";
 import BaseBlock from "@/components/BaseBlock.vue";
 import BasePageHeading from "@/components/BasePageHeading.vue";
+import { useTemplateStore } from "@/stores/template";
+
+const store = useTemplateStore();
 
 // State
 const subscriptions = ref([]);
@@ -336,47 +339,24 @@ const changePage = (page) => {
 };
 
 // Xác nhận xóa một đăng ký
-const confirmDelete = (id) => {
-  Swal.fire({
-    title: "Xác nhận xóa",
-    text: "Bạn có chắc chắn muốn xóa đăng ký này không?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#dc3545",
-    cancelButtonColor: "#6c757d",
-    confirmButtonText: "Xóa",
-    cancelButtonText: "Hủy",
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        const response = await deleteSubscription(id);
+const confirmDelete = async (id) => {
+  await store.confirm({
+        title: "Xác nhận xóa",
+        translate: false,
+        callback: async () => {
+            try {
+              const response = await deleteSubscription(id);
+              console.log(response);
 
-        if (response.success) {
-          Swal.fire({
-            title: "Thành công!",
-            text: response.message || "Đã xóa đăng ký thành công",
-            icon: "success",
-          });
-
-          // Tải lại danh sách
-          loadSubscriptions();
-        } else {
-          Swal.fire({
-            title: "Lỗi!",
-            text: response.message || "Không thể xóa đăng ký",
-            icon: "error",
-          });
-        }
-      } catch (err) {
-        console.error("Lỗi khi xóa đăng ký:", err);
-        Swal.fire({
-          title: "Lỗi!",
-          text: "Đã xảy ra lỗi khi xóa đăng ký. Vui lòng thử lại sau.",
-          icon: "error",
-        });
-      }
-    }
-  });
+              store.alert({ title: "Đã xóa đăng ký thành công" });
+            } catch (error) {
+                store.alert({ title: "Xóa đăng ký không thành công", icon: "error" });
+                console.error("Error delete subscription:", error);
+            } finally {
+              loadSubscriptions();
+            }
+        },
+    });
 };
 
 // Xác nhận xóa nhiều đăng ký đã chọn

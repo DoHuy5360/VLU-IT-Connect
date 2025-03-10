@@ -79,7 +79,6 @@
 import { ref, computed, onMounted, reactive } from "vue";
 import { authRequest } from "../accountmanager/service/axiosConfig";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
-import Swal from "sweetalert2";
 import { useTemplateStore } from "@/stores/template";
 
 const store = useTemplateStore();

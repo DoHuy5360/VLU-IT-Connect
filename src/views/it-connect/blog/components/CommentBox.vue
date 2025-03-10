@@ -19,7 +19,7 @@
         </div>
         <div class="d-flex gap-2 align-items-start align-items-lg-center">
             <slot></slot>
-            <div class="btn btn-sm btn-secondary" style="white-space: nowrap" @click="createComment">{{ store.isVietNamese() ? "Lưu bình luận" : "Save" }}</div>
+            <div class="btn btn-sm btn-secondary" style="white-space: nowrap" @click="createComment">{{ store.isVietNamese() ? "Đăng bình luận" : "Post comments" }}</div>
         </div>
     </div>
 </template>

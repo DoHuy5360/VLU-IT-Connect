@@ -11,14 +11,14 @@
     <div class="content">
         <BaseBlock title="">
             <div class="space-y-5">
-                <form @submit.prevent="handleSubmit">
+                <form @submit.prevent="createCategory">
                     <!-- Parent Category Dropdown -->
                     <div class="mb-4">
                         <label class="form-label" for="parentCategory"> Chọn thể loại cha </label>
                         <select class="form-select" id="parentCategory" v-model="formData.parentId" @blur="v$.name.$touch" :class="{ 'is-invalid': v$.name.$errors.length }" title="Chọn thể loại cha">
-                            <option value="">-- Chọn --</option>
+                            <option value="">-- Gốc --</option>
                             <option v-for="category in categories" :key="category.Id" :value="category.Id">
-                                {{ `${repeatChar("-", category.NestDepth)} ${category.Name}` }}
+                                {{ `${createIndentsForCategorySelector("-", category.NestDepth)} ${category.Name}` }}
                             </option>
                         </select>
                         <div v-if="v$.parentId.$errors.length" class="invalid-feedback">
@@ -36,8 +36,7 @@
                             v-model="formData.name"
                             placeholder="Nhập tên thể loại"
                             @blur="v$.name.$touch"
-                            :class="{ 'is-invalid': v$.name.$errors.length }"
-                        />
+                            :class="{ 'is-invalid': v$.name.$errors.length }" />
                         <div v-if="v$.name.$errors.length" class="invalid-feedback">
                             <span v-if="v$.name.$errors[0].$validator === 'required'"> Hãy nhập tên thể loại </span>
                         </div>
@@ -53,8 +52,7 @@
                             v-model="formData.description"
                             placeholder="Nhập mô tả"
                             @blur="v$.description.$touch"
-                            :class="{ 'is-invalid': v$.description.$errors.length }"
-                        />
+                            :class="{ 'is-invalid': v$.description.$errors.length }" />
                         <div v-if="v$.description.$errors.length" class="invalid-feedback">
                             <span v-if="v$.description.$errors[0].$validator === 'required'"> Hãy nhập mô tả </span>
                         </div>
@@ -76,13 +74,14 @@ import { authRequest } from "../accountmanager/service/axiosConfig";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength, maxLength } from "@vuelidate/validators";
 import { reactive } from "vue";
+import { useTemplateStore } from "@/stores/template.js";
 
 const rules = {
     name: { required, maxLengt: maxLength(225) },
     description: { required, maxLengt: maxLength(160) },
     parentId: {},
 };
-
+const store = useTemplateStore();
 const router = useRouter();
 const categories = ref([]);
 const formData = reactive({
@@ -101,9 +100,9 @@ const formData = reactive({
 
 const v$ = useVuelidate(rules, formData);
 
-const repeatChar = (char, times) => char.repeat(times);
+const createIndentsForCategorySelector = (char, times) => char.repeat(times);
 
-function spreadCategory(categoryJsonTree) {
+function spreadCategoryTreeToSelector(categoryJsonTree) {
     for (let index = 0; index < categoryJsonTree.length; index++) {
         const category = categoryJsonTree[index];
         if (category.Children.$values.length === 0) {
@@ -118,18 +117,14 @@ function spreadCategory(categoryJsonTree) {
                 Name: category.Name,
                 NestDepth: category.NestDepth,
             });
-            spreadCategory(category.Children.$values);
+            spreadCategoryTreeToSelector(category.Children.$values);
         }
     }
 }
 
-// Hàm lấy danh sách categories
-const getCategories = async () => {
+const getCategoryTreeForSelector = async () => {
     try {
         const response = await authRequest.get("/Categories/getallcategories", {
-            headers: {
-                "Content-Type": "application/json",
-            },
             params: {
                 indexPage: 1,
                 limitRange: 100,
@@ -137,63 +132,61 @@ const getCategories = async () => {
         });
 
         if (response.data?.data?.categories?.$values) {
-            spreadCategory(response.data.data.categories.$values);
-            console.log("📂 Danh sách thể loại:", categories.value);
-        } else {
-            console.warn("⚠ Không tìm thấy dữ liệu categories!");
-            categories.value = [];
+            spreadCategoryTreeToSelector(response.data.data.categories.$values);
         }
     } catch (error) {
-        if (error.response?.status === 302 || error.response?.status === 401) {
-            console.error("❌ Phiên làm việc đã hết hạn, vui lòng đăng nhập lại!");
-            router.push("/login");
-            return;
-        }
-        console.error("❌ Lỗi khi tải danh sách thể loại:", error);
-        categories.value = [];
+        store.alert({ title: "Tải danh sách thể loại thất bại", icon: "error" });
     }
 };
 
-// Hàm xử lý khi gửi form
-const handleSubmit = async () => {
-    v$.value.$touch(); // Đánh dấu tất cả các trường
-    if (v$.value.$invalid) {
-        console.log("khong hop le");
+function clearCategoryTreeInSelector() {
+    categories.value = [];
+}
 
+const createCategory = async () => {
+    v$.value.$touch();
+    if (v$.value.$invalid) {
+        store.alert({ title: "Thông tin cần điền chưa hợp lệ", icon: "info" });
         return;
-    } else {
-        console.log("hop le");
-        console.log(formData);
     }
+
     try {
         const now = new Date().toISOString();
+        //= trong payload bên dưới có 2 trường createdAt và updatedAt đang lấy thời gian phía client để gửi về server, bạn hãy cập nhật lại là lấy thời gian trên server để lưu và xóa phần comment này đi
         const payload = {
             ...formData,
             createdAt: now,
             updatedAt: now,
             id: 0,
-            slug: generateSlug(formData.name),
-            code: generateSlug(formData.name),
+            slug: generateSlugFormat(formData.name),
+            code: generateSlugFormat(formData.name),
             parentId: formData.parentId || null,
             children: [],
         };
 
-        const response = await authRequest.post("/Categories/createcategory", payload, {
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        const response = await authRequest.post("/Categories/createCategory", payload);
 
         if (response.data) {
-            console.log("✅ Tạo thể loại thành công!");
-            router.push("/administrator/category");
+            await store.confirm({
+                title: "Tạo thành công",
+                icon: "success",
+                callback: () => redirectToCategoryList(),
+            });
+            clearCategoryTreeInSelector();
+            await getCategoryTreeForSelector();
         }
     } catch (error) {
-        console.error("❌ Lỗi khi tạo thể loại:", error);
+        if (error.response.data.error.details.type == "duplicate") {
+            store.alert({ title: "Tạo thất bại", text: "Tên thể loại này đã tồn tại, hãy sử dụng tên khác", icon: "error" });
+        }
     }
 };
 
-function generateSlug(originString) {
+function redirectToCategoryList(){
+    router.push("/administrator/category");
+}
+
+function generateSlugFormat(originString) {
     return originString
         .toLowerCase()
         .normalize("NFD") // Chuyển thành dạng decomposed để tách dấu
@@ -205,8 +198,7 @@ function generateSlug(originString) {
         .replace(/\s+/g, "-"); // Chuyển khoảng trắng thành dấu gạch ngang
 }
 
-// Gọi hàm lấy danh sách categories khi component được mount
-onMounted(() => {
-    getCategories();
+onMounted(async () => {
+    await getCategoryTreeForSelector();
 });
 </script>

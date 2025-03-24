@@ -1,18 +1,3 @@
-<script setup>
-import { msRequest } from "./accountmanager/service/axiosConfig";
-
-async function fetchProtectedData() {
-    const response = await msRequest.get("/api/admin/posts");
-    try {
-        console.log("Kết quả nhận được:", response.data);
-    } catch (error) {
-        console.error("Lỗi khi gọi API:", error);
-    }
-}
-
-fetchProtectedData();
-</script>
-
 <template>
     <BasePageHeading title="Chào Mừng Quản Trị Viên" subtitle="">
         <template #extra>

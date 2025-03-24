@@ -1,7 +1,7 @@
 <template>
     <BasePageHeading title="Quản Lý Bài Viết" subtitle="">
         <template #extra>
-            <button type="button" class="btn btn-success d-flex align-items-center" @click="navigateToCreate">
+            <button type="button" class="btn btn-success d-flex align-items-center" @click="router.push('/administrator/blog/create')">
                 <i class="fa fa-plus opacity-50 me-2"></i>
                 Thêm bài viết mới
             </button>
@@ -34,31 +34,50 @@
                                         </th>
                                     </tr>
                                 </thead>
+                                <tbody v-if="loading">
+                                    <tr>
+                                        <td colspan="9" class="text-center">Đang tải dữ liệu</td>
+                                    </tr>
+                                </tbody>
+                                <tbody v-if="loading===false && posts.length == 0">
+                                    <tr>
+                                        <td colspan="9" class="text-center">Không có dữ liệu</td>
+                                    </tr>
+                                </tbody>
                                 <DatasetItem tag="tbody" class="fs-sm">
                                     <template #default="{ row, rowIndex }">
                                         <tr>
                                             <th scope="row">{{ rowIndex + 1 }}</th>
                                             <td style="">
                                                 <RouterLink :to="`/administrator/blog/viewdetail/${row.id}`" class="hover_underline text-black" style="cursor: pointer">{{
-                                                    store.truncateText(row.title, 50)
+                                                    store.truncateText(row.Title, 50)
                                                 }}</RouterLink>
                                             </td>
-                                            <td>{{ row.category }}</td>
-                                            <td>{{ row.publishDate }}</td>
-                                            <td>{{ row.createdAt }}</td>
-                                            <td>{{ row.author }}</td>
-                                            <td style="">{{ row.isPublished ? "Có" : "Không" }}</td>
+                                            <td>{{ row.Category.Name }}</td>
+                                            <td>{{ store.formatDate(row.PublishedAt) }}</td>
+                                            <td>{{ store.formatDate(row.CreatedAt) }}</td>
+                                            <td>{{ row.Author }}</td>
+                                            <td style="">{{ row.Published ? "Có" : "Không" }}</td>
                                             <td style="">{{ row.AllowComment ? "Có" : "Không" }}</td>
                                             <td style="">{{ row.CommentCensorship ? "Có" : "Không" }}</td>
                                             <td style="">
                                                 <div class="d-flex gap-2 justify-content-center">
-                                                    <RouterLink :to="`/administrator/blog/edit/${row.id}`" class="btn btn-sm btn-alt-warning">
+                                                    <RouterLink :to="`/administrator/blog/edit/${row.Id}`" class="btn btn-sm btn-alt-warning">
                                                         <i class="fa fa-fw fa-pencil-alt"></i>
                                                     </RouterLink>
-                                                    <button type="button" class="btn btn-sm btn-danger" title="Xóa bài viết" @click="swalConfirm(row.id)">
+                                                    <button type="button" class="btn btn-sm btn-danger" title="Xóa bài viết" @click="deleteBlog(row.Id)">
                                                         <i class="fa fa-fw fa-trash"></i>
                                                     </button>
-                                                    <button type="button" class="btn btn-sm btn-success" title="Gửi thông báo" @click="showSendingNotifyWindow(true)">
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-sm btn-success"
+                                                        title="Gửi thông báo"
+                                                        @click="
+                                                            () => {
+                                                                sendNotifyMaterial.post = row;
+                                                                showSendingNotifyWindow(true);
+                                                            }
+                                                        ">
                                                         <i class="fa fa-fw fa-share"></i>
                                                     </button>
                                                 </div>
@@ -78,19 +97,18 @@
         </BaseBlock>
     </div>
     <div v-if="isShowingNotifyWindow" class="position-fixed w-100 h-100 bg-white d-flex flex-column" style="top: 0; left: 0; z-index: 1040">
-        <div class="p-3 bg-white d-flex justify-content-between align-items-center" style="user-select: none;">
+        <div class="p-3 bg-white d-flex justify-content-between align-items-center" style="user-select: none">
             <strong class="fs-4">Gửi thông báo</strong>
             <div class="btn btn-sm btn-danger" @click="showSendingNotifyWindow(false)">
                 <i class="fa fa-fw fa-close"></i>
             </div>
         </div>
-        <SendNotifyWindow/>
+        <SendNotifyWindow v-model="sendNotifyMaterial" />
     </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, reactive } from "vue";
-import Swal from "sweetalert2";
 import { RouterLink, useRouter } from "vue-router";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
 import { authRequest } from "../accountmanager/service/axiosConfig";
@@ -101,10 +119,13 @@ const store = useTemplateStore();
 
 const router = useRouter();
 const posts = ref([]);
-const loading = ref(true);
+const loading = ref(false);
 const searchingPosts = ref([]);
+const isShowingNotifyWindow = ref(false);
 
-const isShowingNotifyWindow = ref(true);
+const sendNotifyMaterial = reactive({
+    post: null,
+});
 
 function showSendingNotifyWindow(state) {
     isShowingNotifyWindow.value = state;
@@ -136,77 +157,38 @@ function search(input) {
     }
 }
 
-onMounted(async () => {
-    try {
-        const response = await authRequest.get("/admin/posts?PageNumber=1&PageSize=99999");
-        posts.value = response.data.data.$values.map((post) => ({
-            id: post.id,
-            author: post.author,
-            slug: post.slug,
-            title: post.title,
-            isPublished: post.published,
-            publishDate: store.formatDate(post.publishedAt),
-            createdAt: store.formatDate(post.createdAt),
-            metadata: post.metadata,
-            category: post.categoryName,
-            AllowComment: post.AllowComment,
-            CommentCensorship: post.CommentCensorship,
-        }));
-    } catch (error) {
-        switch (error.code) {
-            case "ERR_NETWORK":
-                // handleLogout();
-                break;
-            default:
-                console.error("Error fetching posts:", error);
-                break;
-        }
-    } finally {
-        loading.value = false;
-    }
-});
-
-function handleLogout() {
-    localStorage.removeItem("authToken"); // Xóa token khỏi localStorage
-    router.push("/auth/signin?msg=timeout"); // Chuyển hướng về trang đăng nhập
+async function getBlogs() {
+    loading.value = true;
+    const response = await authRequest.get("/admin/posts?PageNumber=1&PageSize=99999");
+    posts.value = response.data.$values;
+    loading.value = false;
 }
 
-const isAllowComment = (metadata) => {
-    try {
-        const metaObj = JSON.parse(metadata);
-        return metaObj.EnableComments;
-    } catch (error) {
-        console.error("Error parsing metadata:", error);
-        return false;
-    }
-};
-
-const navigateToCreate = () => router.push("/administrator/blog/create");
-
-const swalConfirm = async (id) => {
-    const confirmation = await Swal.fire({
-        title: "Bạn có chắc chắn?",
-        text: "Hành động này không thể hoàn tác.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Đồng ý xóa!",
-        cancelButtonText: "Hủy",
+const deleteBlog = async (id) => {
+    store.confirm({
+        title: "Xác nhận xóa",
+        callback: async () => {
+            try {
+                await authRequest.delete(`/admin/posts/${id}`);
+                posts.value = posts.value.filter((user) => user.id !== id);
+                store.alert({
+                    title: "Xóa thành công",
+                });
+            } catch (error) {
+                store.alert({
+                    title: "Xóa thất bại",
+                });
+                console.error("Error deleting post:", error);
+            } finally {
+            }
+        },
     });
-
-    if (confirmation.isConfirmed) {
-        try {
-            loading.value = true;
-            await authRequest.delete(`/admin/posts/${id}`);
-            posts.value = posts.value.filter((user) => user.id !== id);
-            Swal.fire("Đã xóa!", `Bài viết với ID: ${id} đã được xóa.`, "success");
-        } catch (error) {
-            Swal.fire("Lỗi", "Xóa bài viết thất bại. Vui lòng thử lại.", "error");
-            console.error("Error deleting post:", error);
-        } finally {
-            loading.value = false;
-        }
-    }
 };
+
+onMounted(async () => {
+    await getBlogs();
+});
+
 // Helper variables
 const cols = reactive([
     {

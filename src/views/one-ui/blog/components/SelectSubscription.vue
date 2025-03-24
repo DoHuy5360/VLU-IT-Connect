@@ -63,20 +63,26 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive } from "vue";
+import { ref, computed, onMounted, reactive, watch } from "vue";
 import Swal from "sweetalert2";
 import { RouterLink, useRouter } from "vue-router";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
 import { useTemplateStore } from "@/stores/template";
 import { authRequest } from '../../accountmanager/service/axiosConfig';
 
+const config = reactive({
+    name: "Đăng ký",
+});
+
 const data = defineModel()
 
 const store = useTemplateStore();
 const selectedSubscriptions = ref([]);
-const config = reactive({
-    name: "Đăng ký",
-});
+
+watch(()=>selectedSubscriptions.value.length, ()=>{
+    console.log(1);
+    data.value.subscriptionList = selectedSubscriptions.value
+})
 
 const originListData = ref([]);
 const loading = ref(false);

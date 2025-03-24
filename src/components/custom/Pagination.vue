@@ -1,5 +1,5 @@
 <template>
-    <nav aria-label="Paginate" style="width: fit-content; user-select: none">
+    <nav v-if="data.origin.length != 0" aria-label="Paginate" style="width: fit-content; user-select: none">
         <ul class="pagination pagination-sm">
             <li class="page-item">
                 <a @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="page-link" href="javascript:void(0)" tabindex="-1" aria-label="Previous"> &laquo; </a>

@@ -41,7 +41,7 @@
                                             </td>
                                             <th scope="row">{{ rowIndex + 1 }}</th>
                                             <td>{{ row.Title }}</td>
-                                            <td>{{ row.Content }}</td>
+                                            <td><div v-html="row.Content.replaceAll('[category]', data.dataFill.Category.Name).replaceAll('[url]', linkToTheBlog )"></div></td>
                                             <td>{{ row.Type }}</td>
                                             <td>{{ row.Identify }}</td>
                                         </tr>
@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive } from "vue";
+import { ref, computed, onMounted, reactive, watch } from "vue";
 import Swal from "sweetalert2";
 import { RouterLink, useRouter } from "vue-router";
 import { Dataset, DatasetItem, DatasetInfo, DatasetPager, DatasetSearch, DatasetShow } from "vue-dataset";
@@ -69,13 +69,16 @@ import { useTemplateStore } from "@/stores/template";
 import { authRequest } from '../../accountmanager/service/axiosConfig';
 
 const data = defineModel()
-
 const store = useTemplateStore();
 const selectedEmail = ref(null);
 const config = reactive({
     name: "Mẫu Email",
 });
 
+watch(()=>selectedEmail.value, ()=>{
+    data.value.emailId = selectedEmail.value
+})
+const linkToTheBlog = ref(window.location.origin + "/FE/blog/detail/" + data.value.dataFill.Slug)
 const originListData = ref([]);
 const loading = ref(false);
 const searchingListData = ref([]);

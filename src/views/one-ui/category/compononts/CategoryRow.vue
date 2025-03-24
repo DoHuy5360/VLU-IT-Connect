@@ -1,106 +1,86 @@
 <template>
     <tr>
         <td class="text-center">
-            <label hidden for="categoryRow">Thể loại</label>
-            <input id="categoryRow" type="checkbox" v-model="selected" @change="emitSelection" />
+            <label hidden :for="`categoryRow${category.Id}`">Thể loại</label>
+            <input
+                :id="`categoryRow${category.Id}`"
+                type="checkbox"
+                :value="category.Id"
+                @change="
+                    (event) => {
+                        if (event.target.checked) {
+                            categoryStore.addToSelectedList(category.Id);
+                        } else {
+                            categoryStore.removeFromSelectedList(category.Id);
+                        }
+                    }
+                "
+                class="form-check-input" />
         </td>
 
         <td class="text-left">
-            <div @click="toggleChildren(category.id)" class="d-flex" style="cursor: pointer; width: fit-content; user-select: none">
-                <span v-if="hasChildren" class="btn btn-sm btn-link p-0 me-2" :style="{ marginLeft: `${20 * category.nestDepth}px` }">
+            <div @click="isExpanded = !isExpanded" class="d-flex" style="cursor: pointer; width: fit-content; user-select: none">
+                <span v-if="hasChildren" class="btn btn-sm btn-link p-0 me-2" :style="{ marginLeft: `${20 * category.NestDepth}px` }">
                     <i :class="isExpanded ? 'fa fa-chevron-down' : 'fa fa-chevron-right'"></i>
                 </span>
-                <span v-else class="btn btn-sm btn-link p-0 me-2" :style="{ marginLeft: `${20 * category.nestDepth}px` }"> </span>
-                <span>
-                    {{ category.name }}
-                </span>
+                <span v-else class="btn btn-sm btn-link p-0 me-2" :style="{ marginLeft: `${20 * category.NestDepth}px` }"> </span>
+                <span>{{ category.Name }}</span>
             </div>
         </td>
 
-        <td class="text-center">{{ category.description }}</td>
+        <td class="text-center">{{ category.Description }}</td>
         <td class="">
             <div class="d-flex gap-2 justify-content-center">
-                <button class="btn btn-sm btn-alt-danger" @click="$router.push(`/administrator/category/edit/${category.code}`)"><i class="fa fa-edit"></i> Sửa</button>
-                <button class="btn btn-sm btn-danger" @click="confirmDelete"><i class="fa fa-trash"></i> Xóa</button>
+                <button class="btn btn-sm btn-alt-danger" @click="$router.push(`/administrator/category/edit/${category.Code}`)"><i class="fa fa-edit"></i> Sửa</button>
+                <button class="btn btn-sm btn-danger" @click="deleteCategory"><i class="fa fa-trash"></i> Xóa</button>
             </div>
         </td>
     </tr>
 
-    <!-- Hiển thị danh mục con ngay khi danh mục cha mở -->
     <template v-if="hasChildren && isExpanded">
-        <CategoryRow
-            v-for="child in category.children"
-            :key="child.id"
-            :category="child"
-            :expandedCategories="expandedCategories"
-            @edit="$emit('edit', child)"
-            @delete="$emit('delete', child)"
-            @toggle="toggleChildren"
-        />
+        <CategoryRow v-for="child in category.Children.$values" :key="child.Id" :category="child"/>
     </template>
 </template>
 
-<script>
-import axios from "axios";
-import Swal from "sweetalert2";
-import { useToast } from "vue-toastification";
+<script setup>
+import { ref, computed, defineProps, inject, onBeforeUnmount } from "vue";
 import { authRequest } from "../../../one-ui/accountmanager/service/axiosConfig";
+import { useTemplateStore } from "@/stores/template.js";
+import { useCategoryStore } from "@/stores/category.js";
 
-export default {
-    name: "CategoryRow",
-    props: {
-        category: { type: Object, required: true },
-        expandedCategories: { type: Object, required: true },
-    },
-    emits: ["edit", "delete", "toggle"],
-    data() {
-        return {
-            selected: false,
-        };
-    },
-    computed: {
-        hasChildren() {
-            return this.category.children && this.category.children.length > 0;
-        },
-        isExpanded() {
-            return !!this.expandedCategories[this.category.id];
-        },
-    },
-    methods: {
-        toggleChildren(categoryId) {
-            this.$emit("toggle", categoryId);
-        },
-        emitSelection() {
-            this.$emit("select", { id: this.category.id, selected: this.selected });
-        },
-        async confirmDelete() {
-            const toast = useToast();
-            const result = await Swal.fire({
-                title: `Bạn có chắc chắn muốn xóa danh mục "${this.category.name}"?`,
-                text: "Hành động này không thể hoàn tác!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Xóa ngay",
-                cancelButtonText: "Hủy",
-            });
+const props = defineProps({
+    category: { type: Object, required: true },
+    isShow: { type: Boolean, default: false },
+});
+const categoryStore = useCategoryStore();
+const isExpanded = ref(false);
+const store = useTemplateStore();
+const hasChildren = computed(() => props.category.Children.$values.length != 0);
+const refreshCategoryList = inject("refresh");
 
-            if (result.isConfirmed) {
-                try {
-                    const response = await authRequest.delete("/Categories/deletecategory", {
-                        params: { cateCode: this.category.code }, // Truyền cateCode trong params
-                    });
+const deleteCategory = async () => {
+    store.confirm({
+        title: "Xác nhận xóa",
+        callback: async () => {
+            try {
+                await authRequest.delete("/Categories/deleteCategory", {
+                    params: { id: props.category.Id },
+                });
 
-                    if (response.status === 200) {
-                        this.$emit("delete", this.category); // Emit event để cập nhật danh sách
-                    }
-                } catch (error) {
-                    console.error("❌ Lỗi khi xóa danh mục:", error.response?.data || error.message);
-                    toast.error("Xóa danh mục thất bại!");
-                }
+                await store.alert({ title: "Xóa thành công" });
+            } catch (error) {
+                console.error("Lỗi khi xóa danh mục:", error.response?.data || error.message);
+                await store.alert({ title: "Xóa thất bại", icon: "error" });
+            } finally {
+                refreshCategoryList();
             }
         },
-    },
+    });
 };
+onBeforeUnmount(()=>{
+    //= Khi thực hiện đóng thẻ cha
+    //= Nếu thẻ con bên trong đang được chọn thì xóa nó khỏi danh sách được chọn
+    //= Vì khi đóng thẻ cha thì thẻ con sẽ bị xóa nhưng danh sách thể loại đã chọn không tự động cập nhật.
+   categoryStore.removeFromSelectedList(props.category.Id)
+})
 </script>

@@ -1,35 +1,48 @@
-# oneui-vue-edition
+# Sử dụng
 
-This template should help get you started developing with Vue 3 in Vite.
+## Cài đặt Nodejs version 20 ( Nếu đã có thì bỏ qua )
+> Kiểm tra phiên bản Nodejs đang áp dụng
 
-## Recommended IDE Setup
+`node --version`
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.vscode-typescript-vue-plugin).
+> Tải các gói thư viện cần thiết
 
-## Customize configuration
+`npm ci`
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+> Chạy dự án ở chế độ phát triển ( dành cho lập trình viên )
 
-## Project Setup
+`npm run dev`
 
-```sh
-npm install
-```
+> Đóng gói dự án phục vụ cho môi trường chính thức (môi trường sản xuất)
 
-### Compile and Hot-Reload for Development
+`npm run build`
 
-```sh
-npm run dev
-```
 
-### Compile and Minify for Production
+# Tổ chức mã nguồn
 
-```sh
-npm run build
-```
+## router
+> Cấu hình đường dẫn truy cập các trang
 
-### Lint with [ESLint](https://eslint.org/)
+`src/router/index.js`
 
-```sh
-npm run lint
-```
+## views
+> Chứa các tệp vue chứa nội dung hiển thị các trang
+
+`src/views/*`
+
+## services
+> Thiết lập xử lý các yêu cầu gửi đến máy chủ qua API
+
+`src/services/*`
+
+## stores
+> Quản lý trạng thái ứng dụng FE
+
+`src/stores/template.js`
+
+## layouts, components
+> Chứa các bộ khung và các thành phần giao diện tái sử dụng
+
+`src/layouts/*`
+
+`src/components/*`

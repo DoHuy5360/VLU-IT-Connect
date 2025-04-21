@@ -2,6 +2,9 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
 
+// Import CKEditor
+import CKEditor from "@ckeditor/ckeditor5-vue";
+
 // You can use the following starter router instead of the default one as a clean starting point
 import router from "./router";
 
@@ -24,6 +27,9 @@ const app = createApp(App);
 app.component("BaseBlock", BaseBlock);
 app.component("BaseBackground", BaseBackground);
 app.component("BasePageHeading", BasePageHeading);
+
+// Register CKEditor component
+app.use(CKEditor);
 
 // Register global directives
 app.directive("click-ripple", clickRipple);

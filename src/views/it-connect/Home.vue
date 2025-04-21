@@ -1,160 +1,28 @@
 <template>
-    <div class="gap-3" style="display: grid; grid-template-rows: 550px 1fr">
+    <div class="gap-3" style="display: grid" id="hero">
         <div
-            class="w-100 h-100"
-            style="
-                display: flex;
-                flex-direction: column;
-                background-image: url('../../../assets/media/brand/vlu_landscape.png');
-                background-repeat: no-repeat;
-                background-size: cover;
-                background-position: center;
-            "
+            class="d-none d-sm-flex w-100 bg-new-gray heroLandscape"
+            style="display: flex; flex-direction: column; background-repeat: no-repeat"
+            :style="`background-image: url(${store.getBrandAsset('/vlu_landscape-compressed.jpg')})`"
         >
-            <div
-                class="w-100 h-100"
-                style="
-                    background: rgba(0, 0, 0, 0.3);
-                    display: grid;
-                    place-items: center;
-                "
-            >
-                <div class="d-flex flex-column align-items-center">
-                    <span
-                        class="text-white mb-2"
-                        style="font-weight: bold; font-size: xx-large"
-                        >Bạn cần giúp đỡ vấn đề gì?</span
-                    >
-                    <div class="bg-white rounded-pill px-2 py-1">
-                        <input
-                            type="text"
-                            style="
-                                outline: none;
-                                border: none;
-                                width: 400px;
-                            "
-                            autofocus
-                        />
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
-                                stroke="#171717"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                            <path
-                                d="M22 22L20 20"
-                                stroke="#171717"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-            <div
-                class="w-100 bg-gray position-relative"
-                style="bottom: 0; height: 100px"
-            >
-                <div class="position-absolute w-100" style="bottom: 15px;">
-                    <div class="container">
-                        <div
-                            class="row justify-content-center bg-white rounded"
-                        >
-                            <div class="col-4 p-3">
-                                <img
-                                    src="https://images.unsplash.com/photo-1580795479225-c50ab8c3348d?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    style="
-                                        object-fit: cover;
-                                        display: block;
-                                        width: 100%;
-                                        height: 100px;
-                                    "
-                                    alt=""
-                                />
-                                <div class="d-flex flex-column">
-                                    <b>Yêu cầu hỗ trợ</b>
-                                    <span style=""
-                                        >Hỗ trợ nhanh theo các danh mục dịch
-                                        vụ Công nghệ thông tin sẵn có.</span
-                                    >
-                                </div>
-                            </div>
-                            <div class="col-4 p-3">
-                                <img
-                                    src="https://images.unsplash.com/photo-1495427513693-3f40da04b3fd?q=80&w=1471&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    style="
-                                        object-fit: cover;
-                                        display: block;
-                                        width: 100%;
-                                        height: 100px;
-                                    "
-                                    alt=""
-                                />
-                                <div class="d-flex flex-column">
-                                    <b>Trợ giúp</b>
-                                    <span style=""
-                                        >Bạn không tìm thấy những thông tin
-                                        cần thiết trên đây? Hãy liên hệ với
-                                        bộ phận Hỗ trợ dịch vụ CNTT.</span
-                                    >
-                                </div>
-                            </div>
-                            <div class="col-4 p-3">
-                                <img
-                                    src="https://images.unsplash.com/photo-1456406644174-8ddd4cd52a06?q=80&w=1468&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    style="
-                                        object-fit: cover;
-                                        display: block;
-                                        width: 100%;
-                                        height: 100px;
-                                    "
-                                    alt=""
-                                />
-                                <div class="d-flex flex-column">
-                                    <b>Kiến thức Công nghệ thông tin</b>
-                                    <span style=""
-                                        >Tìm kiếm thông tin để khắc phục sự
-                                        cố hoặc tìm hiểu cách thực hiện
-                                        những gì bạn cần.</span
-                                    >
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <MainSupport />
+        </div>
+        <div
+            class="d-flex d-sm-none w-100 bg-new-gray heroLandscape"
+            style="display: flex; flex-direction: column; background-repeat: no-repeat"
+            :style="`background-image: url(${store.getBrandAsset('/cropped_landscape.png')})`"
+        >
+            <MainSupport />
         </div>
         <div class="d-flex flex-column gap-3">
             <div class="container py-2">
-                <div class="row gap-4">
-                    <div class="col rounded p-4 bg-white shadow-sm">
-                        <h4 class="mb-3" style="font-weight: bold">
-                            Các câu hỏi thường gặp
-                        </h4>
+                <div class="row gap-4" id="wrapQuestionAndNotification">
+                    <div class="col col-sm-12 col-lg-7 rounded p-3 bg-white shadow-sm">
+                        <h4 class="mb-4" style="font-weight: bold" id="frequentlyQuestions">{{ store.isVietNamese() ? "Các câu hỏi thường gặp" : "Frequently questions" }}</h4>
                         <div class="d-flex flex-column gap-3">
-                            <div
-                                v-for="(
-                                    question, index
-                                ) in frequentlyAskedQuestions"
-                                :key="index"
-                            >
-                                <div class="d-flex gap-2">
-                                    <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
+                            <div class="d-flex gap-2">
+                                <div style="width: 24px">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path
                                             d="M15 22.75H9C3.57 22.75 1.25 20.43 1.25 15V9C1.25 3.57 3.57 1.25 9 1.25H15C20.43 1.25 22.75 3.57 22.75 9V15C22.75 20.43 20.43 22.75 15 22.75ZM9 2.75C4.39 2.75 2.75 4.39 2.75 9V15C2.75 19.61 4.39 21.25 9 21.25H15C19.61 21.25 21.25 19.61 21.25 15V9C21.25 4.39 19.61 2.75 15 2.75H9Z"
                                             fill="#171717"
@@ -164,74 +32,194 @@
                                             fill="#171717"
                                         />
                                     </svg>
-                                    <b class="hover_underline" style="cursor: pointer;">{{ question }}</b>
                                 </div>
+                                <RouterLink to="/blog/detail/truy-cap-wifi-van-lang-nhu-the-nao" class="text-black hover_underline">
+                                    <div class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Truy cập Wifi Văn Lang như thế nào?" : "How to access to the Văn Lang Wifi" }}</div>
+                                </RouterLink>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div style="width: 24px">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M15 22.75H9C3.57 22.75 1.25 20.43 1.25 15V9C1.25 3.57 3.57 1.25 9 1.25H15C20.43 1.25 22.75 3.57 22.75 9V15C22.75 20.43 20.43 22.75 15 22.75ZM9 2.75C4.39 2.75 2.75 4.39 2.75 9V15C2.75 19.61 4.39 21.25 9 21.25H15C19.61 21.25 21.25 19.61 21.25 15V9C21.25 4.39 19.61 2.75 15 2.75H9Z"
+                                            fill="#171717"
+                                        />
+                                        <path
+                                            d="M10.74 16.28C10.55 16.28 10.36 16.21 10.21 16.06C9.91999 15.77 9.91999 15.29 10.21 15L13.21 12L10.21 9.00003C9.91999 8.71003 9.91999 8.23003 10.21 7.94003C10.5 7.65003 10.98 7.65003 11.27 7.94003L14.8 11.47C15.09 11.76 15.09 12.24 14.8 12.53L11.27 16.06C11.12 16.21 10.93 16.28 10.74 16.28Z"
+                                            fill="#171717"
+                                        />
+                                    </svg>
+                                </div>
+                                <RouterLink to="/blog/detail/dia-chi-email-cua-em-la-gi-va-su-dung-nhu-the-nao" class="text-black hover_underline">
+                                    <div class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Địa chỉ email của em là gì và sử dụng như thế nào?" : "How to use my email" }}</div>
+                                </RouterLink>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div style="width: 24px">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M15 22.75H9C3.57 22.75 1.25 20.43 1.25 15V9C1.25 3.57 3.57 1.25 9 1.25H15C20.43 1.25 22.75 3.57 22.75 9V15C22.75 20.43 20.43 22.75 15 22.75ZM9 2.75C4.39 2.75 2.75 4.39 2.75 9V15C2.75 19.61 4.39 21.25 9 21.25H15C19.61 21.25 21.25 19.61 21.25 15V9C21.25 4.39 19.61 2.75 15 2.75H9Z"
+                                            fill="#171717"
+                                        />
+                                        <path
+                                            d="M10.74 16.28C10.55 16.28 10.36 16.21 10.21 16.06C9.91999 15.77 9.91999 15.29 10.21 15L13.21 12L10.21 9.00003C9.91999 8.71003 9.91999 8.23003 10.21 7.94003C10.5 7.65003 10.98 7.65003 11.27 7.94003L14.8 11.47C15.09 11.76 15.09 12.24 14.8 12.53L11.27 16.06C11.12 16.21 10.93 16.28 10.74 16.28Z"
+                                            fill="#171717"
+                                        />
+                                    </svg>
+                                </div>
+                                <RouterLink to="/blog/detail/tai-khoan-cac-dich-vu-cntt-cua-sinh-vien-bao-gom-nhung-tai-khoan-nao" class="text-black hover_underline">
+                                    <div class="hover_underline" style="cursor: pointer">
+                                        {{
+                                            store.isVietNamese()
+                                                ? "Tài khoản các dịch vụ CNTT của sinh viên bao gồm những tài khoản nào?"
+                                                : "What accounts are included in student IT services accounts"
+                                        }}
+                                    </div>
+                                </RouterLink>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div style="width: 24px">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M15 22.75H9C3.57 22.75 1.25 20.43 1.25 15V9C1.25 3.57 3.57 1.25 9 1.25H15C20.43 1.25 22.75 3.57 22.75 9V15C22.75 20.43 20.43 22.75 15 22.75ZM9 2.75C4.39 2.75 2.75 4.39 2.75 9V15C2.75 19.61 4.39 21.25 9 21.25H15C19.61 21.25 21.25 19.61 21.25 15V9C21.25 4.39 19.61 2.75 15 2.75H9Z"
+                                            fill="#171717"
+                                        />
+                                        <path
+                                            d="M10.74 16.28C10.55 16.28 10.36 16.21 10.21 16.06C9.91999 15.77 9.91999 15.29 10.21 15L13.21 12L10.21 9.00003C9.91999 8.71003 9.91999 8.23003 10.21 7.94003C10.5 7.65003 10.98 7.65003 11.27 7.94003L14.8 11.47C15.09 11.76 15.09 12.24 14.8 12.53L11.27 16.06C11.12 16.21 10.93 16.28 10.74 16.28Z"
+                                            fill="#171717"
+                                        />
+                                    </svg>
+                                </div>
+                                <RouterLink to="/blog/detail/em-muon-thay-doi-mat-khau-cac-dich-vu-cntt-thi-lam-nhu-the-nao" class="text-black hover_underline">
+                                    <div class="hover_underline" style="cursor: pointer">
+                                        {{ store.isVietNamese() ? "Em muốn thay đổi mật khẩu các dịch vụ CNTT thì làm như thế nào?" : "How to change the IT services's password" }}
+                                    </div>
+                                </RouterLink>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div style="width: 24px">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M15 22.75H9C3.57 22.75 1.25 20.43 1.25 15V9C1.25 3.57 3.57 1.25 9 1.25H15C20.43 1.25 22.75 3.57 22.75 9V15C22.75 20.43 20.43 22.75 15 22.75ZM9 2.75C4.39 2.75 2.75 4.39 2.75 9V15C2.75 19.61 4.39 21.25 9 21.25H15C19.61 21.25 21.25 19.61 21.25 15V9C21.25 4.39 19.61 2.75 15 2.75H9Z"
+                                            fill="#171717"
+                                        />
+                                        <path
+                                            d="M10.74 16.28C10.55 16.28 10.36 16.21 10.21 16.06C9.91999 15.77 9.91999 15.29 10.21 15L13.21 12L10.21 9.00003C9.91999 8.71003 9.91999 8.23003 10.21 7.94003C10.5 7.65003 10.98 7.65003 11.27 7.94003L14.8 11.47C15.09 11.76 15.09 12.24 14.8 12.53L11.27 16.06C11.12 16.21 10.93 16.28 10.74 16.28Z"
+                                            fill="#171717"
+                                        />
+                                    </svg>
+                                </div>
+                                <RouterLink to="/blog/detail/su-dung-microsoft-teams-nhu-the-nao" class="text-black hover_underline">
+                                    <div class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Sử dụng Microsoft Teams như thế nào?" : "How to use Microsoft Teams" }}</div>
+                                </RouterLink>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div style="width: 24px">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M15 22.75H9C3.57 22.75 1.25 20.43 1.25 15V9C1.25 3.57 3.57 1.25 9 1.25H15C20.43 1.25 22.75 3.57 22.75 9V15C22.75 20.43 20.43 22.75 15 22.75ZM9 2.75C4.39 2.75 2.75 4.39 2.75 9V15C2.75 19.61 4.39 21.25 9 21.25H15C19.61 21.25 21.25 19.61 21.25 15V9C21.25 4.39 19.61 2.75 15 2.75H9Z"
+                                            fill="#171717"
+                                        />
+                                        <path
+                                            d="M10.74 16.28C10.55 16.28 10.36 16.21 10.21 16.06C9.91999 15.77 9.91999 15.29 10.21 15L13.21 12L10.21 9.00003C9.91999 8.71003 9.91999 8.23003 10.21 7.94003C10.5 7.65003 10.98 7.65003 11.27 7.94003L14.8 11.47C15.09 11.76 15.09 12.24 14.8 12.53L11.27 16.06C11.12 16.21 10.93 16.28 10.74 16.28Z"
+                                            fill="#171717"
+                                        />
+                                    </svg>
+                                </div>
+                                <RouterLink to="/blog/detail/dang-nhap-vao-trang-elearning-nhu-the-nao" class="text-black hover_underline">
+                                    <div class="hover_underline" style="cursor: pointer">{{ store.isVietNamese() ? "Đăng nhập vào trang Elearning như thế nào?" : "How to login to Elearning" }}</div>
+                                </RouterLink>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div style="width: 24px">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M15 22.75H9C3.57 22.75 1.25 20.43 1.25 15V9C1.25 3.57 3.57 1.25 9 1.25H15C20.43 1.25 22.75 3.57 22.75 9V15C22.75 20.43 20.43 22.75 15 22.75ZM9 2.75C4.39 2.75 2.75 4.39 2.75 9V15C2.75 19.61 4.39 21.25 9 21.25H15C19.61 21.25 21.25 19.61 21.25 15V9C21.25 4.39 19.61 2.75 15 2.75H9Z"
+                                            fill="#171717"
+                                        />
+                                        <path
+                                            d="M10.74 16.28C10.55 16.28 10.36 16.21 10.21 16.06C9.91999 15.77 9.91999 15.29 10.21 15L13.21 12L10.21 9.00003C9.91999 8.71003 9.91999 8.23003 10.21 7.94003C10.5 7.65003 10.98 7.65003 11.27 7.94003L14.8 11.47C15.09 11.76 15.09 12.24 14.8 12.53L11.27 16.06C11.12 16.21 10.93 16.28 10.74 16.28Z"
+                                            fill="#171717"
+                                        />
+                                    </svg>
+                                </div>
+                                <RouterLink to="/blog/detail/lam-the-nao-de-tim-duoc-lop-hoc-tren-elearning" class="text-black hover_underline">
+                                    <div class="hover_underline" style="cursor: pointer">
+                                        {{ store.isVietNamese() ? "Làm thế nào để tìm được lớp học trên Elearning?" : "How to find courses on Elearning" }}
+                                    </div>
+                                </RouterLink>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div style="width: 24px">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M15 22.75H9C3.57 22.75 1.25 20.43 1.25 15V9C1.25 3.57 3.57 1.25 9 1.25H15C20.43 1.25 22.75 3.57 22.75 9V15C22.75 20.43 20.43 22.75 15 22.75ZM9 2.75C4.39 2.75 2.75 4.39 2.75 9V15C2.75 19.61 4.39 21.25 9 21.25H15C19.61 21.25 21.25 19.61 21.25 15V9C21.25 4.39 19.61 2.75 15 2.75H9Z"
+                                            fill="#171717"
+                                        />
+                                        <path
+                                            d="M10.74 16.28C10.55 16.28 10.36 16.21 10.21 16.06C9.91999 15.77 9.91999 15.29 10.21 15L13.21 12L10.21 9.00003C9.91999 8.71003 9.91999 8.23003 10.21 7.94003C10.5 7.65003 10.98 7.65003 11.27 7.94003L14.8 11.47C15.09 11.76 15.09 12.24 14.8 12.53L11.27 16.06C11.12 16.21 10.93 16.28 10.74 16.28Z"
+                                            fill="#171717"
+                                        />
+                                    </svg>
+                                </div>
+                                <RouterLink to="/blog/detail/em-khong-ghi-danh-duoc-vao-lop-hoc-tren-trang-e-learning-thi-phai-lam-sao" class="text-black hover_underline">
+                                    <div class="hover_underline" style="cursor: pointer">
+                                        {{ store.isVietNamese() ? "Em không ghi danh được vào lớp học trên trang E-learning thì phải làm sao?" : "I can't enroll to my Elearning course, HELP!!!" }}
+                                    </div>
+                                </RouterLink>
                             </div>
                         </div>
                     </div>
-                    <div class="col rounded p-4 bg-white shadow-sm">
-                        <h4 class="mb-3" style="font-weight: bold">
-                            Thông báo
-                        </h4>
-                        <div class="d-flex flex-column gap-3">
-                            <div
-                                v-for="(notice, index) in notifications"
-                                :key="index"
-                            >
-                                <div class="d-flex gap-2">
-                                    <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M8.91 19.92L15.43 13.4C16.2 12.63 16.2 11.37 15.43 10.6L8.91 4.07996"
-                                            stroke="#171717"
-                                            stroke-width="1.5"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        />
-                                    </svg>
-                                    <b class="hover_underline" style="cursor: pointer;">
-                                        {{ notice }}
-                                    </b>
+                    <div class="col col-sm-12 col-lg rounded p-3 bg-white shadow-sm">
+                        <h4 class="mb-4" style="font-weight: bold">{{ store.isVietNamese() ? "Thông báo" : "News" }}</h4>
+                        <div class="d-flex flex-column gap-2">
+                            <div v-for="post in news" :key="post.id" class="background_gradient_pink rounded rounded-pill">
+                                <div class="d-flex gap-1 align-items-center py-1 px-2">
+                                    <div style="width: 12px">
+                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                fill-rule="evenodd"
+                                                clip-rule="evenodd"
+                                                d="M3.57564 1.57999C3.80995 1.33987 4.18985 1.33987 4.42417 1.57999L8.42417 5.679C8.65848 5.91911 8.65848 6.30841 8.42417 6.54853L4.64639 10.4198C4.41207 10.6599 4.03218 10.6599 3.79786 10.4198C3.56355 10.1797 3.56355 9.7904 3.79786 9.55028L7.15138 6.11376L3.57564 2.44952C3.34132 2.2094 3.34132 1.8201 3.57564 1.57999Z"
+                                                fill="#252F4A"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <RouterLink :to="`/blog/detail/${post.slug}`" class="hover_underline w-100 text-black" style="cursor: pointer">
+                                        <!-- {{ store.isVietNamese() ? "Nâng cấp hệ thống Wifi và dịch vụ CNTT" : "Update Wifi system and IT services" }} -->
+                                        <div>{{ store.truncateText(post.title, 40) }}</div>
+                                    </RouterLink>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="container py-2 bg-white rounded mb-3">
+            <div class="container py-3 bg-white rounded mb-3 shadow-sm">
                 <div class="d-flex justify-content-between">
-                    <h4 class="mb-3" style="font-weight: bold">
-                        Clip hướng dẫn sử dụng
-                    </h4>
-                    <b class="text-danger hover_underline" style="cursor: pointer;">Xem tất cả</b>
+                    <h4 class="" style="font-weight: bold">{{ store.isVietNamese() ? "Clip hướng dẫn sử dụng" : "Guiding clips" }}</h4>
+                    <RouterLink to="/videos" class="text-primary hover_underline">
+                        <b>{{ store.isVietNamese() ? "Xem tất cả" : "View all" }}</b>
+                    </RouterLink>
                 </div>
-                <div class="row">
-                    <div class="col-4">
-                        <iframe width="100%" height="200px" src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6" frameborder="0" allowfullscreen class="rounded"></iframe>
-                        <div>
-                            <strong>Hướng dẫn</strong>
-                            <div>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime aliquid iusto tempore recusandae obcaecati</div>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <iframe width="100%" height="200px" src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6" frameborder="0" allowfullscreen class="rounded"></iframe>
-                        <div>
-                            <strong>Hướng dẫn</strong>
-                            <div>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime aliquid iusto tempore recusandae obcaecati</div>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <iframe width="100%" height="200px" src="https://www.youtube.com/embed/u31qwQUeGuM?si=9IaKmebZwgbysBE6" frameborder="0" allowfullscreen class="rounded"></iframe>
-                        <div>
-                            <strong>Hướng dẫn</strong>
-                            <div>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime aliquid iusto tempore recusandae obcaecati</div>
-                        </div>
+                <div class="row" id="wrapVideo">
+                    <div v-for="post in posts" :key="post.id" class="col-auto col-sm-4">
+                        <video
+                            v-if="store.isMP4(post.video)"
+                            width="100%"
+                            height="150px"
+                            :src="post.video"
+                            frameborder="0"
+                            controls
+                            allowfullscreen
+                            class="rounded w-100"
+                            title="Guiding clips"
+                        ></video>
+                        <iframe v-else width="100%" height="150px" :src="post.video" frameborder="0" allowfullscreen class="rounded" title="Guiding clips"></iframe>
+                        <RouterLink :to="`/blog/detail/${post.slug}`" :title="post.title" class="text-black hover_underline">
+                            <strong>{{ store.truncateText(post.title, 45) }}</strong>
+                            <div>{{ store.truncateText(post.excerpt, 100) }}</div>
+                        </RouterLink>
                     </div>
                 </div>
             </div>
@@ -240,31 +228,96 @@
 </template>
 
 <script setup>
-import { useTemplateStore } from "@/stores/template";
+import { ref } from "vue";
+import { RouterLink } from "vue-router";
+import { useTemplateStore } from "../../stores/template";
+
+import { guestRequest } from "../one-ui/accountmanager/service/axiosConfig";
+import MainSupport from "./components/home/MainSupport.vue";
+
 const store = useTemplateStore();
 
-const frequentlyAskedQuestions = [
-    "Truy cập Wifi Văn Lang như thế nào?",
-    "Địa chỉ email của em là gì và sử dụng như thế nào?",
-    "Tài khoản các dịch vụ CNTT của sinh viên bao gồm những tài khoản nào?",
-    "Em muốn thay đổi mật khẩu các dịch vụ CNTT thì làm như thế nào?",
-    "Sử dụng Microsoft Teams như thế nào?",
-    "Đăng nhập vào trang Elearning như thế nào?",
-    "Làm thế nào để tìm được lớp học trên Elearning?",
-    "Em không ghi danh được vào lớp học trên trang E-learning thì phải làm sao?",
-];
+const posts = ref([]);
+async function getBlogsHasVideo() {
+    const response = await guestRequest.get(`/posts?PageNumber=1&PageSize=3&HasVideo=true`);
+    posts.value = response.data?.data.map((post) => ({
+        title: post.title,
+        excerpt: post.excerpt,
+        video: store.parseMetadataVideo(post.metadata),
+        slug: post.slug,
+    }));
+}
+getBlogsHasVideo();
 
-const notifications = [
-    "Nâng cấp hệ thống Wifi và dịch vụ CNTT",
-    "Lịch thi (lần 1) học kỳ 1 năm học 2024- 2025",
-    "Lịch thi xếp lớp tiếng Anh K28",
-];
+const news = ref([]);
+async function getBlogsAsNews() {
+    const response = await guestRequest.get(`/posts?PageNumber=1&PageSize=5`);
+    news.value = response.data?.data.map((post) => ({
+        title: post.title,
+        slug: post.slug,
+    }));
+}
+getBlogsAsNews();
 </script>
 
-<style lang="css" scoped>
-
-.hover_underline:hover{
-    text-decoration: underline;
+<style lang="css">
+.background_gradient_pink {
+    background: linear-gradient(to right, #ffebe9, #ffffff);
 }
-
+/* màn hình nhỏ */
+@media (max-width: 576px) {
+    #hero {
+        grid-template-rows: 800px 1fr;
+    }
+    #wrapThreeRepresentItems {
+        height: 100%;
+    }
+    #heroOverlay {
+        background: none !important;
+    }
+    #threeRepresentItems {
+        bottom: 15px;
+    }
+    .heroLandscape {
+        background-size: contain;
+        background-position: top;
+        /* background-image: url("@/../assets/media/brand/cropped_landscape.png"); */
+    }
+    #wrapQuestionAndNotification {
+        display: flex !important;
+        flex-direction: column-reverse;
+    }
+    #wrapVideo {
+        display: flex !important;
+        flex-direction: column;
+    }
+}
+/* màn hình lớn */
+@media (min-width: 576px) {
+    #hero {
+        grid-template-rows: 550px 1fr;
+    }
+    #threeRepresentItems {
+        bottom: 15px;
+    }
+    #wrapThreeRepresentItems {
+        height: 120px;
+    }
+    .heroLandscape {
+        background-size: cover;
+        background-position: center;
+        height: 100%;
+        /* background-image: url("@/../assets/media/brand/vlu_landscape-compressed.jpg"); */
+    }
+    #search {
+        transform: translateY(-50%);
+    }
+}
+/* Tablet */
+@media (min-width: 767px) and (max-width: 885px) {
+    #wrapQuestionAndNotification {
+        display: flex !important;
+        flex-direction: column-reverse;
+    }
+}
 </style>

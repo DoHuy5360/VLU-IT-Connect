@@ -6,5 +6,7 @@
   "[vue]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "files.autoSave": "afterDelay",
+  "CodeGPT.apiKey": "CodeGPT Plus Beta"
 }
